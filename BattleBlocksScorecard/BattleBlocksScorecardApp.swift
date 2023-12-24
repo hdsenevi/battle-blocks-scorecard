@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct BattleBlocksScorecardApp: App {
@@ -13,5 +14,6 @@ struct BattleBlocksScorecardApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: Game.self)
     }
 }

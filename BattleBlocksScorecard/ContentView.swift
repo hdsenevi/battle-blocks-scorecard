@@ -6,16 +6,37 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
+    @Environment(\.modelContext) var modelContext
+    
+    @Query var games: [Game]
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack {
+            List {
+                ForEach(games) { game in
+                    Text(game.name)
+                }
+                .onDelete(perform: deleteGame)
+            }
+            .toolbar {
+                Button("Add game", systemImage: "plus", action: addGame)
+            }
         }
-        .padding()
+    }
+    
+    func addGame() {
+        let game = Game(name: "New game")
+        modelContext.insert(game)
+    }
+    
+    func deleteGame(_ indexSet: IndexSet) {
+        for index in indexSet {
+            let gameToDelete = games[index]
+            modelContext.delete(gameToDelete)
+        }
     }
 }
 
