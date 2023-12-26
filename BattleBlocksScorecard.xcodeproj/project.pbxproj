@@ -13,9 +13,10 @@
 		6010D1092B3650E70026E285 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6010D1082B3650E70026E285 /* Preview Assets.xcassets */; };
 		6010D1112B3797F30026E285 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6010D1102B3797F30026E285 /* Game.swift */; };
 		6010D1132B3797F80026E285 /* Round.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6010D1122B3797F80026E285 /* Round.swift */; };
-		6010D1152B3797FF0026E285 /* Participent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6010D1142B3797FF0026E285 /* Participent.swift */; };
+		6010D1152B3797FF0026E285 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6010D1142B3797FF0026E285 /* Player.swift */; };
 		60C327C72B3863BF009352C8 /* GameDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C327C62B3863BF009352C8 /* GameDetailsView.swift */; };
 		60C327CA2B3A6BE2009352C8 /* RoundDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C327C92B3A6BE2009352C8 /* RoundDetailsView.swift */; };
+		60C327CC2B3A83F2009352C8 /* AddPlayersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C327CB2B3A83F2009352C8 /* AddPlayersView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,9 +27,10 @@
 		6010D1082B3650E70026E285 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		6010D1102B3797F30026E285 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		6010D1122B3797F80026E285 /* Round.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Round.swift; sourceTree = "<group>"; };
-		6010D1142B3797FF0026E285 /* Participent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Participent.swift; sourceTree = "<group>"; };
+		6010D1142B3797FF0026E285 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		60C327C62B3863BF009352C8 /* GameDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDetailsView.swift; sourceTree = "<group>"; };
 		60C327C92B3A6BE2009352C8 /* RoundDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundDetailsView.swift; sourceTree = "<group>"; };
+		60C327CB2B3A83F2009352C8 /* AddPlayersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlayersView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,7 +86,7 @@
 			children = (
 				6010D1102B3797F30026E285 /* Game.swift */,
 				6010D1122B3797F80026E285 /* Round.swift */,
-				6010D1142B3797FF0026E285 /* Participent.swift */,
+				6010D1142B3797FF0026E285 /* Player.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -95,6 +97,7 @@
 				6010D1032B3650E60026E285 /* ContentView.swift */,
 				60C327C62B3863BF009352C8 /* GameDetailsView.swift */,
 				60C327C92B3A6BE2009352C8 /* RoundDetailsView.swift */,
+				60C327CB2B3A83F2009352C8 /* AddPlayersView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -179,10 +182,11 @@
 				60C327CA2B3A6BE2009352C8 /* RoundDetailsView.swift in Sources */,
 				6010D1042B3650E60026E285 /* ContentView.swift in Sources */,
 				60C327C72B3863BF009352C8 /* GameDetailsView.swift in Sources */,
+				60C327CC2B3A83F2009352C8 /* AddPlayersView.swift in Sources */,
 				6010D1112B3797F30026E285 /* Game.swift in Sources */,
 				6010D1132B3797F80026E285 /* Round.swift in Sources */,
 				6010D1022B3650E60026E285 /* BattleBlocksScorecardApp.swift in Sources */,
-				6010D1152B3797FF0026E285 /* Participent.swift in Sources */,
+				6010D1152B3797FF0026E285 /* Player.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

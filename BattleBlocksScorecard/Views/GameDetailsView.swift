@@ -12,8 +12,8 @@ struct GameDetailsView: View {
     @Environment(\.modelContext) var modelContext
     
     @Bindable var game: Game
+    @State private var showAddPlayersView = false
     
-//    @State private var path = [Round]()
     init(game: Game) {
         self.game = game
     }
@@ -37,10 +37,15 @@ struct GameDetailsView: View {
             })
             .toolbar {
                 Button("Add game", systemImage: "plus", action: addRound)
+                Button("Add player", systemImage: "person.badge.plus", action: addPlayers)
             }
-            Button("Start Game") {
-                // Start game action
+            .sheet(isPresented: $showAddPlayersView, onDismiss: addPlayersDismiss) {
+                NavigationView {
+                    AddPlayersView(players: $game.players)
+                }
             }
+            
+            Button("Start Game",action: startGame)
         }
     }
     
@@ -51,10 +56,32 @@ struct GameDetailsView: View {
         }
     }
     
+    func addPlayers() {
+        showAddPlayersView.toggle()
+    }
+    
+    func addPlayersDismiss() {
+        
+    }
+    
+    func startGame() {
+        guard game.players.count != 0 else {
+            addPlayers()
+            return
+        }
+    }
+    
     func deleteRound(_ indexSet: IndexSet) {
         for index in indexSet {
             let roundToDelete = game.rounds[index]
-//            modelContext.delete(roundToDelete)
+            modelContext.delete(roundToDelete)
+            
+            //TODO: check if we need this or not
+            do {
+                try modelContext.save()
+            } catch {
+                print("Error while trying to delete round \(error.localizedDescription)")
+            }
         }
     }
 }
