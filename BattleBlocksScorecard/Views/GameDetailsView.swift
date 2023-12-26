@@ -22,7 +22,11 @@ struct GameDetailsView: View {
         VStack {
             List {
                 ForEach(game.rounds) { round in
-                    Text("Round \(round.name)")
+                    NavigationLink {
+                        RoundDetailsView()
+                    } label: {
+                        Text("Round \(round.roundNumber)")
+                    }
                 }
                 .onDelete(perform: deleteRound)
             }
