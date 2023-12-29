@@ -10,10 +10,12 @@ import SwiftData
 
 @Model
 class Round {
+    var name: String
     var roundNumber: Int
     var score: Int
     
-    init(roundNumber: Int, score: Int) {
+    init(name: String = "", roundNumber: Int, score: Int) {
+        self.name = name
         self.roundNumber = roundNumber
         self.score = score
     }

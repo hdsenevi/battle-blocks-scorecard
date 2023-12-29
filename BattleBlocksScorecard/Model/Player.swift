@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-class Participent {
+class Player {
     var name: String
     
     init(name: String) {
