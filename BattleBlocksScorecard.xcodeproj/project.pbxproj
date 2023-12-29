@@ -17,6 +17,7 @@
 		60C327C72B3863BF009352C8 /* GameDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C327C62B3863BF009352C8 /* GameDetailsView.swift */; };
 		60C327CA2B3A6BE2009352C8 /* RoundDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C327C92B3A6BE2009352C8 /* RoundDetailsView.swift */; };
 		60C327CC2B3A83F2009352C8 /* AddPlayersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C327CB2B3A83F2009352C8 /* AddPlayersView.swift */; };
+		60C327D02B3D3E26009352C8 /* PlayerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C327CF2B3D3E26009352C8 /* PlayerListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 		60C327C62B3863BF009352C8 /* GameDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDetailsView.swift; sourceTree = "<group>"; };
 		60C327C92B3A6BE2009352C8 /* RoundDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundDetailsView.swift; sourceTree = "<group>"; };
 		60C327CB2B3A83F2009352C8 /* AddPlayersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlayersView.swift; sourceTree = "<group>"; };
+		60C327CF2B3D3E26009352C8 /* PlayerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 				6010D1032B3650E60026E285 /* ContentView.swift */,
 				60C327C62B3863BF009352C8 /* GameDetailsView.swift */,
 				60C327C92B3A6BE2009352C8 /* RoundDetailsView.swift */,
+				60C327CF2B3D3E26009352C8 /* PlayerListView.swift */,
 				60C327CB2B3A83F2009352C8 /* AddPlayersView.swift */,
 			);
 			path = Views;
@@ -183,6 +186,7 @@
 				6010D1042B3650E60026E285 /* ContentView.swift in Sources */,
 				60C327C72B3863BF009352C8 /* GameDetailsView.swift in Sources */,
 				60C327CC2B3A83F2009352C8 /* AddPlayersView.swift in Sources */,
+				60C327D02B3D3E26009352C8 /* PlayerListView.swift in Sources */,
 				6010D1112B3797F30026E285 /* Game.swift in Sources */,
 				6010D1132B3797F80026E285 /* Round.swift in Sources */,
 				6010D1022B3650E60026E285 /* BattleBlocksScorecardApp.swift in Sources */,

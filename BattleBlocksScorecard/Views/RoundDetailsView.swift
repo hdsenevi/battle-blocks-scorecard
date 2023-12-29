@@ -9,7 +9,13 @@ import SwiftUI
 
 struct RoundDetailsView: View {
     var body: some View {
-        Text("Round details view")
+        VStack {
+            Text("Round details view")
+            Spacer()
+            Button("Start Round") {
+                
+            }
+        }
     }
 }
 

@@ -10,8 +10,7 @@ import SwiftData
 
 struct AddPlayersView: View {
     @Environment(\.dismiss) var dismiss
-    
-    @Binding var players: [Player]
+    @Environment(\.modelContext) var modelContext
     
     @State private var name = ""
     @FocusState private var focused: Bool
@@ -25,46 +24,39 @@ struct AddPlayersView: View {
                         .submitLabel(.return)
                 }
                 .onSubmit {
-                    addNewPlayerOnSubmit()
-                }
-    
-                Section("Select existing player(s)") {
-                    List {
-                        ForEach(players) { player in
-                            Text(player.name)
-                        }
-                    }
+                    addNewPlayer()
                 }
             }
         }
-        .navigationTitle("Add Players to game")
+        .navigationTitle("Add a new player")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Done", action: doneAction)
+                Button("Add", action: addNewPlayer)
+                    .disabled(name.count == 0)
             }
         }
     }
     
-    func doneAction() {
+    func addNewPlayer() {
         focused = false
-//        dismiss()
-    }
-    
-    func addNewPlayerOnSubmit() {
         
+        let player = Player(name: name)
+        name = ""
+        modelContext.insert(player)
+        do {
+            print("About to save player \(player.name)")
+            try modelContext.save()
+        } catch {
+            print("Error while saving player \(error.localizedDescription)")
+        }
+        
+        dismiss()
     }
 }
 
 #Preview {
-    do {
-        let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        let container = try ModelContainer(for: Game.self, configurations: config)
-        return NavigationView {
-            AddPlayersView(players: .constant([Player(name: "Shana"), Player(name: "Diya")]))
-        }
-        .modelContainer(container)
-    } catch {
-        fatalError("Failed to create model container.")
+    NavigationView {
+        AddPlayersView()
     }
 }

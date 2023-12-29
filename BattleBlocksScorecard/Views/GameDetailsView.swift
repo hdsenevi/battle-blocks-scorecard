@@ -20,6 +20,7 @@ struct GameDetailsView: View {
     
     var body: some View {
         VStack {
+            Text("Selected players \(game.players.count)")
             List {
                 ForEach(game.rounds) { round in
                     NavigationLink {
@@ -41,7 +42,7 @@ struct GameDetailsView: View {
             }
             .sheet(isPresented: $showAddPlayersView, onDismiss: addPlayersDismiss) {
                 NavigationView {
-                    AddPlayersView(players: $game.players)
+                    PlayerListView(game: game)
                 }
             }
             
@@ -86,17 +87,27 @@ struct GameDetailsView: View {
     }
 }
 
-//#Preview {
-//    do {
-//        let config = ModelConfiguration(isStoredInMemoryOnly: true)
-//        let container = try ModelContainer(for: Game.self, configurations: config)
-//        let example = Game(
-//            name: "Sha's place",
-//            startTime: .now
-//        )
-//        return GameDetailsView(game: example)
-//            .modelContainer(container)
-//    } catch {
-//        fatalError("Failed to create model container.")
-//    }
-//}
+#Preview {
+    do {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: Game.self, configurations: config)
+
+        let round1 = Round(roundNumber: 1, score: 0)
+        container.mainContext.insert(round1)
+        
+        let player1 = Player(name: "Shana")
+        container.mainContext.insert(player1)
+        
+        let exampleGame = Game(
+            name: "Sha's place",
+            startTime: .now
+        )
+        exampleGame.rounds = [round1]
+        exampleGame.players = [player1]
+        
+        return GameDetailsView(game: exampleGame)
+            .modelContainer(container)
+    } catch {
+        fatalError("Failed to create model container.")
+    }
+}
