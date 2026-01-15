@@ -5,7 +5,6 @@
 
 import { StyleSheet, View, TouchableOpacity, Platform } from "react-native";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import type { Player } from "@/database/types";
 
 interface PlayerCardProps {

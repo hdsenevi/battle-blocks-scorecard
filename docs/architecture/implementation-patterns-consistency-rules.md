@@ -30,52 +30,53 @@
 
 **Project Organization:**
 - **Tests**: `__tests__` folder at same level as component/file
-  - Example: `components/game/PlayerCard.tsx` → `components/game/__tests__/PlayerCard.test.tsx`
-  - Example: `services/gameRules.ts` → `services/__tests__/gameRules.test.ts`
+  - Example: `src/components/game/PlayerCard.tsx` → `src/components/game/__tests__/PlayerCard.test.tsx`
+  - Example: `src/services/gameRules.ts` → `src/services/__tests__/gameRules.test.ts`
 - **Types**: Co-located with files (TypeScript convention)
   - Example: `types` defined in same file or `types.ts` in same directory
 - **Components**: Hybrid approach (ui/ + feature-based)
-  - `components/ui/` for reusable UI components
-  - `components/game/` for game-specific components
-  - `screens/` for screen-level components
-- **Services**: `services/` directory for business logic
-- **Contexts**: `contexts/` directory for React Context providers
-- **Hooks**: `hooks/` directory for custom React hooks
-- **Utils**: `utils/` directory for utility functions
+  - `src/components/ui/` for reusable UI components
+  - `src/components/game/` for game-specific components
+  - `app/` for screen-level components (Expo Router)
+- **Services**: `src/services/` directory for business logic
+- **Contexts**: `src/contexts/` directory for React Context providers
+- **Hooks**: `src/hooks/` directory for custom React hooks
+- **Utils**: `src/utils/` directory for utility functions
 
 **File Structure Patterns:**
 ```
-app/                    # Expo Router screens
-components/
-  ui/                   # Reusable UI components
-    Button.tsx
-    Card.tsx
+app/                    # Expo Router screens (must be at root)
+src/
+  components/
+    ui/                 # Reusable UI components
+      Button.tsx
+      Card.tsx
+      __tests__/
+        Button.test.tsx
+        Card.test.tsx
+    game/               # Game-specific components
+      PlayerCard.tsx
+      ScoreEntry.tsx
+      __tests__/
+        PlayerCard.test.tsx
+        ScoreEntry.test.tsx
+  contexts/             # React Context providers
+    GameContext.tsx
     __tests__/
-      Button.test.tsx
-      Card.test.tsx
-  game/                 # Game-specific components
-    PlayerCard.tsx
-    ScoreEntry.tsx
+      GameContext.test.tsx
+  services/             # Business logic services
+    database.ts
+    gameRules.ts
+    haptics.ts
     __tests__/
-      PlayerCard.test.tsx
-      ScoreEntry.test.tsx
-screens/                # Screen components (if needed)
-contexts/               # React Context providers
-  GameContext.tsx
-  __tests__/
-    GameContext.test.tsx
-services/               # Business logic services
-  database.ts
-  gameRules.ts
-  haptics.ts
-  __tests__/
-    database.test.ts
-    gameRules.test.ts
-    haptics.test.ts
-hooks/                  # Custom React hooks
-utils/                  # Utility functions
-types/                  # Shared TypeScript types (if needed)
-constants/              # App constants
+      database.test.ts
+      gameRules.test.ts
+      haptics.test.ts
+  hooks/                # Custom React hooks
+  utils/                 # Utility functions
+  database/              # Database schema and types
+  constants/             # App constants
+  reducers/              # State reducers
 ```
 
 ## Format Patterns
@@ -180,8 +181,8 @@ case 'ADD_SCORE':
 
 **Test Location:**
 ```
-components/game/PlayerCard.tsx
-components/game/__tests__/PlayerCard.test.tsx  ✅ Correct
+src/components/game/PlayerCard.tsx
+src/components/game/__tests__/PlayerCard.test.tsx  ✅ Correct
 ```
 
 **Service Function:**
@@ -210,8 +211,8 @@ case 'ADD_SCORE':
 
 **Test Location:**
 ```
-components/game/PlayerCard.tsx
-components/game/PlayerCard.test.tsx  ❌ Wrong (should be in __tests__)
+src/components/game/PlayerCard.tsx
+src/components/game/PlayerCard.test.tsx  ❌ Wrong (should be in __tests__)
 ```
 
 **Service Function:**

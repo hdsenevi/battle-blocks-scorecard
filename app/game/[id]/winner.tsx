@@ -8,10 +8,9 @@ import { StyleSheet, View, ScrollView, TouchableOpacity, Platform } from "react-
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useGameState } from "@/contexts/GameContext";
+import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import { getGame, getPlayersByGame } from "@/services/database";
 import { resumeGameAction } from "@/reducers/actionCreators";
-import { useGameDispatch } from "@/contexts/GameContext";
 import { triggerCompletion } from "@/services/haptics";
 
 export default function WinnerScreen() {

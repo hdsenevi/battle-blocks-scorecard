@@ -16,29 +16,17 @@ import {
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import type { Player } from "@/database/types";
-import {
-  calculateScore,
-  checkPenaltyRule,
-  checkElimination,
-  checkWinCondition,
-} from "@/services/gameRules";
-import {
-  addScoreEntry,
-  updatePlayer,
-  updateGame,
-} from "@/services/database";
+import { calculateScore } from "@/services/gameRules";
+import { addScoreEntry, updatePlayer, updateGame } from "@/services/database";
 import {
   addScoreAction,
   updatePlayerAction,
-  applyPenaltyAction,
-  eliminatePlayerAction,
   completeGameAction,
 } from "@/reducers/actionCreators";
 import { useGameDispatch } from "@/contexts/GameContext";
 import {
   triggerScoreEntry,
   triggerError,
-  triggerPenalty,
   triggerCompletion,
 } from "@/services/haptics";
 
@@ -46,6 +34,7 @@ interface ScoreEntryModalProps {
   visible: boolean;
   player: Player | null;
   gameId: number;
+  gameStatus?: string;
   onClose: () => void;
 }
 
@@ -53,30 +42,130 @@ export function ScoreEntryModal({
   visible,
   player,
   gameId,
+  gameStatus = "active",
   onClose,
 }: ScoreEntryModalProps) {
   const dispatch = useGameDispatch();
   const [entryMode, setEntryMode] = useState<"single" | "multiple">("single");
   const [blockValue, setBlockValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
 
   if (!player) {
     return null;
   }
 
+  // Story 5.3: Prevent score entries after completion
+  if (gameStatus === "completed") {
+    return (
+      <Modal
+        visible={visible}
+        animationType="slide"
+        transparent
+        onRequestClose={onClose}
+        accessibilityViewIsModal
+      >
+        <View style={styles.overlay}>
+          <ThemedView style={styles.modal}>
+            <ThemedText type="title" style={styles.title}>
+              Game Completed
+            </ThemedText>
+            <ThemedText style={styles.instruction}>
+              This game has been completed. No further score entries are allowed.
+            </ThemedText>
+            <TouchableOpacity
+              style={[styles.button, styles.submitButton]}
+              onPress={onClose}
+              accessibilityLabel="Close"
+              accessibilityRole="button"
+            >
+              <ThemedText style={styles.submitButtonText}>Close</ThemedText>
+            </TouchableOpacity>
+          </ThemedView>
+        </View>
+      </Modal>
+    );
+  }
+
+  // Story 4.2: Prevent score entry for eliminated players
+  if (player.is_eliminated) {
+    return (
+      <Modal
+        visible={visible}
+        animationType="slide"
+        transparent
+        onRequestClose={onClose}
+        accessibilityViewIsModal
+      >
+        <View style={styles.overlay}>
+          <ThemedView style={styles.modal}>
+            <ThemedText type="title" style={styles.title}>
+              Player Eliminated
+            </ThemedText>
+            <ThemedText style={styles.instruction}>
+              {player.name} has been eliminated and cannot receive further scores.
+            </ThemedText>
+            <TouchableOpacity
+              style={[styles.button, styles.submitButton]}
+              onPress={onClose}
+              accessibilityLabel="Close"
+              accessibilityRole="button"
+            >
+              <ThemedText style={styles.submitButtonText}>Close</ThemedText>
+            </TouchableOpacity>
+          </ThemedView>
+        </View>
+      </Modal>
+    );
+  }
+
   const handleSubmit = async () => {
+    // Story 6.2: Prevent rapid duplicate score entries
+    const now = Date.now();
+    if (now - lastSubmitTime < 500) {
+      Alert.alert("Please wait", "Please wait a moment before submitting again");
+      triggerError();
+      return;
+    }
+
+    // Story 6.1 & 6.3: Handle invalid score entries and edge cases
     if (!blockValue.trim()) {
       Alert.alert("Error", "Please enter a block value");
       triggerError();
       return;
     }
 
-    const value = parseInt(blockValue.trim(), 10);
-    if (isNaN(value) || value < 0) {
-      Alert.alert("Error", "Please enter a valid number (0 or greater)");
+    const trimmedValue = blockValue.trim();
+
+    // Check for non-numeric input
+    if (!/^\d+$/.test(trimmedValue)) {
+      Alert.alert("Invalid Input", "Please enter a valid number");
       triggerError();
       return;
     }
+
+    const value = parseInt(trimmedValue, 10);
+
+    // Validate value
+    if (isNaN(value) || value < 0) {
+      Alert.alert("Invalid Input", "Please enter a valid number (0 or greater)");
+      triggerError();
+      return;
+    }
+
+    // Story 6.3: Handle very large numbers
+    const MAX_REASONABLE_VALUE = 1000;
+    if (value > MAX_REASONABLE_VALUE) {
+      Alert.alert(
+        "Value Too Large",
+        `Please enter a value less than ${MAX_REASONABLE_VALUE}`
+      );
+      triggerError();
+      return;
+    }
+
+    setLastSubmitTime(now);
+    setIsSubmitting(true);
 
     // Handle zero as a miss (consecutive miss tracking - Story 3.7)
     if (value === 0) {
@@ -106,12 +195,11 @@ export function ScoreEntryModal({
         setBlockValue("");
 
         // Story 4.2: Check for elimination (3 consecutive misses)
-        if (checkElimination(newConsecutiveMisses)) {
+        if (newConsecutiveMisses >= 3) {
           // Mark player as eliminated
           const eliminatedPlayer = await updatePlayer(player.id, {
             is_eliminated: true,
           });
-          dispatch(eliminatePlayerAction(player.id));
           dispatch(updatePlayerAction(eliminatedPlayer));
           triggerError(); // Use error haptic for elimination
           Alert.alert(
@@ -124,7 +212,7 @@ export function ScoreEntryModal({
             `${player.name} has ${newConsecutiveMisses} consecutive miss${newConsecutiveMisses > 1 ? "es" : ""}.`
           );
         }
-      } catch (error) {
+      } catch {
         Alert.alert("Error", "Failed to record miss. Please try again.");
         triggerError();
       } finally {
@@ -132,8 +220,6 @@ export function ScoreEntryModal({
       }
       return;
     }
-
-    setIsSubmitting(true);
 
     try {
       // Calculate score using game rules
@@ -144,10 +230,9 @@ export function ScoreEntryModal({
       let newScore = player.current_score + score;
 
       // Story 4.1: Check for 50+ penalty rule
-      if (checkPenaltyRule(newScore)) {
+      if (newScore > 50) {
         // Reset to 25
         newScore = 25;
-        triggerPenalty();
         Alert.alert(
           "Penalty Applied",
           `${player.name}'s score exceeded 50 and has been reset to 25.`
@@ -155,7 +240,7 @@ export function ScoreEntryModal({
       }
 
       // Story 4.3: Check for win condition (exactly 50)
-      const isWin = checkWinCondition(newScore);
+      const isWin = newScore === 50;
 
       // Update player score in database
       const updatedPlayer = await updatePlayer(player.id, {
@@ -172,11 +257,7 @@ export function ScoreEntryModal({
       });
 
       // Update context
-      if (checkPenaltyRule(player.current_score + score)) {
-        dispatch(applyPenaltyAction(player.id, newScore - (player.current_score + score)));
-      } else {
-        dispatch(addScoreAction(player.id, score));
-      }
+      dispatch(addScoreAction(player.id, score));
       dispatch(updatePlayerAction(updatedPlayer));
 
       // Story 4.3: Handle win condition
@@ -188,17 +269,12 @@ export function ScoreEntryModal({
         onClose();
         setBlockValue("");
         setIsSubmitting(false);
-        // Navigate to winner screen - will be handled by parent component
-        // For now, show alert and let parent handle navigation
         Alert.alert(
           "Game Over!",
           `${player.name} wins with exactly 50 points!`,
           [
             {
-              text: "View Results",
-              onPress: () => {
-                // Navigation handled by checking game status in parent
-              },
+              text: "OK",
             },
           ]
         );
@@ -211,7 +287,7 @@ export function ScoreEntryModal({
       // Close modal
       onClose();
       setBlockValue("");
-    } catch (error) {
+    } catch {
       Alert.alert("Error", "Failed to record score. Please try again.");
       triggerError();
     } finally {
@@ -311,7 +387,11 @@ export function ScoreEntryModal({
               <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+              style={[
+                styles.button,
+                styles.submitButton,
+                isSubmitting && styles.submitButtonDisabled,
+              ]}
               onPress={handleSubmit}
               disabled={isSubmitting}
               accessibilityLabel="Submit score"

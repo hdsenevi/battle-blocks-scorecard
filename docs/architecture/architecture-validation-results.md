@@ -31,14 +31,14 @@ Project structure fully supports all architectural decisions:
 **Functional Requirements Coverage:**
 All 58 functional requirements are architecturally supported:
 
-- **Game Management (FR1-FR7)**: ✅ Covered by `services/database.ts`, `contexts/GameContext.tsx`, `app/(tabs)/index.tsx`
-- **Score Tracking (FR8-FR15)**: ✅ Covered by `services/gameRules.ts`, `components/game/ScoreEntry.tsx`, `contexts/GameContext.tsx`
-- **Rule Enforcement (FR16-FR23)**: ✅ Covered by `services/gameRules.ts`, `services/haptics.ts`, `components/game/RuleIndicator.tsx`
-- **Data Persistence (FR24-FR30)**: ✅ Covered by `services/database.ts` (SQLite), `contexts/GameContext.tsx` (auto-save)
-- **User Interface & Feedback (FR31-FR40)**: ✅ Covered by `components/game/`, `services/haptics.ts`, `app/game/[id]/index.tsx`
-- **Game Completion (FR41-FR46)**: ✅ Covered by `services/gameRules.ts`, `components/game/WinnerScreen.tsx`
+- **Game Management (FR1-FR7)**: ✅ Covered by `src/services/database.ts`, `src/contexts/GameContext.tsx`, `app/(tabs)/index.tsx`
+- **Score Tracking (FR8-FR15)**: ✅ Covered by `src/services/gameRules.ts`, `src/components/game/ScoreEntry.tsx`, `src/contexts/GameContext.tsx`
+- **Rule Enforcement (FR16-FR23)**: ✅ Covered by `src/services/gameRules.ts`, `src/services/haptics.ts`, `src/components/game/RuleIndicator.tsx`
+- **Data Persistence (FR24-FR30)**: ✅ Covered by `src/services/database.ts` (SQLite), `src/contexts/GameContext.tsx` (auto-save)
+- **User Interface & Feedback (FR31-FR40)**: ✅ Covered by `src/components/game/`, `src/services/haptics.ts`, `app/game/[id]/index.tsx`
+- **Game Completion (FR41-FR46)**: ✅ Covered by `src/services/gameRules.ts`, `src/components/game/WinnerScreen.tsx`
 - **Platform & Store (FR47-FR53)**: ✅ Covered by React Native/Expo cross-platform architecture
-- **Error Handling (FR54-FR58)**: ✅ Covered by `utils/validation.ts`, error boundaries, database error handling
+- **Error Handling (FR54-FR58)**: ✅ Covered by `src/utils/validation.ts`, error boundaries, database error handling
 
 **Non-Functional Requirements Coverage:**
 All 47 non-functional requirements are architecturally addressed:
@@ -146,10 +146,10 @@ No critical or important issues found. Architecture is coherent, complete, and r
 
 **First Implementation Priority:**
 
-1. **Database Schema**: Create `database/schema.sql` with `games`, `players`, `score_entries` tables
-2. **Database Service**: Implement `services/database.ts` with SQLite operations
-3. **Game Rules Service**: Implement `services/gameRules.ts` with pure functions (critical for 100% accuracy)
-4. **Game Context**: Implement `contexts/GameContext.tsx` with state management
-5. **Haptic Service**: Implement `services/haptics.ts` wrapper
-6. **Core Components**: Implement `components/game/PlayerCard.tsx`, `components/game/ScoreEntry.tsx`
+1. **Database Schema**: Create `src/database/schema.sql` with `games`, `players`, `score_entries` tables
+2. **Database Service**: Implement `src/services/database.ts` with SQLite operations
+3. **Game Rules Service**: Implement `src/services/gameRules.ts` with pure functions (critical for 100% accuracy)
+4. **Game Context**: Implement `src/contexts/GameContext.tsx` with state management
+5. **Haptic Service**: Implement `src/services/haptics.ts` wrapper
+6. **Core Components**: Implement `src/components/game/PlayerCard.tsx`, `src/components/game/ScoreEntry.tsx`
 7. **Main Game Screen**: Implement `app/game/[id]/index.tsx`

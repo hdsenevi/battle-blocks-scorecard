@@ -3,18 +3,23 @@
  * Displays all players and their current scores
  */
 
-import { useEffect } from "react";
-import { StyleSheet, View, ScrollView, Platform } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Platform,
+  TouchableOpacity,
+} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useGameState } from "@/contexts/GameContext";
+import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import { getGame, getPlayersByGame } from "@/services/database";
 import { resumeGameAction } from "@/reducers/actionCreators";
-import { useGameDispatch } from "@/contexts/GameContext";
 import { PlayerCard } from "@/components/game/PlayerCard";
 import { ScoreEntryModal } from "@/components/game/ScoreEntryModal";
-import { useState } from "react";
+import { ScoreHistory } from "@/components/game/ScoreHistory";
 import type { Player } from "@/database/types";
 
 export default function GameScreen() {
@@ -24,6 +29,7 @@ export default function GameScreen() {
   const dispatch = useGameDispatch();
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isScoreModalVisible, setIsScoreModalVisible] = useState(false);
+  const [isHistoryVisible, setIsHistoryVisible] = useState(false);
 
   useEffect(() => {
     const loadGame = async () => {
@@ -95,12 +101,22 @@ export default function GameScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
-        <ThemedText type="title" style={styles.title}>
-          Game #{currentGame.id}
-        </ThemedText>
-        <ThemedText style={styles.status}>
-          Status: {currentGame.status}
-        </ThemedText>
+        <View>
+          <ThemedText type="title" style={styles.title}>
+            Game #{currentGame.id}
+          </ThemedText>
+          <ThemedText style={styles.status}>
+            Status: {currentGame.status}
+          </ThemedText>
+        </View>
+        <TouchableOpacity
+          style={styles.historyButton}
+          onPress={() => setIsHistoryVisible(true)}
+          accessibilityLabel="View score history"
+          accessibilityRole="button"
+        >
+          <ThemedText style={styles.historyButtonText}>History</ThemedText>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
@@ -114,7 +130,9 @@ export default function GameScreen() {
               isLeader={leader?.id === player.id}
               gameId={currentGame.id}
               onPress={() => {
-                if (!player.is_eliminated && currentGame.status === "active") {
+                // Story 5.3: Prevent score entry for completed games
+                // Story 4.2: Prevent score entry for eliminated players
+                if (currentGame.status === "active" && !player.is_eliminated) {
                   setSelectedPlayer(player);
                   setIsScoreModalVisible(true);
                 }
@@ -128,10 +146,17 @@ export default function GameScreen() {
         visible={isScoreModalVisible}
         player={selectedPlayer}
         gameId={currentGame.id}
+        gameStatus={currentGame.status}
         onClose={() => {
           setIsScoreModalVisible(false);
           setSelectedPlayer(null);
         }}
+      />
+
+      <ScoreHistory
+        visible={isHistoryVisible}
+        gameId={currentGame.id}
+        onClose={() => setIsHistoryVisible(false)}
       />
     </ThemedView>
   );
@@ -142,9 +167,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
+  },
+  historyButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: "#F0F0F0",
+    minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
+    justifyContent: "center",
+  },
+  historyButtonText: {
+    color: "#007AFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
   title: {
     fontSize: 24,

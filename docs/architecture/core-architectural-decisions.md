@@ -35,7 +35,7 @@
 
 **Implementation Approach:**
 - Database schema: `games`, `players`, `score_entries` tables
-- Database service layer: `services/database.ts` for all SQLite operations
+- Database service layer: `src/services/database.ts` for all SQLite operations
 - Automatic migrations for schema changes
 - Transaction support for data integrity
 - Error handling and recovery mechanisms
@@ -60,8 +60,8 @@
 - Can migrate to Zustand later if state becomes more complex
 
 **Implementation Approach:**
-- Game context: `contexts/GameContext.tsx` with game state
-- Reducer: `reducers/gameReducer.ts` for state updates
+- Game context: `src/contexts/GameContext.tsx` with game state
+- Reducer: `src/reducers/gameReducer.ts` for state updates
 - Actions: Type-safe action creators for state mutations
 - Provider: Wrap app with GameProvider for state access
 
@@ -90,7 +90,7 @@
 
 **Structure:**
 ```
-components/
+src/components/
   ui/              # Reusable UI components
     Button.tsx
     Card.tsx
@@ -100,10 +100,10 @@ components/
     ScoreEntry.tsx
     RuleIndicator.tsx
     GameStatus.tsx
-screens/           # Screen-level components
-  GameScreen.tsx
-  WinnerScreen.tsx
-  HomeScreen.tsx
+app/               # Screen-level components (Expo Router)
+  game/[id]/index.tsx
+  game/[id]/winner.tsx
+  (tabs)/index.tsx
 ```
 
 **Affects:**
@@ -124,7 +124,7 @@ screens/           # Screen-level components
 - Simple for solo developer
 
 **Implementation Approach:**
-- Service file: `services/gameRules.ts`
+- Service file: `src/services/gameRules.ts`
 - Functions: `checkPenaltyRule()`, `checkElimination()`, `checkWinCondition()`, `calculateScore()`
 - Pure functions: Input game state, return rule results
 - Type-safe with TypeScript interfaces
@@ -155,7 +155,7 @@ screens/           # Screen-level components
 - Better organization than scattered API calls
 
 **Implementation Approach:**
-- Service file: `services/haptics.ts`
+- Service file: `src/services/haptics.ts`
 - Functions: `triggerScoreEntry()`, `triggerPenalty()`, `triggerCompletion()`, `triggerError()`
 - Haptic types: Light impact (score entry), Medium impact (penalty), Success pattern (completion), Error (invalid actions)
 - < 50ms trigger time requirement

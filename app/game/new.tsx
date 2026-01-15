@@ -25,7 +25,7 @@ export default function NewGameScreen() {
   const dispatch = useGameDispatch();
   const [playerName, setPlayerName] = useState("");
   const [players, setPlayers] = useState<
-    Array<{ id: number; name: string }>
+    { id: number; name: string }[]
   >([]);
   const [isCreating, setIsCreating] = useState(false);
 
