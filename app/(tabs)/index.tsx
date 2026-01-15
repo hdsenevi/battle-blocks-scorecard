@@ -1,98 +1,166 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+/**
+ * Home Screen
+ * Main entry point for the app
+ */
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { StyleSheet, View, TouchableOpacity, Platform } from "react-native";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useRouter } from "expo-router";
+import { useGameState, useGameDispatch } from "@/contexts/GameContext";
+import { useEffect, useState } from "react";
+import { listActiveGames, getGame, getPlayersByGame } from "@/services/database";
+import { resumeGameAction } from "@/reducers/actionCreators";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
+  const gameState = useGameState();
+  const dispatch = useGameDispatch();
+  const [isChecking, setIsChecking] = useState(true);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
+  // Story 2.4: Resume interrupted game on app start
+  useEffect(() => {
+    const checkForActiveGame = async () => {
+      try {
+        // If game already loaded in context, use it
+        if (gameState.currentGame && gameState.gameStatus === "active") {
+          router.replace(`/game/${gameState.currentGame.id}`);
+          return;
+        }
+
+        // Check for active games in database
+        const activeGames = await listActiveGames();
+        if (activeGames.length > 0) {
+          // Use most recent active game
+          const game = await getGame(activeGames[0].id);
+          if (game) {
+            const players = await getPlayersByGame(game.id);
+            dispatch(resumeGameAction(game, players));
+            router.replace(`/game/${game.id}`);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Failed to check for active game:", error);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    checkForActiveGame();
+  }, [dispatch, router, gameState.currentGame, gameState.gameStatus]);
+
+  const handleStartNewGame = () => {
+    router.push("/game/new");
+  };
+
+  const handleContinueGame = () => {
+    if (gameState.currentGame) {
+      router.push(`/game/${gameState.currentGame.id}`);
+    }
+  };
+
+  const hasActiveGame = gameState.currentGame && gameState.gameStatus === "active";
+
+  if (isChecking) {
+    return (
+      <ThemedView style={styles.container}>
+        <View style={styles.content}>
+          <ThemedText>Loading...</ThemedText>
+        </View>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+    );
+  }
+
+  return (
+    <ThemedView style={styles.container}>
+      <View style={styles.content}>
+        <ThemedText type="title" style={styles.title}>
+          Battle Blocks Scorecard
         </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+
+        <ThemedText style={styles.subtitle}>
+          Track scores for your Battle Blocks games
+        </ThemedText>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={[styles.button, styles.primaryButton]}
+            onPress={handleStartNewGame}
+            accessibilityLabel="Start New Game"
+            accessibilityRole="button"
+          >
+            <ThemedText style={styles.buttonText}>Start New Game</ThemedText>
+          </TouchableOpacity>
+
+          {hasActiveGame && (
+            <TouchableOpacity
+              style={[styles.button, styles.secondaryButton]}
+              onPress={handleContinueGame}
+              accessibilityLabel="Continue Game"
+              accessibilityRole="button"
+            >
+              <ThemedText style={styles.secondaryButtonText}>
+                Continue Game
+              </ThemedText>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  title: {
+    fontSize: 32,
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 40,
+    textAlign: "center",
+    opacity: 0.7,
+  },
+  buttonContainer: {
+    width: "100%",
+    maxWidth: 300,
+    gap: 16,
+  },
+  button: {
+    paddingVertical: Platform.select({ ios: 16, android: 18, default: 16 }),
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
+  },
+  primaryButton: {
+    backgroundColor: "#007AFF",
+  },
+  secondaryButton: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#007AFF",
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  secondaryButtonText: {
+    color: "#007AFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
