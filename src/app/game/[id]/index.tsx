@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
@@ -25,6 +26,7 @@ import type { Player } from "@/database/types";
 export default function GameScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const navigation = useNavigation();
   const gameState = useGameState();
   const dispatch = useGameDispatch();
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -77,11 +79,26 @@ export default function GameScreen() {
     };
 
     loadGame();
-  }, [id, dispatch, router, gameState.currentGame?.id, gameState.players.length, gameState.gameStatus]);
+  }, [
+    id,
+    dispatch,
+    router,
+    gameState.currentGame?.id,
+    gameState.players.length,
+    gameState.gameStatus,
+  ]);
 
   const currentGame = gameState.currentGame;
   const players = gameState.players;
   const leader = gameState.leader;
+
+  // Set navigation header title and back button text
+  useEffect(() => {
+    navigation.setOptions({
+      headerBackTitle: "back",
+      ...(currentGame?.id && { title: `Game #${currentGame.id}` }),
+    });
+  }, [currentGame?.id, navigation]);
 
   // Watch for game completion
   useEffect(() => {
@@ -119,7 +136,10 @@ export default function GameScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+      >
         {players.length === 0 ? (
           <ThemedText style={styles.emptyText}>No players yet</ThemedText>
         ) : (

@@ -17,7 +17,12 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import type { Player } from "@/database/types";
 import { calculateScore } from "@/services/gameRules";
-import { addScoreEntry, updatePlayer, updateGame } from "@/services/database";
+import {
+  addScoreEntry,
+  updatePlayer,
+  updateGame,
+  DatabaseError,
+} from "@/services/database";
 import {
   addScoreAction,
   updatePlayerAction,
@@ -170,6 +175,11 @@ export function ScoreEntryModal({
     // Handle zero as a miss (consecutive miss tracking - Story 3.7)
     if (value === 0) {
       try {
+        // Validate player and gameId before proceeding
+        if (!player || !player.id || !gameId) {
+          throw new Error("Invalid player or game data");
+        }
+
         // Increment consecutive misses
         const newConsecutiveMisses = player.consecutive_misses + 1;
         const updatedPlayer = await updatePlayer(player.id, {
@@ -177,12 +187,12 @@ export function ScoreEntryModal({
         });
 
         // Save miss entry to database
-        await addScoreEntry({
-          player_id: player.id,
-          game_id: gameId,
-          score_value: 0,
-          entry_type: entryMode === "single" ? "single_block" : "multiple_blocks",
-        });
+        await addScoreEntry(
+          player.id,
+          gameId,
+          0,
+          entryMode === "single" ? "single_block" : "multiple_blocks"
+        );
 
         // Update context
         dispatch(updatePlayerAction(updatedPlayer));
@@ -212,8 +222,25 @@ export function ScoreEntryModal({
             `${player.name} has ${newConsecutiveMisses} consecutive miss${newConsecutiveMisses > 1 ? "es" : ""}.`
           );
         }
-      } catch {
-        Alert.alert("Error", "Failed to record miss. Please try again.");
+      } catch (error) {
+        console.error("Failed to record miss:", error);
+        
+        // Extract error message more reliably
+        let errorMessage = "Unknown error";
+        if (error instanceof DatabaseError) {
+          errorMessage = error.message || "Database operation failed";
+        } else if (error instanceof Error) {
+          errorMessage = error.message || "An error occurred";
+        } else if (typeof error === "string") {
+          errorMessage = error;
+        } else {
+          errorMessage = String(error) || "Unknown error";
+        }
+        
+        Alert.alert(
+          "Error",
+          `Failed to record miss. ${errorMessage} Please try again.`
+        );
         triggerError();
       } finally {
         setIsSubmitting(false);
@@ -222,6 +249,11 @@ export function ScoreEntryModal({
     }
 
     try {
+      // Validate player and gameId before proceeding
+      if (!player || !player.id || !gameId) {
+        throw new Error("Invalid player or game data");
+      }
+
       // Calculate score using game rules
       const blocks = entryMode === "single" ? [value] : Array(value).fill(1);
       const score = calculateScore(blocks, entryMode === "multiple");
@@ -249,12 +281,12 @@ export function ScoreEntryModal({
       });
 
       // Save score entry to database
-      await addScoreEntry({
-        player_id: player.id,
-        game_id: gameId,
-        score_value: score,
-        entry_type: entryMode === "single" ? "single_block" : "multiple_blocks",
-      });
+      await addScoreEntry(
+        player.id,
+        gameId,
+        score,
+        entryMode === "single" ? "single_block" : "multiple_blocks"
+      );
 
       // Update context
       dispatch(addScoreAction(player.id, score));
@@ -287,8 +319,25 @@ export function ScoreEntryModal({
       // Close modal
       onClose();
       setBlockValue("");
-    } catch {
-      Alert.alert("Error", "Failed to record score. Please try again.");
+    } catch (error) {
+      console.error("Failed to record score:", error);
+      
+      // Extract error message more reliably
+      let errorMessage = "Unknown error";
+      if (error instanceof DatabaseError) {
+        errorMessage = error.message || "Database operation failed";
+      } else if (error instanceof Error) {
+        errorMessage = error.message || "An error occurred";
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      } else {
+        errorMessage = String(error) || "Unknown error";
+      }
+      
+      Alert.alert(
+        "Error",
+        `Failed to record score. ${errorMessage} Please try again.`
+      );
       triggerError();
     } finally {
       setIsSubmitting(false);
@@ -374,7 +423,6 @@ export function ScoreEntryModal({
             accessibilityLabel={
               entryMode === "single" ? "Block number input" : "Number of blocks input"
             }
-            accessibilityRole="textbox"
           />
 
           <View style={styles.buttonContainer}>

@@ -3,7 +3,7 @@
  * Create a new game and add players
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -15,19 +15,25 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { useGameDispatch } from "@/contexts/GameContext";
 import { createGame, addPlayer, DatabaseError } from "@/services/database";
 import { startGameAction, addPlayerAction } from "@/reducers/actionCreators";
 
 export default function NewGameScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const dispatch = useGameDispatch();
   const [playerName, setPlayerName] = useState("");
-  const [players, setPlayers] = useState<
-    { id: number; name: string }[]
-  >([]);
+  const [players, setPlayers] = useState<{ id: number; name: string }[]>([]);
   const [isCreating, setIsCreating] = useState(false);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerBackTitle: "back",
+      title: "New Game",
+    });
+  }, [navigation]);
 
   const handleAddPlayer = () => {
     const trimmedName = playerName.trim();
@@ -67,7 +73,7 @@ export default function NewGameScreen() {
 
     try {
       // Create game in database
-      const game = await createGame({ status: "active" });
+      const game = await createGame("active");
 
       // Initialize game in context
       dispatch(startGameAction(game));
@@ -93,7 +99,10 @@ export default function NewGameScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+      >
         <ThemedText type="title" style={styles.title}>
           New Game
         </ThemedText>

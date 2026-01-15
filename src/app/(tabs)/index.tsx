@@ -9,7 +9,11 @@ import { ThemedView } from "@/components/themed-view";
 import { useRouter } from "expo-router";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import { useEffect, useState } from "react";
-import { listActiveGames, getGame, getPlayersByGame } from "@/services/database";
+import {
+  listActiveGames,
+  getGame,
+  getPlayersByGame,
+} from "@/services/database";
 import { resumeGameAction } from "@/reducers/actionCreators";
 
 export default function HomeScreen() {
@@ -17,42 +21,32 @@ export default function HomeScreen() {
   const gameState = useGameState();
   const dispatch = useGameDispatch();
   const [isChecking, setIsChecking] = useState(true);
+  const [hasActiveGames, setHasActiveGames] = useState(false);
 
-  // Story 2.4: Resume interrupted game on app start
+  // Check for active games to show Continue Game button, but don't auto-navigate
   useEffect(() => {
-    const checkForActiveGame = async () => {
+    const checkForActiveGames = async () => {
       try {
-        // If game already loaded in context, use it
+        // If game already loaded in context, show continue button
         if (gameState.currentGame && gameState.gameStatus === "active") {
-          router.replace(`/game/${gameState.currentGame.id}`);
+          setHasActiveGames(true);
+          setIsChecking(false);
           return;
         }
 
         // Check for active games in database
         const activeGames = await listActiveGames();
-        if (activeGames.length === 1) {
-          // Single active game - auto-resume
-          const game = await getGame(activeGames[0].id);
-          if (game) {
-            const players = await getPlayersByGame(game.id);
-            dispatch(resumeGameAction(game, players));
-            router.replace(`/game/${game.id}`);
-            return;
-          }
-        } else if (activeGames.length > 1) {
-          // Multiple active games - show selection screen
-          // Don't auto-resume, let user choose
-          // The "Continue Game" button will navigate to selection screen
-        }
+        setHasActiveGames(activeGames.length > 0);
       } catch (error) {
-        console.error("Failed to check for active game:", error);
+        console.error("Failed to check for active games:", error);
+        setHasActiveGames(false);
       } finally {
         setIsChecking(false);
       }
     };
 
-    checkForActiveGame();
-  }, [dispatch, router, gameState.currentGame, gameState.gameStatus]);
+    checkForActiveGames();
+  }, [gameState.currentGame, gameState.gameStatus]);
 
   const handleStartNewGame = () => {
     router.push("/game/new");
@@ -85,8 +79,6 @@ export default function HomeScreen() {
     }
   };
 
-  const hasActiveGame = gameState.currentGame && gameState.gameStatus === "active";
-
   if (isChecking) {
     return (
       <ThemedView style={styles.container}>
@@ -118,7 +110,7 @@ export default function HomeScreen() {
             <ThemedText style={styles.buttonText}>Start New Game</ThemedText>
           </TouchableOpacity>
 
-          {hasActiveGame && (
+          {hasActiveGames && (
             <TouchableOpacity
               style={[styles.button, styles.secondaryButton]}
               onPress={handleContinueGame}

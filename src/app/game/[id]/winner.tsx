@@ -4,8 +4,14 @@
  */
 
 import { useEffect } from "react";
-import { StyleSheet, View, ScrollView, TouchableOpacity, Platform } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
@@ -18,6 +24,14 @@ export default function WinnerScreen() {
   const router = useRouter();
   const gameState = useGameState();
   const dispatch = useGameDispatch();
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerBackTitle: "back",
+      title: "Game Winner",
+    });
+  }, [navigation]);
 
   useEffect(() => {
     const loadGame = async () => {
@@ -85,7 +99,9 @@ export default function WinnerScreen() {
             🎉 Winner! 🎉
           </ThemedText>
           <ThemedText style={styles.winnerName}>{winner.name}</ThemedText>
-          <ThemedText style={styles.winnerScore}>{winner.current_score} Points</ThemedText>
+          <ThemedText style={styles.winnerScore}>
+            {winner.current_score} Points
+          </ThemedText>
         </View>
 
         <View style={styles.scoresSection}>
@@ -106,7 +122,9 @@ export default function WinnerScreen() {
               <View style={styles.playerInfo}>
                 <ThemedText style={styles.playerName}>{player.name}</ThemedText>
                 {player.is_eliminated && (
-                  <ThemedText style={styles.eliminatedLabel}>Eliminated</ThemedText>
+                  <ThemedText style={styles.eliminatedLabel}>
+                    Eliminated
+                  </ThemedText>
                 )}
               </View>
               <ThemedText style={styles.finalScore}>
@@ -122,7 +140,9 @@ export default function WinnerScreen() {
           accessibilityLabel="Start new game"
           accessibilityRole="button"
         >
-          <ThemedText style={styles.newGameButtonText}>Start New Game</ThemedText>
+          <ThemedText style={styles.newGameButtonText}>
+            Start New Game
+          </ThemedText>
         </TouchableOpacity>
       </ScrollView>
     </ThemedView>
