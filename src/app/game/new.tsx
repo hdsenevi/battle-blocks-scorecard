@@ -74,13 +74,7 @@ export default function NewGameScreen() {
 
       // Add all players to database and context
       for (const player of players) {
-        const dbPlayer = await addPlayer({
-          game_id: game.id,
-          name: player.name,
-          current_score: 0,
-          consecutive_misses: 0,
-          is_eliminated: false,
-        });
+        const dbPlayer = await addPlayer(game.id, player.name);
 
         dispatch(addPlayerAction(dbPlayer));
       }

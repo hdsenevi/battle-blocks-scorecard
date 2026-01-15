@@ -30,8 +30,8 @@ export default function HomeScreen() {
 
         // Check for active games in database
         const activeGames = await listActiveGames();
-        if (activeGames.length > 0) {
-          // Use most recent active game
+        if (activeGames.length === 1) {
+          // Single active game - auto-resume
           const game = await getGame(activeGames[0].id);
           if (game) {
             const players = await getPlayersByGame(game.id);
@@ -39,6 +39,10 @@ export default function HomeScreen() {
             router.replace(`/game/${game.id}`);
             return;
           }
+        } else if (activeGames.length > 1) {
+          // Multiple active games - show selection screen
+          // Don't auto-resume, let user choose
+          // The "Continue Game" button will navigate to selection screen
         }
       } catch (error) {
         console.error("Failed to check for active game:", error);
@@ -54,9 +58,30 @@ export default function HomeScreen() {
     router.push("/game/new");
   };
 
-  const handleContinueGame = () => {
-    if (gameState.currentGame) {
+  const handleContinueGame = async () => {
+    if (gameState.currentGame && gameState.gameStatus === "active") {
+      // If game already in context, navigate directly
       router.push(`/game/${gameState.currentGame.id}`);
+      return;
+    }
+
+    // Check for active games
+    try {
+      const activeGames = await listActiveGames();
+      if (activeGames.length === 1) {
+        // Single game - resume directly
+        const game = await getGame(activeGames[0].id);
+        if (game) {
+          const players = await getPlayersByGame(game.id);
+          dispatch(resumeGameAction(game, players));
+          router.push(`/game/${game.id}`);
+        }
+      } else if (activeGames.length > 1) {
+        // Multiple games - show selection screen
+        router.push("/game/select");
+      }
+    } catch (error) {
+      console.error("Failed to check for active games:", error);
     }
   };
 

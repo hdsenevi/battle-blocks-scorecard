@@ -79,16 +79,16 @@ export default function GameScreen() {
     loadGame();
   }, [id, dispatch, router, gameState.currentGame?.id, gameState.players.length, gameState.gameStatus]);
 
+  const currentGame = gameState.currentGame;
+  const players = gameState.players;
+  const leader = gameState.leader;
+
   // Watch for game completion
   useEffect(() => {
     if (currentGame?.status === "completed" && id) {
       router.replace(`/game/${id}/winner`);
     }
   }, [currentGame?.status, id, router]);
-
-  const currentGame = gameState.currentGame;
-  const players = gameState.players;
-  const leader = gameState.leader;
 
   if (!currentGame) {
     return (
