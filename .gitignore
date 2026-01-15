@@ -42,7 +42,8 @@ app-example
 /ios
 /android
 
-_bmad
+# bmad
+.bmad-core
 
 # Snyk Security Extension - AI Rules (auto-generated)
 .cursor/rules/snyk_rules.mdc
