@@ -4,7 +4,7 @@
 
 import { renderHook, waitFor } from "@testing-library/react-native";
 import { AppState } from "react-native";
-import { useAppLifecycle } from "../use-app-lifecycle";
+import { useAppLifecycle } from "../useAppLifecycle";
 import { GameProvider } from "../../contexts/GameContext";
 import * as database from "../../services/database";
 import { Game, Player } from "../../database/types";
