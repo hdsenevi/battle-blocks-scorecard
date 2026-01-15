@@ -206,6 +206,7 @@ export function gameReducer(
     default: {
       // TypeScript exhaustiveness check
       const _exhaustive: never = action;
+      void _exhaustive; // Suppress unused variable warning
       return state;
     }
   }

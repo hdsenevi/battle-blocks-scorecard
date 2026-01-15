@@ -9,10 +9,15 @@ import { ThemedView } from "./themed-view";
 import { ThemedText } from "./themed-text";
 import { StyleSheet } from "react-native";
 import { initializeDatabase } from "../services/database";
+import { useAppLifecycle } from "../hooks/useAppLifecycle";
 
 export function AppLifecycleHandler() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
+
+  // Use app lifecycle hook to handle save/restore
+  // Hook will handle errors gracefully if database isn't ready
+  useAppLifecycle();
 
   useEffect(() => {
     const init = async () => {

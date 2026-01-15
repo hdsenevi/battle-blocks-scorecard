@@ -2,6 +2,7 @@
  * Tests for useAppLifecycle hook
  */
 
+import React from "react";
 import { renderHook, waitFor } from "@testing-library/react-native";
 import { AppState } from "react-native";
 import { useAppLifecycle } from "../useAppLifecycle";
@@ -101,7 +102,7 @@ describe("useAppLifecycle", () => {
     mockDatabase.listActiveGames.mockResolvedValue([]);
     mockDatabase.updateGame.mockResolvedValue(mockGame);
 
-    const { result } = renderHook(() => useAppLifecycle(), { wrapper });
+    renderHook(() => useAppLifecycle(), { wrapper });
 
     // Get the change handler
     const changeHandler = (AppState.addEventListener as jest.Mock).mock

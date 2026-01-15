@@ -1,0 +1,19 @@
+# Cursor Rules for Battle Blocks Scorecard
+
+## Package Manager
+This project uses **pnpm** as the package manager. Always use `pnpm` instead of `npm` for all package management commands:
+
+- Use `pnpm install` instead of `npm install`
+- Use `pnpm run <script>` instead of `npm run <script>`
+- Use `pnpm add <package>` instead of `npm install <package>`
+- Use `pnpm exec <command>` instead of `npx <command>` when appropriate
+
+The project has a `pnpm-lock.yaml` file, confirming pnpm is the package manager.
+
+## Examples
+- ✅ `pnpm run lint`
+- ✅ `pnpm test`
+- ✅ `pnpm install`
+- ❌ `npm run lint`
+- ❌ `npm test`
+- ❌ `npm install`

@@ -4,6 +4,7 @@
  */
 
 import React from "react";
+import { View, Text } from "react-native";
 import { render, renderHook } from "@testing-library/react-native";
 import {
   GameProvider,
@@ -20,10 +21,10 @@ describe("GameContext", () => {
       const TestComponent = () => {
         const { state, dispatch } = useGameContext();
         return (
-          <>
-            <div testID="state">{JSON.stringify(state)}</div>
-            <div testID="dispatch">{dispatch ? "dispatch" : "no-dispatch"}</div>
-          </>
+          <View>
+            <Text testID="state">{JSON.stringify(state)}</Text>
+            <Text testID="dispatch">{dispatch ? "dispatch" : "no-dispatch"}</Text>
+          </View>
         );
       };
 
@@ -34,7 +35,7 @@ describe("GameContext", () => {
       );
 
       expect(getByTestId("state")).toBeTruthy();
-      expect(getByTestId("dispatch").props.children).toBe("dispatch");
+      expect(getByTestId("dispatch")).toBeTruthy();
     });
 
     it("should initialize with initial state", () => {

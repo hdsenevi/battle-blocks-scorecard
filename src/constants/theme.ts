@@ -29,14 +29,24 @@ export const Colors = {
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+    /** iOS San Francisco font family */
+    sans: 'System', // San Francisco on iOS
+    /** iOS serif font */
+    serif: 'Georgia',
+    /** iOS rounded font */
+    rounded: 'System',
+    /** iOS monospaced font */
+    mono: 'Menlo',
+  },
+  android: {
+    /** Android Roboto font family */
+    sans: 'Roboto',
+    /** Android serif font */
+    serif: 'serif',
+    /** Android sans-serif font */
+    rounded: 'Roboto',
+    /** Android monospaced font */
+    mono: 'monospace',
   },
   default: {
     sans: 'normal',

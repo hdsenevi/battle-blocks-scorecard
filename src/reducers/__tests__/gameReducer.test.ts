@@ -3,7 +3,7 @@
  * Tests for game state reducer and immutability
  */
 
-import { gameReducer, initialState, GameState } from "../gameReducer";
+import { gameReducer, initialState } from "../gameReducer";
 import type { Game, Player } from "../../database/types";
 import {
   startGameAction,

@@ -4,7 +4,7 @@
  * to automatically save and restore game state
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { AppState, AppStateStatus } from "react-native";
 import { useGameContext } from "../contexts/GameContext";
 import {
@@ -12,7 +12,6 @@ import {
   getGame,
   getPlayersByGame,
   updateGame,
-  DatabaseError,
 } from "../services/database";
 import { resumeGameAction } from "../reducers/actionCreators";
 
@@ -29,7 +28,7 @@ export function useAppLifecycle() {
   /**
    * Save current game state to database
    */
-  const saveGameState = async () => {
+  const saveGameState = useCallback(async () => {
     try {
       // Only save if there's an active game
       if (!state.currentGame || state.gameStatus !== "active") {
@@ -49,12 +48,12 @@ export function useAppLifecycle() {
         console.error("Failed to save game state:", error);
       }
     }
-  };
+  }, [state.currentGame, state.gameStatus]);
 
   /**
    * Restore game state from database
    */
-  const restoreGameState = async () => {
+  const restoreGameState = useCallback(async () => {
     // Prevent multiple simultaneous restorations
     if (isRestoringRef.current) {
       return;
@@ -99,7 +98,7 @@ export function useAppLifecycle() {
     } finally {
       isRestoringRef.current = false;
     }
-  };
+  }, [state.currentGame, state.gameStatus, dispatch]);
 
   useEffect(() => {
     // Restore game state on app start
@@ -135,7 +134,7 @@ export function useAppLifecycle() {
     return () => {
       subscription.remove();
     };
-  }, []); // Only run on mount/unmount
+  }, [restoreGameState, saveGameState]); // Include callbacks in dependencies
 
   // Save game state whenever game state changes (debounced in production)
   useEffect(() => {
@@ -148,5 +147,5 @@ export function useAppLifecycle() {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [state.currentGame?.id, state.gameStatus, state.players.length]);
+  }, [state.currentGame, state.gameStatus, state.players.length, saveGameState]);
 }
