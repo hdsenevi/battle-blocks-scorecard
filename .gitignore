@@ -1,25 +1,49 @@
-### Xcode ###
-## User settings
-xcuserdata/
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
-## Xcode 8 and earlier
-*.xcscmblueprint
-*.xccheckout
+# dependencies
+node_modules/
 
-### Xcode Patch ###
-*.xcodeproj/*
-!*.xcodeproj/project.pbxproj
-!*.xcodeproj/xcshareddata/
-!*.xcodeproj/project.xcworkspace/
-!*.xcworkspace/contents.xcworkspacedata
-/*.gcno
-**/xcshareddata/WorkspaceSettings.xcsettings
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
 
-### Misc
-*.DS_Store
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
 
-### Build
-builds/*
+# Metro
+.metro-health-check*
 
-### Fastlane
-fastlane/report.xml
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+app-example
+
+# generated native folders
+/ios
+/android
+
+# bmad
+.bmad-core
+
+# Snyk Security Extension - AI Rules (auto-generated)
+.cursor/rules/snyk_rules.mdc
