@@ -233,15 +233,17 @@ export async function createGame(status: GameStatus = "active"): Promise<Game> {
         runError instanceof Error
           ? runError.message
           : typeof runError === "string"
-            ? runError
-            : JSON.stringify(runError);
+          ? runError
+          : JSON.stringify(runError);
       const errorDetails =
         runError && typeof runError === "object" && "cause" in runError
           ? String((runError as any).cause)
           : undefined;
 
       throw new DatabaseError(
-        `Failed to insert game: ${errorMessage}${errorDetails ? ` (${errorDetails})` : ""}`,
+        `Failed to insert game: ${errorMessage}${
+          errorDetails ? ` (${errorDetails})` : ""
+        }`,
         runError instanceof Error ? runError : undefined,
         "CREATE_GAME_INSERT_ERROR"
       );
@@ -272,8 +274,8 @@ export async function createGame(status: GameStatus = "active"): Promise<Game> {
       error instanceof Error
         ? error.message
         : typeof error === "string"
-          ? error
-          : String(error);
+        ? error
+        : String(error);
     throw new DatabaseError(
       `Failed to create game: ${errorMessage}`,
       error instanceof Error ? error : undefined,

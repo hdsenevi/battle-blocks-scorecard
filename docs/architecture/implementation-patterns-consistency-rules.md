@@ -20,6 +20,7 @@
 - **Components**: PascalCase (e.g., `PlayerCard.tsx`, `ScoreEntry.tsx`)
 - **Files**: Match component/function name (e.g., `gameRules.ts`, `haptics.ts`)
 - **Functions**: camelCase (e.g., `checkPenaltyRule()`, `triggerScoreEntry()`)
+- **Hooks**: camelCase with `use` prefix (e.g., `useGame()`, `useScoreEntry()`, `useThemeColor()`)
 - **Variables**: camelCase (e.g., `currentScore`, `playerName`)
 - **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_SCORE`, `PENALTY_THRESHOLD`)
 - **Types/Interfaces**: PascalCase (e.g., `GameState`, `Player`, `ScoreEntry`)
@@ -193,6 +194,16 @@ export function checkPenaltyRule(score: number): boolean {
 }
 ```
 
+**Custom Hook:**
+```typescript
+// ✅ GOOD: camelCase with use prefix, type-safe
+export function useGame(gameId: string) {
+  const [game, setGame] = useState<Game | null>(null);
+  // ... hook logic
+  return { game, isLoading };
+}
+```
+
 **Anti-Patterns:**
 
 **Database Query:**
@@ -221,5 +232,18 @@ src/components/game/PlayerCard.test.tsx  ❌ Wrong (should be in __tests__)
 export function checkPenalty(score) {
   console.log('checking...');
   return score > 50;
+}
+```
+
+**Custom Hook:**
+```typescript
+// ❌ BAD: Wrong naming (should be camelCase with use prefix)
+export function UseGame(gameId) {
+  // ...
+}
+
+// ❌ BAD: Wrong naming (should be camelCase, not kebab-case)
+export function use-game(gameId) {
+  // ...
 }
 ```
