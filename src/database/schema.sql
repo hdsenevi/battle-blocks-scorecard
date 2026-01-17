@@ -4,7 +4,7 @@
 -- Games table: Tracks game sessions
 CREATE TABLE IF NOT EXISTS games (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    status TEXT NOT NULL CHECK(status IN ('active', 'completed', 'paused')),
+    status TEXT NOT NULL CHECK(status IN ('active', 'completed', 'paused', 'notcompleted')),
     created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );

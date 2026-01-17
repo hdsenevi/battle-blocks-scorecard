@@ -14,7 +14,7 @@ Users can start new games, add players (minimum 2, no maximum), view current gam
 - Game creation flow with player management
 - Main game screen showing all players and scores
 - Resume functionality for interrupted games
-- Game status tracking (active, completed, paused)
+- Game status tracking (active, completed, paused, notcompleted)
 - Enables users to begin playing and manage game sessions
 
 ### Story 2.1: Create New Game Flow
@@ -33,6 +33,10 @@ So that I can begin playing Battle Blocks with my friends and family.
 **And** I can see a form or interface to add players
 **And** the game state is initialized in the GameContext
 **And** the UI provides clear visual feedback that a new game is being created
+**And** automation tests are created:
+- Component tests verify "Start New Game" button interaction and navigation
+- Component tests verify game creation in GameContext
+- E2E test flow verifies complete game creation journey (home screen → new game screen)
 
 **FRs covered:** FR1, FR24, FR26
 
@@ -59,6 +63,11 @@ So that all participants can be tracked in the game.
 **And** if I try to start with less than 2 players, I see a clear error message
 **And** player names are validated (not empty, reasonable length)
 **And** the UI provides visual feedback when a player is added
+**And** automation tests are created:
+- Component tests verify player addition form interaction
+- Component tests verify minimum 2 players requirement and button state
+- Component tests verify player name validation
+- E2E test flow verifies adding players to a game
 
 **FRs covered:** FR2, FR3, FR24, FR26
 
@@ -84,6 +93,12 @@ So that I can see the current game state at a glance.
 **And** the screen follows the design system (NativeWind, proper spacing, touch targets)
 **And** the screen is accessible (screen reader support, proper contrast)
 **And** UI transitions are smooth (< 200ms per NFR2)
+**And** automation tests are created:
+- Component tests verify player display and score rendering
+- Component tests verify leader indication display
+- Component tests verify real-time score updates
+- Component tests verify accessibility attributes
+- E2E test flow verifies main game screen displays correctly
 
 **FRs covered:** FR4, FR11, FR31, FR38, FR40, NFR2, NFR35, NFR36, NFR37
 
@@ -111,6 +126,11 @@ So that I can continue playing from where we left off.
 **And** if multiple active games exist, I can see a list to choose from
 **And** the UI clearly indicates which game I am resuming
 **And** if no active games exist, the resume option is not shown
+**And** automation tests are created:
+- Unit tests verify game state restoration from database (mocked)
+- Component tests verify resume game UI and interaction
+- Integration tests verify complete restore cycle
+- E2E test flow verifies game resume functionality
 
 **FRs covered:** FR5, FR6, FR25, FR28, FR29, NFR4
 
@@ -124,16 +144,50 @@ So that I can see which games are still in progress and which are finished.
 
 **Acceptance Criteria:**
 
-**Given** games can be in different states (active, completed, paused)
+**Given** games can be in different states (active, completed, paused, notcompleted)
 **When** I view game lists or game details
 **Then** the system correctly identifies:
 - Active games (status = "active") - games currently in progress
 - Completed games (status = "completed") - games that have ended with a winner
-- Paused games (status = "paused") - games that were interrupted
+- Paused games (status = "paused") - games that were interrupted and can be resumed
+- Notcompleted games (status = "notcompleted") - games that were paused but never completed (see Story 2.6)
 **And** active games can be resumed (Story 2.4)
 **And** completed games cannot be modified or resumed
 **And** the game status is displayed clearly in the UI
 **And** the database correctly stores and retrieves game status
 **And** game status transitions are handled correctly (active → completed when winner is determined)
+**And** automation tests are created:
+- Unit tests verify game status management logic
+- Component tests verify game status display
+- Unit tests verify status transition rules
+- Integration tests verify status persistence
+
+**FRs covered:** FR7, FR40, FR44
+
+---
+
+### Story 2.6: Not Completed Game State
+
+As a user,
+I want the system to track games that were paused but never completed when I start a new game,
+So that I can distinguish between games that were intentionally paused (and can be resumed) and games that were abandoned.
+
+**Acceptance Criteria:**
+
+**Given** I have an active game
+**When** I navigate back from the game screen (pausing the game)
+**And** I start a new game before completing or resuming the paused game
+**Then** the previously paused game is automatically marked as "notcompleted"
+**And** the new game becomes the active game
+**And** notcompleted games cannot be resumed or modified
+**And** notcompleted games are not shown in the resume game list
+**And** the database correctly stores and retrieves the notcompleted status
+**And** the game status is displayed clearly in the UI when viewing a notcompleted game
+**And** score entry is prevented for notcompleted games (same as completed games)
+**And** automation tests are created:
+- Unit tests verify notcompleted status logic
+- Component tests verify notcompleted games are not shown in resume list
+- Unit tests verify score entry prevention for notcompleted games
+- Integration tests verify status transition to notcompleted
 
 **FRs covered:** FR7, FR40, FR44

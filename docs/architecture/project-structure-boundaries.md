@@ -120,6 +120,17 @@ battle-blocks-scorecard/
 │   │   └── android-icon-*.png
 │   └── fonts/                  # Custom fonts (if needed)
 │
+├── .maestro/                    # E2E test flows (Maestro)
+│   ├── flows/                 # Test flow definitions
+│   │   ├── 01-create-game.yaml
+│   │   ├── 02-add-players.yaml
+│   │   ├── 03-enter-scores.yaml
+│   │   ├── 04-rule-enforcement.yaml
+│   │   ├── 05-complete-game.yaml
+│   │   └── 06-resume-game.yaml
+│   ├── config.yaml             # Maestro configuration
+│   └── README.md               # E2E testing documentation
+│
 └── references/                  # Project documentation
     └── battle-blocks-instructions.pdf
 ```
@@ -245,6 +256,8 @@ battle-blocks-scorecard/
 - `__tests__` folders at same level as source files
 - Test files mirror source file names with `.test.tsx` or `.test.ts` extension
 - Unit tests for services, integration tests for components
+- E2E tests in `.maestro/flows/` directory (YAML format)
+- Test configuration: `jest.config.js` (unit/component), `.maestro/config.yaml` (E2E)
 
 **Asset Organization:**
 - `assets/images/` for all image assets

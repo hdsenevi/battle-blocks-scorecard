@@ -17,8 +17,10 @@ import { ThemedView } from "@/components/themed-view";
 import { useGameDispatch } from "@/contexts/GameContext";
 import {
   listActiveGames,
+  listPausedGames,
   getGame,
   getPlayersByGame,
+  updateGame,
   DatabaseError,
 } from "@/services/database";
 import { resumeGameAction } from "@/reducers/actionCreators";
@@ -42,10 +44,12 @@ export default function GameSelectionScreen() {
         setError(null);
 
         const activeGames = await listActiveGames();
+        const pausedGames = await listPausedGames();
+        const allResumableGames = [...activeGames, ...pausedGames];
 
         // Load player count for each game
         const gamesWithMetadata: GameWithMetadata[] = await Promise.all(
-          activeGames.map(async (game) => {
+          allResumableGames.map(async (game) => {
             const players = await getPlayersByGame(game.id);
             return {
               ...game,
@@ -78,9 +82,20 @@ export default function GameSelectionScreen() {
         return;
       }
 
-      const players = await getPlayersByGame(gameId);
-      dispatch(resumeGameAction(game, players));
-      router.replace(`/game/${gameId}`);
+      // If paused, make it active
+      if (game.status === "paused") {
+        await updateGame(gameId, { status: "active" });
+        const updatedGame = await getGame(gameId);
+        if (updatedGame) {
+          const players = await getPlayersByGame(gameId);
+          dispatch(resumeGameAction(updatedGame, players));
+          router.replace(`/game/${gameId}`);
+        }
+      } else {
+        const players = await getPlayersByGame(gameId);
+        dispatch(resumeGameAction(game, players));
+        router.replace(`/game/${gameId}`);
+      }
     } catch (err) {
       console.error("Failed to resume game:", err);
       setError(
@@ -154,7 +169,7 @@ export default function GameSelectionScreen() {
           Select Game to Resume
         </ThemedText>
         <ThemedText style={styles.headerSubtitle}>
-          {games.length} active {games.length === 1 ? "game" : "games"}
+          {games.length} {games.length === 1 ? "game" : "games"} to resume
         </ThemedText>
       </View>
 

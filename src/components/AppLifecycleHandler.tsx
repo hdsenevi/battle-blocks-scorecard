@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { ThemedView } from "./themed-view";
 import { ThemedText } from "./themed-text";
 import { StyleSheet } from "react-native";
-import { initializeDatabase } from "../services/database";
+import { initializeDatabase, getDatabasePath } from "../services/database";
 import { useAppLifecycle } from "../hooks/useAppLifecycle";
 
 export function AppLifecycleHandler() {
@@ -19,11 +19,29 @@ export function AppLifecycleHandler() {
   // Hook will handle errors gracefully if database isn't ready
   useAppLifecycle();
 
+  /**
+   * Log database path for debugging (non-blocking, dev only)
+   */
+  const logDatabasePathSafely = async (): Promise<void> => {
+    if (!__DEV__) return;
+    
+    try {
+      const dbPath = await getDatabasePath();
+      console.log("Database path:", dbPath);
+    } catch (pathError) {
+      console.warn("Could not retrieve database path:", pathError);
+    }
+  };
+
   useEffect(() => {
     const init = async () => {
       try {
         // Initialize database schema on app start
         await initializeDatabase();
+        
+        // Log database path (non-blocking, dev only)
+        await logDatabasePathSafely();
+        
         setIsInitializing(false);
       } catch (error) {
         console.error("Failed to initialize database:", error);

@@ -38,6 +38,12 @@ So that I understand what went wrong and can correct my input.
 **And** I can correct my input and try again
 **And** the app does not crash or lose game state (NFR16, NFR19)
 **And** edge cases are handled (zero blocks, negative values, etc.)
+**And** automation tests are created:
+- Component tests verify invalid input handling and error messages
+- Component tests verify error haptic feedback triggered
+- Component tests verify accessibility of error messages
+- Unit tests verify error handling doesn't crash app or lose state
+- E2E test flow verifies handling invalid score entries
 
 **FRs covered:** FR54, FR56, FR37, NFR16, NFR19
 
@@ -59,6 +65,11 @@ So that accidental double-taps don't cause errors or incorrect scores.
 **And** the app does not crash or lose game state (NFR16, NFR20)
 **And** the UI provides feedback that the entry is being processed
 **And** concurrent operations don't cause data corruption (NFR20)
+**And** automation tests are created:
+- Component tests verify rapid duplicate entry prevention
+- Integration tests verify only one score entry recorded for rapid taps
+- Unit tests verify concurrent operation handling
+- E2E test flow verifies rapid duplicate entry prevention
 
 **FRs covered:** FR55, NFR16, NFR20
 
@@ -83,6 +94,12 @@ So that unusual inputs don't break the game or cause errors.
 **And** game state remains intact
 **And** clear error messages guide the user
 **And** the system recovers gracefully from edge cases
+**And** automation tests are created:
+- Unit tests verify edge case handling (zero, negative, very large numbers)
+- Unit tests verify edge cases don't crash app
+- Component tests verify error messages for edge cases
+- Integration tests verify game state remains intact after edge cases
+- E2E test flow verifies edge case handling
 
 **FRs covered:** FR56, NFR16
 
@@ -105,6 +122,11 @@ So that I know who is still in the game.
 **And** the indication is accessible (screen reader announces elimination status)
 **And** color coding is supplemented with other indicators (icons, text) for accessibility
 **And** the visual design follows the design system
+**And** automation tests are created:
+- Component tests verify eliminated players visually distinct
+- Component tests verify eliminated players not interactive for score entry
+- Component tests verify accessibility of elimination indication
+- E2E test flow verifies eliminated players display
 
 **FRs covered:** FR39, NFR41
 
@@ -130,6 +152,10 @@ So that the app can be submitted and published to app stores.
 **And** the app includes required privacy disclosures
 **And** store listing materials are prepared
 **And** the app is tested for store compliance
+**And** automation tests are created:
+- E2E tests verify privacy policy accessible within app
+- Manual testing checklist for store compliance requirements
+- Component tests verify required UI elements for store compliance
 
 **FRs covered:** FR50, FR51, FR52, NFR28, NFR29, NFR30, NFR32, NFR33, NFR34
 
@@ -155,5 +181,11 @@ So that I can use the app effectively regardless of my abilities.
 - Reduced motion preferences respected for animations
 **And** all game state information is accessible through screen readers
 **And** the app follows platform accessibility guidelines
+**And** automation tests are created:
+- Component tests verify screen reader labels for all interactive elements
+- Component tests verify touch target sizes meet requirements
+- Component tests verify color contrast meets WCAG AA standards
+- Component tests verify reduced motion preferences respected
+- Accessibility testing checklist for manual verification
 
 **FRs covered:** NFR35, NFR36, NFR37, NFR38, NFR39, NFR40, NFR41

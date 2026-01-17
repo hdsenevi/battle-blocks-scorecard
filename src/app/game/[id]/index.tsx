@@ -16,7 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
-import { getGame, getPlayersByGame } from "@/services/database";
+import { getGame, getPlayersByGame, updateGame } from "@/services/database";
 import { resumeGameAction } from "@/reducers/actionCreators";
 import { PlayerCard } from "@/components/game/PlayerCard";
 import { ScoreEntryModal } from "@/components/game/ScoreEntryModal";
@@ -107,6 +107,23 @@ export default function GameScreen() {
     }
   }, [currentGame?.status, id, router]);
 
+  // Pause game when navigating back (if game is active)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", async (e) => {
+      // Only pause if the game is currently active
+      if (currentGame && currentGame.status === "active") {
+        try {
+          // Update game status to paused in database
+          await updateGame(currentGame.id, { status: "paused" });
+        } catch (error) {
+          console.error("Failed to pause game:", error);
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, currentGame]);
+
   if (!currentGame) {
     return (
       <ThemedView style={styles.container}>
@@ -150,7 +167,7 @@ export default function GameScreen() {
               isLeader={leader?.id === player.id}
               gameId={currentGame.id}
               onPress={() => {
-                // Story 5.3: Prevent score entry for completed games
+                // Story 5.3: Prevent score entry for completed/notcompleted/paused games
                 // Story 4.2: Prevent score entry for eliminated players
                 if (currentGame.status === "active" && !player.is_eliminated) {
                   setSelectedPlayer(player);

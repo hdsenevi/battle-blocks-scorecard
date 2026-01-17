@@ -13,7 +13,7 @@
 - NativeWind configuration and setup
 - Error handling and recovery patterns
 - App lifecycle management
-- Testing strategy for rule enforcement
+- Testing strategy and automation framework (Jest + React Native Testing Library + Maestro)
 
 **Deferred Decisions (Post-MVP):**
 - Game history querying patterns (Phase 2)
@@ -171,6 +171,41 @@ app/               # Screen-level components (Expo Router)
 - Rule enforcement feedback
 - Accessibility (haptic supplements visual feedback)
 - Performance (< 50ms requirement)
+
+## Testing Architecture
+
+**Decision: Multi-Layer Testing Strategy**
+
+**Tools:**
+- **Jest** (v30.2.0) + **React Native Testing Library** (v13.3.3) - Unit and component testing
+- **Maestro** - End-to-end testing (Expo-recommended)
+
+**Rationale:**
+- Prevent regressions as stories progress
+- Fast feedback with unit/component tests
+- Confidence with E2E tests for critical user journeys
+- Expo officially recommends Maestro for E2E testing
+- Jest already established in project
+
+**Implementation Approach:**
+- **Unit Tests**: 100% coverage for services, reducers, utilities
+- **Component Tests**: 80% coverage for UI and game components
+- **E2E Tests**: Critical user journeys in `.maestro/flows/`
+- Test organization: `src/**/__tests__/` for unit/component tests
+- E2E flows: YAML-based flows in `.maestro/flows/`
+
+**Test Layers:**
+1. Unit tests (Jest) - Pure functions, business logic
+2. Component tests (React Native Testing Library) - React components
+3. Integration tests (Jest + RTL) - Component + service integration
+4. E2E tests (Maestro) - Complete user journeys
+
+**Affects:**
+- Regression prevention
+- Code quality and confidence
+- Development workflow
+- CI/CD pipeline
+- Long-term maintainability
 
 ## Decision Impact Analysis
 

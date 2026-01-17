@@ -60,8 +60,15 @@ export function ScoreEntryModal({
     return null;
   }
 
-  // Story 5.3: Prevent score entries after completion
-  if (gameStatus === "completed") {
+  // Story 5.3: Prevent score entries after completion or for non-active games
+  if (gameStatus === "completed" || gameStatus === "notcompleted" || gameStatus === "paused") {
+    const statusMessage = 
+      gameStatus === "completed" 
+        ? "This game has been completed. No further score entries are allowed."
+        : gameStatus === "notcompleted"
+        ? "This game was not completed. No further score entries are allowed."
+        : "This game is paused. Resume the game to continue playing.";
+    
     return (
       <Modal
         visible={visible}
@@ -73,10 +80,10 @@ export function ScoreEntryModal({
         <View style={styles.overlay}>
           <ThemedView style={styles.modal}>
             <ThemedText type="title" style={styles.title}>
-              Game Completed
+              {gameStatus === "completed" ? "Game Completed" : gameStatus === "notcompleted" ? "Game Not Completed" : "Game Paused"}
             </ThemedText>
             <ThemedText style={styles.instruction}>
-              This game has been completed. No further score entries are allowed.
+              {statusMessage}
             </ThemedText>
             <TouchableOpacity
               style={[styles.button, styles.submitButton]}

@@ -11,8 +11,10 @@ import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import { useEffect, useState } from "react";
 import {
   listActiveGames,
+  listPausedGames,
   getGame,
   getPlayersByGame,
+  updateGame,
 } from "@/services/database";
 import { resumeGameAction } from "@/reducers/actionCreators";
 
@@ -23,20 +25,21 @@ export default function HomeScreen() {
   const [isChecking, setIsChecking] = useState(true);
   const [hasActiveGames, setHasActiveGames] = useState(false);
 
-  // Check for active games to show Continue Game button, but don't auto-navigate
+  // Check for active or paused games to show Continue Game button, but don't auto-navigate
   useEffect(() => {
     const checkForActiveGames = async () => {
       try {
         // If game already loaded in context, show continue button
-        if (gameState.currentGame && gameState.gameStatus === "active") {
+        if (gameState.currentGame && (gameState.gameStatus === "active" || gameState.gameStatus === "paused")) {
           setHasActiveGames(true);
           setIsChecking(false);
           return;
         }
 
-        // Check for active games in database
+        // Check for active or paused games in database
         const activeGames = await listActiveGames();
-        setHasActiveGames(activeGames.length > 0);
+        const pausedGames = await listPausedGames();
+        setHasActiveGames(activeGames.length > 0 || pausedGames.length > 0);
       } catch (error) {
         console.error("Failed to check for active games:", error);
         setHasActiveGames(false);
@@ -53,24 +56,42 @@ export default function HomeScreen() {
   };
 
   const handleContinueGame = async () => {
-    if (gameState.currentGame && gameState.gameStatus === "active") {
+    if (gameState.currentGame && (gameState.gameStatus === "active" || gameState.gameStatus === "paused")) {
       // If game already in context, navigate directly
+      // If paused, make it active first
+      if (gameState.gameStatus === "paused") {
+        await updateGame(gameState.currentGame.id, { status: "active" });
+      }
       router.push(`/game/${gameState.currentGame.id}`);
       return;
     }
 
-    // Check for active games
+    // Check for active or paused games
     try {
       const activeGames = await listActiveGames();
-      if (activeGames.length === 1) {
+      const pausedGames = await listPausedGames();
+      const allResumableGames = [...activeGames, ...pausedGames];
+      
+      if (allResumableGames.length === 1) {
         // Single game - resume directly
-        const game = await getGame(activeGames[0].id);
+        const game = await getGame(allResumableGames[0].id);
         if (game) {
-          const players = await getPlayersByGame(game.id);
-          dispatch(resumeGameAction(game, players));
-          router.push(`/game/${game.id}`);
+          // If paused, make it active
+          if (game.status === "paused") {
+            await updateGame(game.id, { status: "active" });
+            const updatedGame = await getGame(game.id);
+            if (updatedGame) {
+              const players = await getPlayersByGame(updatedGame.id);
+              dispatch(resumeGameAction(updatedGame, players));
+              router.push(`/game/${updatedGame.id}`);
+            }
+          } else {
+            const players = await getPlayersByGame(game.id);
+            dispatch(resumeGameAction(game, players));
+            router.push(`/game/${game.id}`);
+          }
         }
-      } else if (activeGames.length > 1) {
+      } else if (allResumableGames.length > 1) {
         // Multiple games - show selection screen
         router.push("/game/select");
       }

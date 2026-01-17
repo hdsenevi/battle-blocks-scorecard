@@ -38,6 +38,10 @@ So that I can record scores during gameplay.
 **And** the interface is accessible (screen reader support, proper labels)
 **And** UI transitions appear smoothly (< 200ms per NFR2)
 **And** the interface follows the design system (NativeWind styling)
+**And** automation tests are created:
+- Component tests verify score entry interface opens and displays correctly
+- Component tests verify accessibility attributes and touch targets
+- E2E test flow verifies score entry interface interaction
 
 **FRs covered:** FR32, NFR2, NFR35, NFR36, NFR37
 
@@ -61,6 +65,12 @@ So that the score equals the block number (e.g., block 12 = 12 points).
 **And** the main game screen updates to show the new score
 **And** the score entry interface closes and returns to main game screen
 **And** invalid inputs (negative, zero, non-numeric) are handled with clear error messages
+**And** automation tests are created:
+- Unit tests verify single block score calculation (block number = score)
+- Component tests verify score entry form interaction and submission
+- Component tests verify invalid input handling and error messages
+- Integration tests verify score saved to database with correct entry_type
+- E2E test flow verifies entering single block score
 
 **FRs covered:** FR8, FR9, FR13, FR23, FR34, NFR1, NFR7
 
@@ -85,6 +95,12 @@ So that the score equals the count of blocks (e.g., 3 blocks = 3 points).
 **And** the score entry interface closes and returns to main game screen
 **And** invalid inputs (negative, zero, non-numeric) are handled with clear error messages
 **And** the distinction between single block (number) vs multiple blocks (count) is clear in the UI
+**And** automation tests are created:
+- Unit tests verify multiple blocks score calculation (count = score)
+- Component tests verify multiple blocks entry form interaction
+- Component tests verify distinction between single vs multiple block modes
+- Integration tests verify score saved to database with entry_type = "multiple_blocks"
+- E2E test flow verifies entering multiple blocks score
 
 **FRs covered:** FR8, FR10, FR13, FR23, FR34, NFR1, NFR7
 
@@ -107,6 +123,11 @@ So that I always know the current game state.
 **And** the UI feels responsive with no lag or freezing (NFR6)
 **And** score calculations are mathematically correct (NFR23)
 **And** the display follows the design system (proper typography, spacing, contrast)
+**And** automation tests are created:
+- Component tests verify real-time score updates in UI
+- Component tests verify score display updates when scores change
+- Integration tests verify score calculation accuracy
+- E2E test flow verifies real-time score display updates
 
 **FRs covered:** FR11, FR13, NFR1, NFR6, NFR23
 
@@ -129,6 +150,13 @@ So that I know who is winning at any moment.
 **And** the leader indication is accessible (screen reader announces leader, not just color)
 **And** the visual hierarchy makes the leader clear and prominent
 **And** leader identification happens in real-time without perceptible delay
+**And** automation tests are created:
+- Unit tests verify leader identification logic (highest score)
+- Unit tests verify tie handling (multiple leaders)
+- Component tests verify leader visual highlighting
+- Component tests verify leader indication updates when scores change
+- Component tests verify accessibility for leader indication
+- E2E test flow verifies leader identification and highlighting
 
 **FRs covered:** FR12, FR38, NFR40, NFR41
 
@@ -154,6 +182,11 @@ So that I can review past score entries.
 **And** the display is clear and easy to read
 **And** the history is retrieved from the database efficiently
 **And** the UI follows the design system
+**And** automation tests are created:
+- Component tests verify score history display and scrolling
+- Component tests verify score history entries show correct data
+- Integration tests verify score history retrieved from database
+- E2E test flow verifies viewing score history
 
 **FRs covered:** FR14
 
@@ -175,5 +208,10 @@ So that elimination rules can be enforced automatically (foundation for Epic 4).
 **And** if a player scores points (non-zero), their consecutive_misses is reset to 0
 **And** the tracking happens automatically without user intervention
 **And** the data is available for the elimination rule logic (Epic 4, Story 4.2)
+**And** automation tests are created:
+- Unit tests verify consecutive miss tracking logic (increment on 0, reset on non-zero)
+- Unit tests verify consecutive_misses stored in database
+- Integration tests verify consecutive miss tracking with score entries
+- Unit tests verify data available for elimination rule
 
 **FRs covered:** FR15, FR18

@@ -39,6 +39,12 @@ So that I know the game is complete and who won.
 **And** the game is saved as a completed game (FR27, FR44)
 **And** the UI transition is smooth (< 200ms per NFR2)
 **And** the celebration is accessible (screen reader announces winner)
+**And** automation tests are created:
+- Component tests verify winner announcement screen displays correctly
+- Component tests verify game status marked as "completed" in database
+- Component tests verify success haptic feedback triggered
+- Component tests verify accessibility of winner announcement
+- E2E test flow verifies winner announcement screen
 
 **FRs covered:** FR41, FR42, FR44, FR36, NFR2, NFR40
 
@@ -62,6 +68,11 @@ So that I can see the complete game results.
 **And** the display is clear and easy to read
 **And** the scores are saved to the database as game metadata (FR29)
 **And** the UI follows the design system
+**And** automation tests are created:
+- Component tests verify final scores display for all players
+- Component tests verify winner highlighted in final scores
+- Integration tests verify final scores saved to database
+- E2E test flow verifies final scores display
 
 **FRs covered:** FR43, FR29
 
@@ -82,6 +93,11 @@ So that completed games cannot be modified.
 **And** a clear message indicates the game is completed
 **And** the game status remains "completed" in the database
 **And** completed games cannot be resumed or modified
+**And** automation tests are created:
+- Component tests verify score entry disabled for completed games
+- Unit tests verify game status prevents score entries
+- Integration tests verify completed games cannot be modified
+- E2E test flow verifies score entry prevention after completion
 
 **FRs covered:** FR45
 
@@ -106,5 +122,10 @@ So that I can review the final game state.
 **And** the completed game is stored permanently in the database (NFR14)
 **And** the UI follows the design system
 **And** I can navigate back to start a new game
+**And** automation tests are created:
+- Component tests verify completed game results display
+- Component tests verify game metadata displayed correctly
+- Integration tests verify completed games stored permanently
+- E2E test flow verifies viewing completed game results
 
 **FRs covered:** FR46, NFR14

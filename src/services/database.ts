@@ -24,7 +24,7 @@ let initializationPromise: Promise<void> | null = null;
 export class DatabaseError extends Error {
   constructor(message: string, public cause?: Error, public code?: string) {
     super(message);
-    this.name = "DatabaseError";
+      this.name = "DatabaseError";
   }
 }
 
@@ -80,7 +80,7 @@ async function executeSchemaStatements(
     // Create tables
     `CREATE TABLE IF NOT EXISTS games (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      status TEXT NOT NULL CHECK(status IN ('active', 'completed', 'paused')),
+      status TEXT NOT NULL CHECK(status IN ('active', 'completed', 'paused', 'notcompleted')),
       created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
     );`,
@@ -418,6 +418,33 @@ export async function listCompletedGames(): Promise<Game[]> {
   }
 }
 
+/**
+ * List all paused games
+ * @returns Array of paused games
+ * @throws {DatabaseError} If query fails
+ */
+export async function listPausedGames(): Promise<Game[]> {
+  try {
+    const db = await getDatabase();
+    const games = await db.getAllAsync<Game>(
+      "SELECT * FROM games WHERE status = ? ORDER BY created_at DESC",
+      ["paused"]
+    );
+    return games;
+  } catch (error) {
+    if (error instanceof DatabaseError) {
+      throw error;
+    }
+    throw new DatabaseError(
+      `Failed to list paused games: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      error instanceof Error ? error : undefined,
+      "LIST_PAUSED_GAMES_ERROR"
+    );
+  }
+}
+
 // ============================================================================
 // Player Operations
 // ============================================================================
@@ -745,6 +772,27 @@ export async function withTransaction<T>(
       }`,
       error instanceof Error ? error : undefined,
       "TRANSACTION_ERROR"
+    );
+  }
+}
+
+/**
+ * Get the absolute file path to the SQLite database
+ * Useful for debugging and inspecting the database outside the application
+ * @returns Absolute path to the database file
+ * @throws {DatabaseError} If database path cannot be retrieved
+ */
+export async function getDatabasePath(): Promise<string> {
+  try {
+    const db = await getDatabase();
+    return db.databasePath;
+  } catch (error) {
+    throw new DatabaseError(
+      `Failed to get database path: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      error instanceof Error ? error : undefined,
+      "GET_DATABASE_PATH_ERROR"
     );
   }
 }

@@ -17,7 +17,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useNavigation, useRouter } from "expo-router";
 import { useGameDispatch } from "@/contexts/GameContext";
-import { createGame, addPlayer, DatabaseError } from "@/services/database";
+import { createGame, addPlayer, DatabaseError, updateGame, listPausedGames } from "@/services/database";
 import { startGameAction, addPlayerAction } from "@/reducers/actionCreators";
 
 export default function NewGameScreen() {
@@ -72,7 +72,14 @@ export default function NewGameScreen() {
     setIsCreating(true);
 
     try {
-      // Create game in database
+      const pausedGames = await listPausedGames();
+
+      // Update all paused games to notcompleted
+      for (const pausedGame of pausedGames) {
+        await updateGame(pausedGame.id, { status: "notcompleted" });
+      }
+
+      // Create new game in database
       const game = await createGame("active");
 
       // Initialize game in context
@@ -120,7 +127,6 @@ export default function NewGameScreen() {
             onChangeText={setPlayerName}
             onSubmitEditing={handleAddPlayer}
             accessibilityLabel="Player name input"
-            accessibilityRole="textbox"
           />
           <TouchableOpacity
             style={styles.addButton}

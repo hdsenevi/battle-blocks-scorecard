@@ -41,6 +41,12 @@ So that I don't need to manually calculate or remember the penalty.
 **And** the penalty enforcement is 100% accurate (NFR22, NFR24)
 **And** the rule enforcement happens in real-time without perceptible delay (NFR5)
 **And** all players can see the penalty was applied on the main game screen
+**And** automation tests are created:
+- Unit tests verify 50+ penalty rule detection (checkPenaltyRule)
+- Unit tests verify score reset to 25 when penalty triggered
+- Component tests verify visual feedback for penalty (animations, indicators)
+- Integration tests verify penalty rule enforcement end-to-end
+- E2E test flow verifies 50+ penalty rule enforcement
 
 **FRs covered:** FR16, FR17, FR33, FR35, NFR5, NFR8, NFR22, NFR24
 
@@ -68,6 +74,13 @@ So that elimination rules are enforced without manual tracking.
 **And** the elimination is 100% accurate (NFR22, NFR24)
 **And** the rule enforcement happens in real-time without perceptible delay (NFR5)
 **And** all players can see who has been eliminated on the main game screen
+**And** automation tests are created:
+- Unit tests verify elimination rule detection (checkElimination at 3 misses)
+- Unit tests verify player marked as eliminated in database
+- Component tests verify visual feedback for elimination (grayed out, indicators)
+- Component tests verify eliminated players cannot receive scores
+- Integration tests verify elimination rule enforcement end-to-end
+- E2E test flow verifies automatic player elimination
 
 **FRs covered:** FR19, FR20, FR39, NFR5, NFR22, NFR24
 
@@ -90,6 +103,11 @@ So that the game can end automatically when someone wins.
 **And** the detection happens in real-time without perceptible delay (NFR5)
 **And** the win condition triggers the game completion flow (Epic 5, Story 5.1)
 **And** if a score would exceed 50, the penalty rule (Story 4.1) applies instead
+**And** automation tests are created:
+- Unit tests verify win condition detection (checkWinCondition at exactly 50)
+- Unit tests verify scores exceeding 50 trigger penalty instead of win
+- Integration tests verify win condition triggers game completion flow
+- E2E test flow verifies win condition detection
 
 **FRs covered:** FR21, FR22, FR41, NFR5, NFR22, NFR24
 
@@ -114,5 +132,10 @@ So that I understand what happened and trust the automatic enforcement.
 **And** the feedback is clear and understandable for ages 6+
 **And** the feedback appears on the main game screen so all players can see it
 **And** the visual feedback follows the design system (colors, typography, spacing)
+**And** automation tests are created:
+- Component tests verify visual feedback for each rule type (penalty, elimination, win)
+- Component tests verify accessibility of visual feedback (not just color)
+- Component tests verify animations respect reduced motion preferences
+- E2E test flow verifies visual feedback for rule enforcement
 
 **FRs covered:** FR33, NFR8, NFR39, NFR41

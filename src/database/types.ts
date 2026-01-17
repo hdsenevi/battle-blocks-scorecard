@@ -3,7 +3,7 @@
  * TypeScript interfaces for database entities
  */
 
-export type GameStatus = 'active' | 'completed' | 'paused';
+export type GameStatus = 'active' | 'completed' | 'paused' | 'notcompleted';
 export type ScoreEntryType = 'single_block' | 'multiple_blocks';
 
 /**
