@@ -1,0 +1,18 @@
+# Maestro E2E Testing Configuration
+# For Expo managed workflow
+
+# App configuration
+# Note: For Expo development builds, use the app name or bundle ID
+# The bundle ID will be set when building with EAS Build
+# For local development, Maestro can detect the app automatically
+
+# Platform support
+platforms:
+  - ios
+  - android
+
+# Expo-specific configuration
+# Maestro works with Expo development builds (not Expo Go)
+# Ensure you have built a development build before running tests:
+# - iOS: npx expo run:ios
+# - Android: npx expo run:android

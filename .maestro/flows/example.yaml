@@ -1,0 +1,22 @@
+# Example Maestro Test Flow
+# This flow demonstrates basic Maestro commands and test structure
+
+appId: com.battleblocks.scorecard
+---
+# Launch the app
+- launchApp
+
+# Wait for app to load
+- waitForAnimationToEnd
+
+# Verify home screen is visible
+- assertVisible: "Start New Game"
+
+# Optional: Tap on "Start New Game" button
+# Uncomment to test navigation
+# - tapOn: "Start New Game"
+# - waitForAnimationToEnd
+# - assertVisible: "Add Player"
+
+# Navigate back (if we navigated forward)
+# - back

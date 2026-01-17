@@ -30,16 +30,23 @@ This document defines the comprehensive testing strategy for Battle Blocks Score
 - **@testing-library/jest-native** (v5.4.3) - React Native-specific matchers
 
 **Coverage:**
-- Services (`src/services/`) - 100% coverage required
+- Services (`src/services/`) - **100% coverage required**
   - `gameRules.ts` - All rule enforcement functions
   - `database.ts` - Database operations (mocked)
   - `haptics.ts` - Haptic service functions
-- Reducers (`src/reducers/`) - 100% coverage required
+- Reducers (`src/reducers/`) - **100% coverage required**
   - `gameReducer.ts` - All action handlers
-- Utilities (`src/utils/`) - 100% coverage required
+- Utilities (`src/utils/`) - **100% coverage required**
   - `validation.ts`, `formatting.ts`, `platform.ts`, `accessibility.ts`
 - Hooks (`src/hooks/`) - Core logic coverage
   - `useAppLifecycle.ts` - Lifecycle logic
+
+**Coverage Requirements:**
+- All service functions: 100% coverage (branches, functions, lines, statements)
+- All utility functions: 100% coverage (branches, functions, lines, statements)
+- All reducer actions: 100% coverage (branches, functions, lines, statements)
+- Coverage thresholds enforced in `jest.config.js`
+- Coverage reports generated in `coverage/` directory (HTML, text, JSON, lcov)
 
 **Location:** `src/**/__tests__/*.test.ts` or `*.test.tsx`
 
@@ -173,6 +180,40 @@ src/components/game/__tests__/
 5. **Good DX**: Excellent developer experience and tooling
 
 ## Test Organization Structure
+
+### Unit Test Organization
+
+Tests are co-located with source files in `__tests__/` directories:
+
+```
+src/
+├── services/
+│   ├── __tests__/
+│   │   ├── gameRules.test.ts
+│   │   ├── database.test.ts
+│   │   └── haptics.test.ts
+│   ├── gameRules.ts
+│   ├── database.ts
+│   └── haptics.ts
+├── utils/
+│   ├── __tests__/
+│   │   ├── platform.test.ts
+│   │   └── accessibility.test.ts
+│   ├── platform.ts
+│   └── accessibility.ts
+└── reducers/
+    ├── __tests__/
+    │   └── gameReducer.test.ts
+    └── gameReducer.ts
+```
+
+### Test File Naming Convention
+
+- Unit tests: `*.test.ts` (TypeScript)
+- Component tests: `*.test.tsx` (TypeScript + JSX)
+- Integration tests: `*.integration.test.ts` or `*.integration.test.tsx`
+
+### E2E Test Organization
 
 ```
 battle-blocks-scorecard/

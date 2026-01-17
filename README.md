@@ -7,13 +7,13 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 1. Install dependencies
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. Start the app
 
    ```bash
-   npx expo start
+   pnpm start
    ```
 
 In the output, you'll find options to open the app in a
@@ -41,6 +41,42 @@ To learn more about developing your project with Expo, look at the following res
 
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+
+## E2E Testing with Maestro
+
+This project uses [Maestro](https://maestro.mobile.dev/) for end-to-end testing.
+
+### Install Maestro CLI
+
+**macOS/Linux:**
+```bash
+curl -Ls "https://get.maestro.mobile.dev" | bash
+```
+
+**Verify installation:**
+```bash
+maestro --version
+```
+
+### Prerequisites
+
+1. Build a development build (Maestro requires Expo development builds, not Expo Go):
+   - iOS: `pnpm run ios` or `npx expo run:ios`
+   - Android: `pnpm run android` or `npx expo run:android`
+
+2. Ensure a simulator/emulator is running
+
+### Running E2E Tests
+
+```bash
+# Run all test flows
+maestro test .maestro/flows/
+
+# Run a specific flow
+maestro test .maestro/flows/example.yaml
+```
+
+For more information, see [.maestro/README.md](.maestro/README.md).
 
 ## Join the community
 
