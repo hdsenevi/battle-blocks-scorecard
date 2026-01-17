@@ -12,8 +12,11 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/__tests__/**/*.test.tsx'],
   collectCoverageFrom: [
-    'services/**/*.{ts,tsx}',
-    '!services/**/*.d.ts',
+    'src/services/**/*.{ts,tsx}',
+    'src/utils/**/*.{ts,tsx}',
+    'src/reducers/**/*.{ts,tsx}',
+    '!**/*.d.ts',
+    '!**/__tests__/**',
   ],
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
