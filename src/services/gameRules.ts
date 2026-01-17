@@ -48,24 +48,29 @@ export function calculateScore(
     return 0;
   }
 
-  // Filter out invalid values (NaN, null, undefined, negative)
-  const validBlocks = blocks.filter(
-    (block) =>
-      typeof block === "number" &&
-      !isNaN(block) &&
-      block >= 0 &&
-      isFinite(block)
-  );
-
-  if (validBlocks.length === 0) {
-    return 0;
-  }
-
   if (isMultiple) {
-    // Multiple blocks mode: return count of valid blocks
+    // Multiple blocks mode: count valid blocks (0 is considered valid, Infinity is not)
+    const validBlocks = blocks.filter(
+      (block) =>
+        typeof block === "number" &&
+        !isNaN(block) &&
+        block >= 0 &&
+        isFinite(block)
+    );
     return validBlocks.length;
   } else {
-    // Single block mode: return the first valid block number value
+    // Single block mode: filter out invalid values (NaN, null, undefined, negative, 0, Infinity)
+    // and return first valid non-zero finite value
+    const validBlocks = blocks.filter(
+      (block) =>
+        typeof block === "number" &&
+        !isNaN(block) &&
+        block > 0 &&
+        isFinite(block)
+    );
+    if (validBlocks.length === 0) {
+      return 0;
+    }
     return validBlocks[0];
   }
 }

@@ -178,9 +178,15 @@ describe("useAppLifecycle", () => {
       expect(mockDatabase.listActiveGames).toHaveBeenCalled();
     });
 
-    // Should not crash
-    expect(consoleErrorSpy).not.toHaveBeenCalled();
+    // Wait for the error to be logged (since __DEV__ is true)
+    await waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Failed to restore game state:",
+        expect.any(Error)
+      );
+    });
 
+    // Should not crash - error is logged but app continues
     consoleErrorSpy.mockRestore();
   });
 

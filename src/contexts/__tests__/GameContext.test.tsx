@@ -5,7 +5,7 @@
 
 import React from "react";
 import { View, Text } from "react-native";
-import { render, renderHook } from "@testing-library/react-native";
+import { render, renderHook, waitFor, act } from "@testing-library/react-native";
 import {
   GameProvider,
   useGameContext,
@@ -85,7 +85,7 @@ describe("GameContext", () => {
       expect(result.current.players).toEqual([]);
     });
 
-    it("should return updated state after dispatch", () => {
+    it("should return updated state after dispatch", async () => {
       const { result } = renderHook(
         () => {
           const state = useGameState();
@@ -104,10 +104,14 @@ describe("GameContext", () => {
         updated_at: 1000,
       };
 
-      result.current.dispatch(startGameAction(game));
+      act(() => {
+        result.current.dispatch(startGameAction(game));
+      });
 
-      expect(result.current.state.currentGame).toEqual(game);
-      expect(result.current.state.gameStatus).toBe("active");
+      await waitFor(() => {
+        expect(result.current.state.currentGame).toEqual(game);
+        expect(result.current.state.gameStatus).toBe("active");
+      });
     });
   });
 
@@ -120,14 +124,17 @@ describe("GameContext", () => {
       expect(typeof result.current).toBe("function");
     });
 
-    it("should dispatch actions that update state", () => {
-      const { result: stateResult } = renderHook(() => useGameState(), {
-        wrapper: GameProvider,
-      });
-
-      const { result: dispatchResult } = renderHook(() => useGameDispatch(), {
-        wrapper: GameProvider,
-      });
+    it("should dispatch actions that update state", async () => {
+      const { result } = renderHook(
+        () => {
+          const state = useGameState();
+          const dispatch = useGameDispatch();
+          return { state, dispatch };
+        },
+        {
+          wrapper: GameProvider,
+        }
+      );
 
       const game: Game = {
         id: 1,
@@ -136,9 +143,13 @@ describe("GameContext", () => {
         updated_at: 1000,
       };
 
-      dispatchResult.current(startGameAction(game));
+      act(() => {
+        result.current.dispatch(startGameAction(game));
+      });
 
-      expect(stateResult.current.currentGame).toEqual(game);
+      await waitFor(() => {
+        expect(result.current.state.currentGame).toEqual(game);
+      });
     });
   });
 });

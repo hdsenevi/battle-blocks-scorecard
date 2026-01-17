@@ -198,7 +198,7 @@ describe("Game Rules Service", () => {
       it("should handle mixed valid and invalid values", () => {
         const mixed = [5, -1, 10, NaN, 0, -5, 15, Infinity];
         expect(calculateScore(mixed, false)).toBe(5);
-        expect(calculateScore(mixed, true)).toBe(5); // 5, 10, 0, 15, Infinity (5 valid)
+        expect(calculateScore(mixed, true)).toBe(4); // 5, 10, 0, 15 (4 valid, Infinity excluded)
       });
     });
   });

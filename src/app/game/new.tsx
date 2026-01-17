@@ -127,12 +127,14 @@ export default function NewGameScreen() {
             onChangeText={setPlayerName}
             onSubmitEditing={handleAddPlayer}
             accessibilityLabel="Player name input"
+            testID="player-name-input"
           />
           <TouchableOpacity
             style={styles.addButton}
             onPress={handleAddPlayer}
             accessibilityLabel="Add player"
             accessibilityRole="button"
+            testID="add-player-button"
           >
             <ThemedText style={styles.addButtonText}>Add</ThemedText>
           </TouchableOpacity>
@@ -167,6 +169,7 @@ export default function NewGameScreen() {
           disabled={players.length < 2 || isCreating}
           accessibilityLabel="Start game"
           accessibilityRole="button"
+          testID="start-game-button"
         >
           <ThemedText style={styles.startButtonText}>
             {isCreating ? "Creating..." : "Start Game"}

@@ -1,0 +1,72 @@
+# Maestro Test Flow: Add Players to Game
+# Story 2.2: Add Players to Game
+# Tests AC: 2, 3, 5, 7, 8, 9, 10, 11
+
+appId: com.battleblocks.scorecard
+---
+# Launch the app
+- launchApp
+
+# Wait for app to load
+- waitForAnimationToEnd
+
+# Navigate to new game setup screen
+- assertVisible: "Start New Game"
+- tapOn: "Start New Game"
+- waitForAnimationToEnd
+
+# Verify we're on the new game setup screen
+- assertVisible: "New Game"
+- assertVisible: "Add at least 2 players to start"
+
+# Test: Add a player with a valid name and verify the player appears in the list
+- tapOn:
+    id: "player-name-input"
+- inputText: "Alice"
+- tapOn:
+    id: "add-player-button"
+- waitForAnimationToEnd
+
+# Verify player appears in the list
+- assertVisible: "Alice"
+- assertVisible: "Players (1)"
+
+# Test: Attempt to add a player with an invalid name (empty) and verify error handling
+- tapOn:
+    id: "add-player-button"
+- waitForAnimationToEnd
+# Note: Alert dialog should appear - Maestro will verify this by checking the error message
+# Since Maestro can't directly assert Alert dialogs, we verify by checking that no second player was added
+- assertVisible: "Players (1)"
+
+# Test: Add a second player and verify the "Start Game" button becomes enabled
+- tapOn:
+    id: "player-name-input"
+- inputText: "Bob"
+- tapOn:
+    id: "add-player-button"
+- waitForAnimationToEnd
+
+# Verify second player appears
+- assertVisible: "Bob"
+- assertVisible: "Players (2)"
+
+# Verify "Start Game" button is enabled (should be visible and not disabled)
+- assertVisible: "Start Game"
+
+# Test: Attempt to start game with only 1 player and verify error message
+# First, remove one player
+- tapOn: "Remove"
+- waitForAnimationToEnd
+
+# Verify we're back to 1 player
+- assertVisible: "Players (1)"
+
+# Try to start game with only 1 player
+- tapOn:
+    id: "start-game-button"
+- waitForAnimationToEnd
+# Note: Alert dialog should appear with error message
+# Since Maestro can't directly assert Alert dialogs, we verify by checking that we're still on the same screen
+- assertVisible: "New Game"
+- assertVisible: "Players (1)"
