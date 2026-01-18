@@ -23,44 +23,49 @@ appId: com.battleblocks.scorecard
 - tapOn:
     id: "player-name-input"
 - inputText: "Alice"
+- hideKeyboard
 - tapOn:
     id: "add-player-button"
 - waitForAnimationToEnd
 
 # Verify player appears in the list
 - assertVisible: "Alice"
-- assertVisible: "Players (1)"
+- assertVisible:
+    id: "players-count-1"
+- hideKeyboard
 
 # Test: Attempt to add a player with an invalid name (empty) and verify error handling
 - tapOn:
     id: "add-player-button"
 - waitForAnimationToEnd
 # Note: Alert dialog should appear - Maestro will verify this by checking the error message
-# Since Maestro can't directly assert Alert dialogs, we verify by checking that no second player was added
-- assertVisible: "Players (1)"
+- tapOn: OK
 
 # Test: Add a second player and verify the "Start Game" button becomes enabled
 - tapOn:
     id: "player-name-input"
 - inputText: "Bob"
+- hideKeyboard
 - tapOn:
     id: "add-player-button"
 - waitForAnimationToEnd
 
 # Verify second player appears
 - assertVisible: "Bob"
-- assertVisible: "Players (2)"
+- assertVisible:
+    id: "players-count-2"
 
 # Verify "Start Game" button is enabled (should be visible and not disabled)
 - assertVisible: "Start Game"
 
 # Test: Attempt to start game with only 1 player and verify error message
 # First, remove one player
-- tapOn: "Remove"
+- tapOn: Remove Bob
 - waitForAnimationToEnd
 
 # Verify we're back to 1 player
-- assertVisible: "Players (1)"
+- assertVisible:
+    id: "players-count-1"
 
 # Try to start game with only 1 player
 - tapOn:
@@ -69,4 +74,5 @@ appId: com.battleblocks.scorecard
 # Note: Alert dialog should appear with error message
 # Since Maestro can't directly assert Alert dialogs, we verify by checking that we're still on the same screen
 - assertVisible: "New Game"
-- assertVisible: "Players (1)"
+- assertVisible:
+    id: "players-count-1"

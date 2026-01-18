@@ -142,7 +142,11 @@ export default function NewGameScreen() {
 
         {players.length > 0 && (
           <View style={styles.playersContainer}>
-            <ThemedText type="subtitle" style={styles.playersTitle}>
+            <ThemedText 
+              type="subtitle" 
+              style={styles.playersTitle}
+              testID={`players-count-${players.length}`}
+            >
               Players ({players.length})
             </ThemedText>
             {players.map((player) => (

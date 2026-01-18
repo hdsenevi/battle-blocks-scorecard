@@ -5,7 +5,6 @@
 import React from "react";
 import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
 import { Alert } from "react-native";
-import { useRouter, useNavigation } from "expo-router";
 import NewGameScreen from "../../game/new";
 import { GameProvider } from "@/contexts/GameContext";
 import * as database from "@/services/database";

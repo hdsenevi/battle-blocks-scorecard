@@ -127,6 +127,7 @@ export default function HomeScreen() {
             onPress={handleStartNewGame}
             accessibilityLabel="Start New Game"
             accessibilityRole="button"
+            testID="start-new-game-button"
           >
             <ThemedText style={styles.buttonText}>Start New Game</ThemedText>
           </TouchableOpacity>
