@@ -12,8 +12,8 @@ import {
   TextInput,
   Platform,
   Alert,
+  Text,
 } from "react-native";
-import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import type { Player } from "@/database/types";
 import { calculateScore } from "@/services/gameRules";
@@ -79,19 +79,19 @@ export function ScoreEntryModal({
       >
         <View style={styles.overlay}>
           <ThemedView style={styles.modal}>
-            <ThemedText type="title" style={styles.title}>
+            <Text className="text-2xl mb-2">
               {gameStatus === "completed" ? "Game Completed" : gameStatus === "notcompleted" ? "Game Not Completed" : "Game Paused"}
-            </ThemedText>
-            <ThemedText style={styles.instruction}>
+            </Text>
+            <Text className="text-base mb-6 opacity-70">
               {statusMessage}
-            </ThemedText>
+            </Text>
             <TouchableOpacity
               style={[styles.button, styles.submitButton]}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
             >
-              <ThemedText style={styles.submitButtonText}>Close</ThemedText>
+              <Text className="text-white text-base font-semibold">Close</Text>
             </TouchableOpacity>
           </ThemedView>
         </View>
@@ -111,19 +111,19 @@ export function ScoreEntryModal({
       >
         <View style={styles.overlay}>
           <ThemedView style={styles.modal}>
-            <ThemedText type="title" style={styles.title}>
+            <Text className="text-2xl mb-2">
               Player Eliminated
-            </ThemedText>
-            <ThemedText style={styles.instruction}>
+            </Text>
+            <Text className="text-base mb-6 opacity-70">
               {player.name} has been eliminated and cannot receive further scores.
-            </ThemedText>
+            </Text>
             <TouchableOpacity
               style={[styles.button, styles.submitButton]}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
             >
-              <ThemedText style={styles.submitButtonText}>Close</ThemedText>
+              <Text className="text-white text-base font-semibold">Close</Text>
             </TouchableOpacity>
           </ThemedView>
         </View>
@@ -367,13 +367,13 @@ export function ScoreEntryModal({
     >
       <View style={styles.overlay}>
         <ThemedView style={styles.modal}>
-          <ThemedText type="title" style={styles.title}>
+          <Text className="text-2xl mb-2">
             Enter Score for {player.name}
-          </ThemedText>
+          </Text>
 
-          <ThemedText style={styles.currentScore}>
+          <Text className="text-base mb-6 opacity-70">
             Current Score: {player.current_score}
-          </ThemedText>
+          </Text>
 
           <View style={styles.modeSelector}>
             <TouchableOpacity
@@ -385,14 +385,13 @@ export function ScoreEntryModal({
               accessibilityLabel="Single block mode"
               accessibilityRole="button"
             >
-              <ThemedText
-                style={[
-                  styles.modeButtonText,
-                  entryMode === "single" && styles.modeButtonTextActive,
-                ]}
+              <Text
+                className={`text-base font-semibold ${
+                  entryMode === "single" ? "text-white" : "text-primary"
+                }`}
               >
                 Single Block
-              </ThemedText>
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -403,22 +402,21 @@ export function ScoreEntryModal({
               accessibilityLabel="Multiple blocks mode"
               accessibilityRole="button"
             >
-              <ThemedText
-                style={[
-                  styles.modeButtonText,
-                  entryMode === "multiple" && styles.modeButtonTextActive,
-                ]}
+              <Text
+                className={`text-base font-semibold ${
+                  entryMode === "multiple" ? "text-white" : "text-primary"
+                }`}
               >
                 Multiple Blocks
-              </ThemedText>
+              </Text>
             </TouchableOpacity>
           </View>
 
-          <ThemedText style={styles.instruction}>
+          <Text className="text-base mb-4 opacity-70">
             {entryMode === "single"
               ? "Enter the block number (e.g., 12 = 12 points)"
               : "Enter the number of blocks (e.g., 3 blocks = 3 points)"}
-          </ThemedText>
+          </Text>
 
           <TextInput
             style={styles.input}
@@ -439,7 +437,7 @@ export function ScoreEntryModal({
               accessibilityLabel="Cancel"
               accessibilityRole="button"
             >
-              <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+              <Text className="text-primary text-base font-semibold">Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -452,9 +450,9 @@ export function ScoreEntryModal({
               accessibilityLabel="Submit score"
               accessibilityRole="button"
             >
-              <ThemedText style={styles.submitButtonText}>
+              <Text className="text-white text-base font-semibold">
                 {isSubmitting ? "Submitting..." : "Submit"}
-              </ThemedText>
+              </Text>
             </TouchableOpacity>
           </View>
         </ThemedView>
@@ -478,15 +476,6 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 400,
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 8,
-  },
-  currentScore: {
-    fontSize: 16,
-    marginBottom: 24,
-    opacity: 0.7,
-  },
   modeSelector: {
     flexDirection: "row",
     gap: 12,
@@ -506,19 +495,6 @@ const styles = StyleSheet.create({
   modeButtonActive: {
     borderColor: "#007AFF",
     backgroundColor: "#F0F8FF",
-  },
-  modeButtonText: {
-    fontSize: 16,
-    color: "#666",
-  },
-  modeButtonTextActive: {
-    color: "#007AFF",
-    fontWeight: "600",
-  },
-  instruction: {
-    fontSize: 14,
-    marginBottom: 16,
-    opacity: 0.7,
   },
   input: {
     borderWidth: 1,
@@ -546,20 +522,10 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: "#E0E0E0",
   },
-  cancelButtonText: {
-    color: "#000",
-    fontSize: 16,
-    fontWeight: "600",
-  },
   submitButton: {
     backgroundColor: "#007AFF",
   },
   submitButtonDisabled: {
     opacity: 0.6,
-  },
-  submitButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

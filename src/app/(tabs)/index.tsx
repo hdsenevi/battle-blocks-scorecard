@@ -3,8 +3,7 @@
  * Main entry point for the app
  */
 
-import { StyleSheet, View, TouchableOpacity, Platform } from "react-native";
-import { ThemedText } from "@/components/themed-text";
+import { StyleSheet, View, TouchableOpacity, Platform, Text } from "react-native";
 import { ThemedView } from "@/components/themed-view";
 import { useRouter } from "expo-router";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
@@ -104,7 +103,7 @@ export default function HomeScreen() {
     return (
       <ThemedView style={styles.container}>
         <View style={styles.content}>
-          <ThemedText>Loading...</ThemedText>
+          <Text className="text-base">Loading...</Text>
         </View>
       </ThemedView>
     );
@@ -113,13 +112,13 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
-        <ThemedText type="title" style={styles.title}>
+        <Text className="text-3xl font-bold mb-4 text-center">
           Battle Blocks Scorecard
-        </ThemedText>
+        </Text>
 
-        <ThemedText style={styles.subtitle}>
+        <Text className="text-base mb-10 text-center opacity-70">
           Track scores for your Battle Blocks games
-        </ThemedText>
+        </Text>
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity
@@ -129,7 +128,7 @@ export default function HomeScreen() {
             accessibilityRole="button"
             testID="start-new-game-button"
           >
-            <ThemedText style={styles.buttonText}>Start New Game</ThemedText>
+            <Text className="text-white text-base font-semibold">Start New Game</Text>
           </TouchableOpacity>
 
           {hasActiveGames && (
@@ -140,9 +139,9 @@ export default function HomeScreen() {
               accessibilityLabel="Continue Game"
               accessibilityRole="button"
             >
-              <ThemedText style={styles.secondaryButtonText}>
+              <Text className="text-primary text-base font-semibold">
                 Continue Game
-              </ThemedText>
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -160,17 +159,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-  },
-  title: {
-    fontSize: 32,
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 40,
-    textAlign: "center",
-    opacity: 0.7,
   },
   buttonContainer: {
     width: "100%",
@@ -192,15 +180,5 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: "#007AFF",
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  secondaryButtonText: {
-    color: "#007AFF",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

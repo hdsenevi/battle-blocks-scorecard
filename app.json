@@ -26,6 +26,7 @@
             "package": "com.anonymous.battleblocksscorecard"
         },
         "web": {
+            "bundler": "metro",
             "output": "static",
             "favicon": "./src/assets/images/favicon.png"
         },

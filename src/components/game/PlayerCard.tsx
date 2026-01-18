@@ -3,8 +3,7 @@
  * Displays a player's name, score, and status
  */
 
-import { StyleSheet, View, TouchableOpacity, Platform } from "react-native";
-import { ThemedText } from "@/components/themed-text";
+import { View, TouchableOpacity, Platform, Text } from "react-native";
 import type { Player } from "@/database/types";
 
 interface PlayerCardProps {
@@ -20,100 +19,42 @@ export function PlayerCard({
   gameId,
   onPress,
 }: PlayerCardProps) {
-  const cardStyle = [
-    styles.card,
-    isLeader && styles.leaderCard,
-    player.is_eliminated && styles.eliminatedCard,
-  ];
+  const minHeight = Platform.select({ ios: 80, android: 88, default: 80 });
 
   return (
     <TouchableOpacity
-      style={cardStyle}
+      className={`bg-gray-50 rounded-card p-4 border-2 border-gray-200 ${player.is_eliminated ? "opacity-50" : ""}`}
+      style={{ minHeight }}
       onPress={onPress}
       disabled={player.is_eliminated || !onPress}
       testID={`player-card-${player.name}`}
       accessibilityLabel={`${player.name}, Score: ${player.current_score}${isLeader ? ", Leader" : ""}${player.is_eliminated ? ", Eliminated" : ""}`}
       accessibilityRole="button"
     >
-      <View style={styles.content}>
-        <View style={styles.nameContainer}>
-          <ThemedText style={styles.name}>{player.name}</ThemedText>
+      <View className="flex-row justify-between items-center">
+        <View className="flex-1 gap-2">
+          <Text className="text-lg font-semibold text-black">
+            {player.name}
+          </Text>
           {isLeader && (
-            <View style={styles.leaderBadge}>
-              <ThemedText style={styles.leaderText}>👑 Leader</ThemedText>
+            <View className="self-start bg-primary rounded-badge px-2 py-1 mt-1">
+              <Text className="text-white text-xs font-semibold">
+                👑 Leader
+              </Text>
             </View>
           )}
           {player.is_eliminated && (
-            <View style={styles.eliminatedBadge}>
-              <ThemedText style={styles.eliminatedText}>Eliminated</ThemedText>
+            <View className="self-start bg-eliminated rounded-badge px-2 py-1 mt-1">
+              <Text className="text-white text-xs font-semibold">
+                Eliminated
+              </Text>
             </View>
           )}
         </View>
-        <ThemedText style={styles.score}>{player.current_score}</ThemedText>
+        <Text className="text-3xl font-bold text-primary">
+          {player.current_score}
+        </Text>
       </View>
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 2,
-    borderColor: "#E0E0E0",
-    minHeight: Platform.select({ ios: 80, android: 88, default: 80 }),
-  },
-  leaderCard: {
-    borderColor: "#007AFF",
-    backgroundColor: "#F0F8FF",
-  },
-  eliminatedCard: {
-    opacity: 0.5,
-    backgroundColor: "#F5F5F5",
-  },
-  content: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  nameContainer: {
-    flex: 1,
-    gap: 8,
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  leaderBadge: {
-    alignSelf: "flex-start",
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginTop: 4,
-  },
-  leaderText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  eliminatedBadge: {
-    alignSelf: "flex-start",
-    backgroundColor: "#999999",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginTop: 4,
-  },
-  eliminatedText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  score: {
-    fontSize: 32,
-    fontWeight: "700",
-    color: "#007AFF",
-  },
-});

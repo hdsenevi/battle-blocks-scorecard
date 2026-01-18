@@ -10,9 +10,9 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  Text,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useGameDispatch } from "@/contexts/GameContext";
 import {
@@ -121,7 +121,7 @@ export default function GameSelectionScreen() {
     return (
       <ThemedView style={styles.container}>
         <View style={styles.content}>
-          <ThemedText>Loading games...</ThemedText>
+          <Text className="text-base">Loading games...</Text>
         </View>
       </ThemedView>
     );
@@ -131,12 +131,12 @@ export default function GameSelectionScreen() {
     return (
       <ThemedView style={styles.container}>
         <View style={styles.content}>
-          <ThemedText style={styles.errorText}>{error}</ThemedText>
+          <Text className="text-base text-red-500 mb-4 text-center">{error}</Text>
           <TouchableOpacity
             style={styles.button}
             onPress={() => router.back()}
           >
-            <ThemedText style={styles.buttonText}>Go Back</ThemedText>
+            <Text className="text-white text-base font-semibold">Go Back</Text>
           </TouchableOpacity>
         </View>
       </ThemedView>
@@ -147,15 +147,15 @@ export default function GameSelectionScreen() {
     return (
       <ThemedView style={styles.container}>
         <View style={styles.content}>
-          <ThemedText style={styles.title}>No Active Games</ThemedText>
-          <ThemedText style={styles.subtitle}>
+          <Text className="text-2xl mb-2 text-center">No Active Games</Text>
+          <Text className="text-base mb-6 text-center opacity-70">
             Start a new game to begin playing
-          </ThemedText>
+          </Text>
           <TouchableOpacity
             style={styles.button}
             onPress={() => router.replace("/(tabs)")}
           >
-            <ThemedText style={styles.buttonText}>Go to Home</ThemedText>
+            <Text className="text-white text-base font-semibold">Go to Home</Text>
           </TouchableOpacity>
         </View>
       </ThemedView>
@@ -165,12 +165,12 @@ export default function GameSelectionScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
-        <ThemedText type="title" style={styles.headerTitle} testID="select-game-title">
+        <Text className="text-2xl mb-2" testID="select-game-title">
           Select Game to Resume
-        </ThemedText>
-        <ThemedText style={styles.headerSubtitle} testID="select-game-subtitle">
+        </Text>
+        <Text className="text-sm opacity-70" testID="select-game-subtitle">
           {games.length} {games.length === 1 ? "game" : "games"} to resume
-        </ThemedText>
+        </Text>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.list}>
@@ -187,14 +187,14 @@ export default function GameSelectionScreen() {
           >
             <View style={styles.gameCardContent}>
               <View style={styles.gameCardHeader}>
-                <ThemedText style={styles.gameId}>Game #{game.id}</ThemedText>
-                <ThemedText style={styles.gameDate}>
+                <Text className="text-lg font-semibold">Game #{game.id}</Text>
+                <Text className="text-sm opacity-70">
                   {formatDate(game.created_at)}
-                </ThemedText>
+                </Text>
               </View>
-              <ThemedText style={styles.gamePlayers}>
+              <Text className="text-sm opacity-70">
                 {game.playerCount} {game.playerCount === 1 ? "player" : "players"}
-              </ThemedText>
+              </Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -208,7 +208,7 @@ export default function GameSelectionScreen() {
           accessibilityLabel="Cancel and go to home"
           accessibilityRole="button"
         >
-          <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+          <Text className="text-primary text-base font-semibold">Cancel</Text>
         </TouchableOpacity>
       </View>
     </ThemedView>
@@ -229,14 +229,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
-  },
-  headerTitle: {
-    fontSize: 24,
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    opacity: 0.7,
   },
   scrollView: {
     flex: 1,
@@ -261,18 +253,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  gameId: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  gameDate: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
-  gamePlayers: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
   footer: {
     padding: 16,
     borderTopWidth: 1,
@@ -288,11 +268,6 @@ const styles = StyleSheet.create({
     minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
     marginTop: 16,
   },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
   cancelButton: {
     paddingVertical: Platform.select({ ios: 12, android: 14, default: 12 }),
     paddingHorizontal: 24,
@@ -300,27 +275,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
-  },
-  cancelButtonText: {
-    color: "#007AFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 24,
-    textAlign: "center",
-    opacity: 0.7,
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#FF3B30",
-    marginBottom: 16,
-    textAlign: "center",
   },
 });

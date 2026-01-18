@@ -10,9 +10,9 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  Text,
 } from "react-native";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import { getGame, getPlayersByGame } from "@/services/database";
@@ -78,7 +78,7 @@ export default function WinnerScreen() {
   if (!currentGame) {
     return (
       <ThemedView style={styles.container}>
-        <ThemedText>Loading...</ThemedText>
+        <Text className="text-base">Loading...</Text>
       </ThemedView>
     );
   }
@@ -95,19 +95,19 @@ export default function WinnerScreen() {
         contentContainerStyle={styles.content}
       >
         <View style={styles.winnerSection}>
-          <ThemedText type="title" style={styles.winnerTitle}>
+          <Text className="text-4xl mb-4">
             🎉 Winner! 🎉
-          </ThemedText>
-          <ThemedText style={styles.winnerName}>{winner.name}</ThemedText>
-          <ThemedText style={styles.winnerScore}>
+          </Text>
+          <Text className="text-3xl font-bold mb-2">{winner.name}</Text>
+          <Text className="text-2xl opacity-80">
             {winner.current_score} Points
-          </ThemedText>
+          </Text>
         </View>
 
         <View style={styles.scoresSection}>
-          <ThemedText type="subtitle" style={styles.scoresTitle}>
+          <Text className="text-xl font-bold mb-4">
             Final Scores
-          </ThemedText>
+          </Text>
           {sortedPlayers.map((player, index) => (
             <View
               key={player.id}
@@ -117,19 +117,19 @@ export default function WinnerScreen() {
               ]}
             >
               <View style={styles.rankContainer}>
-                <ThemedText style={styles.rank}>#{index + 1}</ThemedText>
+                <Text className="text-base font-semibold opacity-70">#{index + 1}</Text>
               </View>
               <View style={styles.playerInfo}>
-                <ThemedText style={styles.playerName}>{player.name}</ThemedText>
+                <Text className="text-lg font-semibold">{player.name}</Text>
                 {player.is_eliminated && (
-                  <ThemedText style={styles.eliminatedLabel}>
+                  <Text className="text-xs opacity-60 mt-1">
                     Eliminated
-                  </ThemedText>
+                  </Text>
                 )}
               </View>
-              <ThemedText style={styles.finalScore}>
+              <Text className="text-xl font-bold text-primary">
                 {player.current_score}
-              </ThemedText>
+              </Text>
             </View>
           ))}
         </View>
@@ -140,9 +140,9 @@ export default function WinnerScreen() {
           accessibilityLabel="Start new game"
           accessibilityRole="button"
         >
-          <ThemedText style={styles.newGameButtonText}>
+          <Text className="text-white text-lg font-semibold">
             Start New Game
-          </ThemedText>
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </ThemedView>
@@ -164,25 +164,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     paddingVertical: 32,
   },
-  winnerTitle: {
-    fontSize: 36,
-    marginBottom: 16,
-  },
-  winnerName: {
-    fontSize: 28,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  winnerScore: {
-    fontSize: 24,
-    opacity: 0.8,
-  },
   scoresSection: {
     marginBottom: 32,
-  },
-  scoresTitle: {
-    fontSize: 20,
-    marginBottom: 16,
   },
   scoreRow: {
     flexDirection: "row",
@@ -200,27 +183,8 @@ const styles = StyleSheet.create({
   rankContainer: {
     width: 40,
   },
-  rank: {
-    fontSize: 16,
-    fontWeight: "600",
-    opacity: 0.7,
-  },
   playerInfo: {
     flex: 1,
-  },
-  playerName: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  eliminatedLabel: {
-    fontSize: 12,
-    opacity: 0.6,
-    marginTop: 4,
-  },
-  finalScore: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#007AFF",
   },
   newGameButton: {
     backgroundColor: "#007AFF",
@@ -229,10 +193,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
-  },
-  newGameButtonText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "600",
   },
 });

@@ -5,10 +5,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  Text,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import {
   listCompletedGames,
@@ -93,7 +93,7 @@ export default function HistoryScreen() {
     return (
       <ThemedView style={styles.container}>
         <View style={[styles.content, { paddingTop: insets.top }]}>
-          <ThemedText>Loading history...</ThemedText>
+          <Text className="text-base">Loading history...</Text>
         </View>
       </ThemedView>
     );
@@ -103,7 +103,7 @@ export default function HistoryScreen() {
     return (
       <ThemedView style={styles.container}>
         <View style={[styles.content, { paddingTop: insets.top }]}>
-          <ThemedText style={styles.errorText}>{error}</ThemedText>
+          <Text className="text-base text-red-500 text-center">{error}</Text>
         </View>
       </ThemedView>
     );
@@ -113,12 +113,12 @@ export default function HistoryScreen() {
     return (
       <ThemedView style={styles.container}>
         <View style={[styles.content, { paddingTop: insets.top }]}>
-          <ThemedText type="title" style={styles.title}>
+          <Text className="text-2xl mb-2 text-center">
             No Completed Games
-          </ThemedText>
-          <ThemedText style={styles.subtitle}>
+          </Text>
+          <Text className="text-base mb-6 text-center opacity-70">
             Completed games will appear here
-          </ThemedText>
+          </Text>
         </View>
       </ThemedView>
     );
@@ -127,12 +127,12 @@ export default function HistoryScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-        <ThemedText type="title" style={styles.headerTitle}>
+        <Text className="text-2xl mb-2">
           Game History
-        </ThemedText>
-        <ThemedText style={styles.headerSubtitle}>
+        </Text>
+        <Text className="text-sm opacity-70">
           {games.length} completed {games.length === 1 ? "game" : "games"}
-        </ThemedText>
+        </Text>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.list}>
@@ -148,22 +148,22 @@ export default function HistoryScreen() {
           >
             <View style={styles.gameCardContent}>
               <View style={styles.gameCardHeader}>
-                <ThemedText style={styles.gameId}>Game #{game.id}</ThemedText>
-                <ThemedText style={styles.gameDate}>
+                <Text className="text-lg font-semibold">Game #{game.id}</Text>
+                <Text className="text-sm opacity-70">
                   {formatDate(game.updated_at)}
-                </ThemedText>
+                </Text>
               </View>
               {game.winnerName && (
                 <View style={styles.winnerInfo}>
-                  <ThemedText style={styles.winnerLabel}>Winner:</ThemedText>
-                  <ThemedText style={styles.winnerName}>
+                  <Text className="text-sm opacity-70">Winner:</Text>
+                  <Text className="text-base font-semibold text-primary">
                     {game.winnerName} ({game.winnerScore} pts)
-                  </ThemedText>
+                  </Text>
                 </View>
               )}
-              <ThemedText style={styles.gamePlayers}>
+              <Text className="text-sm opacity-70">
                 {game.playerCount} {game.playerCount === 1 ? "player" : "players"}
-              </ThemedText>
+              </Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -186,14 +186,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
-  },
-  headerTitle: {
-    fontSize: 24,
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    opacity: 0.7,
   },
   scrollView: {
     flex: 1,
@@ -218,46 +210,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  gameId: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  gameDate: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
   winnerInfo: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-  },
-  winnerLabel: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
-  winnerName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#007AFF",
-  },
-  gamePlayers: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 24,
-    textAlign: "center",
-    opacity: 0.7,
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#FF3B30",
-    textAlign: "center",
   },
 });

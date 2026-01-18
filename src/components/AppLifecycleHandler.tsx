@@ -6,8 +6,7 @@
 
 import { useEffect, useState } from "react";
 import { ThemedView } from "./themed-view";
-import { ThemedText } from "./themed-text";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import { initializeDatabase, getDatabasePath } from "../services/database";
 import { useAppLifecycle } from "../hooks/useAppLifecycle";
 
@@ -59,12 +58,12 @@ export function AppLifecycleHandler() {
   if (initError) {
     return (
       <ThemedView style={styles.errorContainer}>
-        <ThemedText style={styles.errorText}>
+        <Text className="text-red-500 text-lg font-semibold mb-2 text-center px-5">
           Database Error: {initError}
-        </ThemedText>
-        <ThemedText style={styles.errorSubtext}>
+        </Text>
+        <Text className="text-white text-sm text-center px-5">
           Please restart the app
-        </ThemedText>
+        </Text>
       </ThemedView>
     );
   }
@@ -88,19 +87,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.8)",
     zIndex: 9999,
-  },
-  errorText: {
-    color: "#FF3B30",
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 8,
-    textAlign: "center",
-    paddingHorizontal: 20,
-  },
-  errorSubtext: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    textAlign: "center",
-    paddingHorizontal: 20,
   },
 });

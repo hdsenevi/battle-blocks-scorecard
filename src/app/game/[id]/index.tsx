@@ -10,10 +10,10 @@ import {
   ScrollView,
   Platform,
   TouchableOpacity,
+  Text,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
-import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import { getGame, getPlayersByGame, updateGame } from "@/services/database";
@@ -127,7 +127,7 @@ export default function GameScreen() {
   if (!currentGame) {
     return (
       <ThemedView style={styles.container}>
-        <ThemedText>Loading game...</ThemedText>
+        <Text className="text-base">Loading game...</Text>
       </ThemedView>
     );
   }
@@ -136,12 +136,12 @@ export default function GameScreen() {
     <ThemedView style={styles.container}>
       <View style={styles.header}>
         <View>
-          <ThemedText type="title" style={styles.title} testID="game-title">
+          <Text className="text-2xl mb-2" testID="game-title">
             Game #{currentGame.id}
-          </ThemedText>
-          <ThemedText style={styles.status} testID="game-status">
+          </Text>
+          <Text className="text-sm opacity-70 capitalize" testID="game-status">
             Status: {currentGame.status}
-          </ThemedText>
+          </Text>
         </View>
         <TouchableOpacity
           style={styles.historyButton}
@@ -150,7 +150,7 @@ export default function GameScreen() {
           accessibilityLabel="View score history"
           accessibilityRole="button"
         >
-          <ThemedText style={styles.historyButtonText}>History</ThemedText>
+          <Text className="text-primary text-base font-semibold">History</Text>
         </TouchableOpacity>
       </View>
 
@@ -159,7 +159,7 @@ export default function GameScreen() {
         contentContainerStyle={styles.content}
       >
         {players.length === 0 ? (
-          <ThemedText style={styles.emptyText}>No players yet</ThemedText>
+          <Text className="text-center mt-10 opacity-70">No players yet</Text>
         ) : (
           players.map((player) => (
             <PlayerCard
@@ -220,30 +220,11 @@ const styles = StyleSheet.create({
     minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
     justifyContent: "center",
   },
-  historyButtonText: {
-    color: "#007AFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 8,
-  },
-  status: {
-    fontSize: 14,
-    opacity: 0.7,
-    textTransform: "capitalize",
-  },
   scrollView: {
     flex: 1,
   },
   content: {
     padding: 16,
     gap: 12,
-  },
-  emptyText: {
-    textAlign: "center",
-    marginTop: 40,
-    opacity: 0.7,
   },
 });

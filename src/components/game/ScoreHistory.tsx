@@ -10,8 +10,8 @@ import {
   FlatList,
   Modal,
   TouchableOpacity,
+  Text,
 } from "react-native";
-import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { getScoreEntriesByGame, getPlayersByGame } from "@/services/database";
 import type { ScoreEntry } from "@/database/types";
@@ -79,15 +79,15 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
   const renderItem = ({ item }: { item: ScoreHistoryItem }) => (
     <View style={styles.historyItem}>
       <View style={styles.historyItemLeft}>
-        <ThemedText style={styles.playerName}>{item.playerName}</ThemedText>
-        <ThemedText style={styles.entryType}>
+        <Text className="text-base font-semibold mb-1">{item.playerName}</Text>
+        <Text className="text-sm opacity-70 mb-0.5">
           {formatEntryType(item.entry_type)}
-        </ThemedText>
-        <ThemedText style={styles.timestamp}>
+        </Text>
+        <Text className="text-xs opacity-50">
           {formatTimestamp(item.created_at)}
-        </ThemedText>
+        </Text>
       </View>
-      <ThemedText style={styles.scoreValue}>+{item.score_value}</ThemedText>
+      <Text className="text-xl font-bold text-primary">+{item.score_value}</Text>
     </View>
   );
 
@@ -102,25 +102,25 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
       <View style={styles.overlay}>
         <ThemedView style={styles.modal}>
           <View style={styles.header}>
-            <ThemedText type="title" style={styles.title}>
+            <Text className="text-2xl">
               Score History
-            </ThemedText>
+            </Text>
             <TouchableOpacity
               onPress={onClose}
               accessibilityLabel="Close score history"
               accessibilityRole="button"
             >
-              <ThemedText style={styles.closeButton}>Close</ThemedText>
+              <Text className="text-base text-primary font-semibold">Close</Text>
             </TouchableOpacity>
           </View>
 
           {isLoading ? (
             <View style={styles.loadingContainer}>
-              <ThemedText>Loading...</ThemedText>
+              <Text className="text-base">Loading...</Text>
             </View>
           ) : scoreEntries.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <ThemedText style={styles.emptyText}>No score entries yet</ThemedText>
+              <Text className="opacity-70">No score entries yet</Text>
             </View>
           ) : (
             <FlatList
@@ -156,14 +156,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  title: {
-    fontSize: 24,
-  },
-  closeButton: {
-    fontSize: 16,
-    color: "#007AFF",
-    fontWeight: "600",
-  },
   loadingContainer: {
     padding: 40,
     alignItems: "center",
@@ -171,9 +163,6 @@ const styles = StyleSheet.create({
   emptyContainer: {
     padding: 40,
     alignItems: "center",
-  },
-  emptyText: {
-    opacity: 0.7,
   },
   list: {
     flex: 1,
@@ -192,24 +181,5 @@ const styles = StyleSheet.create({
   },
   historyItemLeft: {
     flex: 1,
-  },
-  playerName: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  entryType: {
-    fontSize: 14,
-    opacity: 0.7,
-    marginBottom: 2,
-  },
-  timestamp: {
-    fontSize: 12,
-    opacity: 0.5,
-  },
-  scoreValue: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#007AFF",
   },
 });

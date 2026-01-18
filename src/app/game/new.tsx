@@ -12,8 +12,8 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Text,
 } from "react-native";
-import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useNavigation, useRouter } from "expo-router";
 import { useGameDispatch } from "@/contexts/GameContext";
@@ -110,13 +110,13 @@ export default function NewGameScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.content}
       >
-        <ThemedText type="title" style={styles.title}>
+        <Text className="text-3xl font-bold mb-2">
           New Game
-        </ThemedText>
+        </Text>
 
-        <ThemedText style={styles.subtitle}>
+        <Text className="text-base mb-6 opacity-70">
           Add at least 2 players to start
-        </ThemedText>
+        </Text>
 
         <View style={styles.inputContainer}>
           <TextInput
@@ -136,28 +136,27 @@ export default function NewGameScreen() {
             accessibilityRole="button"
             testID="add-player-button"
           >
-            <ThemedText style={styles.addButtonText}>Add</ThemedText>
+            <Text className="text-white text-base font-semibold">Add</Text>
           </TouchableOpacity>
         </View>
 
         {players.length > 0 && (
           <View style={styles.playersContainer}>
-            <ThemedText 
-              type="subtitle" 
-              style={styles.playersTitle}
+            <Text 
+              className="text-xl font-bold mb-3"
               testID={`players-count-${players.length}`}
             >
               Players ({players.length})
-            </ThemedText>
+            </Text>
             {players.map((player) => (
               <View key={player.id} style={styles.playerItem}>
-                <ThemedText style={styles.playerName}>{player.name}</ThemedText>
+                <Text className="text-base">{player.name}</Text>
                 <TouchableOpacity
                   onPress={() => handleRemovePlayer(player.id)}
                   accessibilityLabel={`Remove ${player.name}`}
                   accessibilityRole="button"
                 >
-                  <ThemedText style={styles.removeButton}>Remove</ThemedText>
+                  <Text className="text-red-500 text-sm">Remove</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -175,9 +174,9 @@ export default function NewGameScreen() {
           accessibilityRole="button"
           testID="start-game-button"
         >
-          <ThemedText style={styles.startButtonText}>
+          <Text className="text-white text-lg font-semibold">
             {isCreating ? "Creating..." : "Start Game"}
-          </ThemedText>
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </ThemedView>
@@ -193,15 +192,6 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 24,
-    opacity: 0.7,
   },
   inputContainer: {
     flexDirection: "row",
@@ -227,17 +217,8 @@ const styles = StyleSheet.create({
     minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
     minWidth: Platform.select({ ios: 44, android: 48, default: 44 }),
   },
-  addButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
   playersContainer: {
     marginBottom: 24,
-  },
-  playersTitle: {
-    fontSize: 18,
-    marginBottom: 12,
   },
   playerItem: {
     flexDirection: "row",
@@ -247,13 +228,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
-  },
-  playerName: {
-    fontSize: 16,
-  },
-  removeButton: {
-    color: "#FF3B30",
-    fontSize: 14,
   },
   startButton: {
     backgroundColor: "#007AFF",
@@ -266,10 +240,5 @@ const styles = StyleSheet.create({
   startButtonDisabled: {
     backgroundColor: "#CCCCCC",
     opacity: 0.6,
-  },
-  startButtonText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "600",
   },
 });
