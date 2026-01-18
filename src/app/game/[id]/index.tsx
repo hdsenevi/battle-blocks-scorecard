@@ -136,16 +136,17 @@ export default function GameScreen() {
     <ThemedView style={styles.container}>
       <View style={styles.header}>
         <View>
-          <ThemedText type="title" style={styles.title}>
+          <ThemedText type="title" style={styles.title} testID="game-title">
             Game #{currentGame.id}
           </ThemedText>
-          <ThemedText style={styles.status}>
+          <ThemedText style={styles.status} testID="game-status">
             Status: {currentGame.status}
           </ThemedText>
         </View>
         <TouchableOpacity
           style={styles.historyButton}
           onPress={() => setIsHistoryVisible(true)}
+          testID="score-history-button"
           accessibilityLabel="View score history"
           accessibilityRole="button"
         >

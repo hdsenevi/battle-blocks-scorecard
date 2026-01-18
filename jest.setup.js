@@ -103,14 +103,18 @@ jest.mock('expo/src/winter/runtime.native', () => ({
 }), { virtual: true });
 
 // Mock expo-sqlite
+const mockDbInstance = {
+  exec: jest.fn(),
+  closeAsync: jest.fn(),
+  runAsync: jest.fn(),
+  getAllAsync: jest.fn(),
+  getFirstAsync: jest.fn(),
+  execAsync: jest.fn(),
+};
+
 jest.mock('expo-sqlite', () => ({
-  openDatabase: jest.fn(() => ({
-    exec: jest.fn(),
-    closeAsync: jest.fn(),
-    runAsync: jest.fn(),
-    getAllAsync: jest.fn(),
-    getFirstAsync: jest.fn(),
-  })),
+  openDatabase: jest.fn(() => mockDbInstance),
+  openDatabaseAsync: jest.fn(() => Promise.resolve(mockDbInstance)),
 }));
 
 // Mock expo module to prevent runtime initialization

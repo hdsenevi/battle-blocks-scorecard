@@ -136,6 +136,7 @@ export default function HomeScreen() {
             <TouchableOpacity
               style={[styles.button, styles.secondaryButton]}
               onPress={handleContinueGame}
+              testID="continue-game-button"
               accessibilityLabel="Continue Game"
               accessibilityRole="button"
             >

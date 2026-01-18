@@ -31,6 +31,7 @@ export function PlayerCard({
       style={cardStyle}
       onPress={onPress}
       disabled={player.is_eliminated || !onPress}
+      testID={`player-card-${player.name}`}
       accessibilityLabel={`${player.name}, Score: ${player.current_score}${isLeader ? ", Leader" : ""}${player.is_eliminated ? ", Eliminated" : ""}`}
       accessibilityRole="button"
     >

@@ -165,10 +165,10 @@ export default function GameSelectionScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
-        <ThemedText type="title" style={styles.headerTitle}>
+        <ThemedText type="title" style={styles.headerTitle} testID="select-game-title">
           Select Game to Resume
         </ThemedText>
-        <ThemedText style={styles.headerSubtitle}>
+        <ThemedText style={styles.headerSubtitle} testID="select-game-subtitle">
           {games.length} {games.length === 1 ? "game" : "games"} to resume
         </ThemedText>
       </View>
@@ -179,6 +179,7 @@ export default function GameSelectionScreen() {
             key={game.id}
             style={styles.gameCard}
             onPress={() => handleSelectGame(game.id)}
+            testID={`game-card-${game.id}`}
             accessibilityLabel={`Resume game ${game.id}, started ${formatDate(
               game.created_at
             )}, ${game.playerCount} players`}
@@ -203,6 +204,7 @@ export default function GameSelectionScreen() {
         <TouchableOpacity
           style={styles.cancelButton}
           onPress={() => router.replace("/(tabs)")}
+          testID="cancel-game-selection-button"
           accessibilityLabel="Cancel and go to home"
           accessibilityRole="button"
         >
