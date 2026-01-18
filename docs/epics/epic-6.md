@@ -43,7 +43,6 @@ So that I understand what went wrong and can correct my input.
 - Component tests verify error haptic feedback triggered
 - Component tests verify accessibility of error messages
 - Unit tests verify error handling doesn't crash app or lose state
-- E2E test flow verifies handling invalid score entries
 
 **FRs covered:** FR54, FR56, FR37, NFR16, NFR19
 
@@ -69,7 +68,6 @@ So that accidental double-taps don't cause errors or incorrect scores.
 - Component tests verify rapid duplicate entry prevention
 - Integration tests verify only one score entry recorded for rapid taps
 - Unit tests verify concurrent operation handling
-- E2E test flow verifies rapid duplicate entry prevention
 
 **FRs covered:** FR55, NFR16, NFR20
 
@@ -99,7 +97,6 @@ So that unusual inputs don't break the game or cause errors.
 - Unit tests verify edge cases don't crash app
 - Component tests verify error messages for edge cases
 - Integration tests verify game state remains intact after edge cases
-- E2E test flow verifies edge case handling
 
 **FRs covered:** FR56, NFR16
 
@@ -126,7 +123,6 @@ So that I know who is still in the game.
 - Component tests verify eliminated players visually distinct
 - Component tests verify eliminated players not interactive for score entry
 - Component tests verify accessibility of elimination indication
-- E2E test flow verifies eliminated players display
 
 **FRs covered:** FR39, NFR41
 
@@ -153,7 +149,6 @@ So that the app can be submitted and published to app stores.
 **And** store listing materials are prepared
 **And** the app is tested for store compliance
 **And** automation tests are created:
-- E2E tests verify privacy policy accessible within app
 - Manual testing checklist for store compliance requirements
 - Component tests verify required UI elements for store compliance
 

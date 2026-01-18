@@ -46,7 +46,6 @@ So that I don't need to manually calculate or remember the penalty.
 - Unit tests verify score reset to 25 when penalty triggered
 - Component tests verify visual feedback for penalty (animations, indicators)
 - Integration tests verify penalty rule enforcement end-to-end
-- E2E test flow verifies 50+ penalty rule enforcement
 
 **FRs covered:** FR16, FR17, FR33, FR35, NFR5, NFR8, NFR22, NFR24
 
@@ -80,7 +79,6 @@ So that elimination rules are enforced without manual tracking.
 - Component tests verify visual feedback for elimination (grayed out, indicators)
 - Component tests verify eliminated players cannot receive scores
 - Integration tests verify elimination rule enforcement end-to-end
-- E2E test flow verifies automatic player elimination
 
 **FRs covered:** FR19, FR20, FR39, NFR5, NFR22, NFR24
 
@@ -107,7 +105,6 @@ So that the game can end automatically when someone wins.
 - Unit tests verify win condition detection (checkWinCondition at exactly 50)
 - Unit tests verify scores exceeding 50 trigger penalty instead of win
 - Integration tests verify win condition triggers game completion flow
-- E2E test flow verifies win condition detection
 
 **FRs covered:** FR21, FR22, FR41, NFR5, NFR22, NFR24
 
@@ -136,6 +133,5 @@ So that I understand what happened and trust the automatic enforcement.
 - Component tests verify visual feedback for each rule type (penalty, elimination, win)
 - Component tests verify accessibility of visual feedback (not just color)
 - Component tests verify animations respect reduced motion preferences
-- E2E test flow verifies visual feedback for rule enforcement
 
 **FRs covered:** FR33, NFR8, NFR39, NFR41

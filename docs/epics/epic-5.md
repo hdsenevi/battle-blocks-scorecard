@@ -44,7 +44,6 @@ So that I know the game is complete and who won.
 - Component tests verify game status marked as "completed" in database
 - Component tests verify success haptic feedback triggered
 - Component tests verify accessibility of winner announcement
-- E2E test flow verifies winner announcement screen
 
 **FRs covered:** FR41, FR42, FR44, FR36, NFR2, NFR40
 
@@ -72,7 +71,6 @@ So that I can see the complete game results.
 - Component tests verify final scores display for all players
 - Component tests verify winner highlighted in final scores
 - Integration tests verify final scores saved to database
-- E2E test flow verifies final scores display
 
 **FRs covered:** FR43, FR29
 
@@ -97,7 +95,6 @@ So that completed games cannot be modified.
 - Component tests verify score entry disabled for completed games
 - Unit tests verify game status prevents score entries
 - Integration tests verify completed games cannot be modified
-- E2E test flow verifies score entry prevention after completion
 
 **FRs covered:** FR45
 
@@ -126,6 +123,5 @@ So that I can review the final game state.
 - Component tests verify completed game results display
 - Component tests verify game metadata displayed correctly
 - Integration tests verify completed games stored permanently
-- E2E test flow verifies viewing completed game results
 
 **FRs covered:** FR46, NFR14

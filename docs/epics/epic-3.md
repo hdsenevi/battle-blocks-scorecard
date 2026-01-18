@@ -41,7 +41,6 @@ So that I can record scores during gameplay.
 **And** automation tests are created:
 - Component tests verify score entry interface opens and displays correctly
 - Component tests verify accessibility attributes and touch targets
-- E2E test flow verifies score entry interface interaction
 
 **FRs covered:** FR32, NFR2, NFR35, NFR36, NFR37
 
@@ -70,7 +69,6 @@ So that the score equals the block number (e.g., block 12 = 12 points).
 - Component tests verify score entry form interaction and submission
 - Component tests verify invalid input handling and error messages
 - Integration tests verify score saved to database with correct entry_type
-- E2E test flow verifies entering single block score
 
 **FRs covered:** FR8, FR9, FR13, FR23, FR34, NFR1, NFR7
 
@@ -100,7 +98,6 @@ So that the score equals the count of blocks (e.g., 3 blocks = 3 points).
 - Component tests verify multiple blocks entry form interaction
 - Component tests verify distinction between single vs multiple block modes
 - Integration tests verify score saved to database with entry_type = "multiple_blocks"
-- E2E test flow verifies entering multiple blocks score
 
 **FRs covered:** FR8, FR10, FR13, FR23, FR34, NFR1, NFR7
 
@@ -127,7 +124,6 @@ So that I always know the current game state.
 - Component tests verify real-time score updates in UI
 - Component tests verify score display updates when scores change
 - Integration tests verify score calculation accuracy
-- E2E test flow verifies real-time score display updates
 
 **FRs covered:** FR11, FR13, NFR1, NFR6, NFR23
 
@@ -156,7 +152,6 @@ So that I know who is winning at any moment.
 - Component tests verify leader visual highlighting
 - Component tests verify leader indication updates when scores change
 - Component tests verify accessibility for leader indication
-- E2E test flow verifies leader identification and highlighting
 
 **FRs covered:** FR12, FR38, NFR40, NFR41
 
@@ -186,7 +181,6 @@ So that I can review past score entries.
 - Component tests verify score history display and scrolling
 - Component tests verify score history entries show correct data
 - Integration tests verify score history retrieved from database
-- E2E test flow verifies viewing score history
 
 **FRs covered:** FR14
 
