@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the comprehensive testing strategy for Battle Blocks Scorecard, establishing a multi-layered testing approach that prevents regressions and ensures quality as the application evolves.
+This document defines the comprehensive testing strategy for Battle Blocks Scorecard, establishing a multi-layered testing approach that ensures quality as the application evolves.
 
 **Last Updated:** 2026-01-15  
 **Status:** Active  
@@ -12,7 +12,6 @@ This document defines the comprehensive testing strategy for Battle Blocks Score
 
 **Core Principles:**
 - **Integrated Testing**: Automation tests are part of every story, not a separate epic
-- **Prevent Regressions**: Every story includes tests that prevent future regressions
 - **Test Pyramid**: Unit tests (base) → Component tests (middle) → E2E tests (top)
 - **Fast Feedback**: Unit and component tests run quickly in CI/CD
 - **Confidence**: E2E tests validate critical user journeys
@@ -364,10 +363,9 @@ maestro test .maestro/flows/01-create-game.yaml  # Run specific flow
 
 **Process:**
 1. Review test coverage after each story
-2. Add regression tests for bugs found
-3. Refactor tests when patterns emerge
-4. Update E2E flows when UI changes
-5. Document new testing patterns
+2. Refactor tests when patterns emerge
+3. Update E2E flows when UI changes
+4. Document new testing patterns
 
 ## Testing Best Practices
 
@@ -413,14 +411,6 @@ maestro test .maestro/flows/01-create-game.yaml  # Run specific flow
 - Story 1.12: CI/CD integration
 
 **All subsequent stories** include automation test requirements in their acceptance criteria.
-
-### Regression Prevention
-
-**Process:**
-- Every bug fix must include a regression test
-- Every new feature must include tests
-- E2E tests must cover critical user journeys
-- Review test failures before fixing code
 
 ## Future Enhancements
 

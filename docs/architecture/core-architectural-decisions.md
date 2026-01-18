@@ -181,7 +181,6 @@ app/               # Screen-level components (Expo Router)
 - **Maestro** - End-to-end testing (Expo-recommended)
 
 **Rationale:**
-- Prevent regressions as stories progress
 - Fast feedback with unit/component tests
 - Confidence with E2E tests for critical user journeys
 - Expo officially recommends Maestro for E2E testing
@@ -201,7 +200,6 @@ app/               # Screen-level components (Expo Router)
 4. E2E tests (Maestro) - Complete user journeys
 
 **Affects:**
-- Regression prevention
 - Code quality and confidence
 - Development workflow
 - CI/CD pipeline
