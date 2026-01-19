@@ -5,14 +5,12 @@
 
 import { useEffect, useState } from "react";
 import {
-  StyleSheet,
   View,
   FlatList,
   Modal,
   TouchableOpacity,
   Text,
 } from "react-native";
-import { ThemedView } from "@/components/themed-view";
 import { getScoreEntriesByGame, getPlayersByGame } from "@/services/database";
 import type { ScoreEntry } from "@/database/types";
 
@@ -77,8 +75,8 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
   };
 
   const renderItem = ({ item }: { item: ScoreHistoryItem }) => (
-    <View style={styles.historyItem}>
-      <View style={styles.historyItemLeft}>
+    <View className="flex-row justify-between items-center py-3 px-4 border-b border-[#E0E0E0]">
+      <View className="flex-1">
         <Text className="text-base font-semibold mb-1">{item.playerName}</Text>
         <Text className="text-sm opacity-70 mb-0.5">
           {formatEntryType(item.entry_type)}
@@ -99,9 +97,9 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
       onRequestClose={onClose}
       accessibilityViewIsModal
     >
-      <View style={styles.overlay}>
-        <ThemedView style={styles.modal}>
-          <View style={styles.header}>
+      <View className="flex-1 bg-black/50 justify-end">
+        <View className="bg-white rounded-t-[20px] max-h-[80%] flex-1">
+          <View className="flex-row justify-between items-center p-5 border-b border-[#E0E0E0]">
             <Text className="text-2xl">
               Score History
             </Text>
@@ -115,11 +113,11 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
           </View>
 
           {isLoading ? (
-            <View style={styles.loadingContainer}>
+            <View className="flex-1 py-10 items-center justify-center">
               <Text className="text-base">Loading...</Text>
             </View>
           ) : scoreEntries.length === 0 ? (
-            <View style={styles.emptyContainer}>
+            <View className="flex-1 py-10 items-center justify-center">
               <Text className="opacity-70">No score entries yet</Text>
             </View>
           ) : (
@@ -127,59 +125,12 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
               data={scoreEntries}
               renderItem={renderItem}
               keyExtractor={(item) => item.id.toString()}
-              style={styles.list}
-              contentContainerStyle={styles.listContent}
+              className="flex-1"
+              contentContainerStyle={{ paddingBottom: 20 }}
             />
           )}
-        </ThemedView>
+        </View>
       </View>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  modal: {
-    backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: "80%",
-    padding: 20,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  loadingContainer: {
-    padding: 40,
-    alignItems: "center",
-  },
-  emptyContainer: {
-    padding: 40,
-    alignItems: "center",
-  },
-  list: {
-    flex: 1,
-  },
-  listContent: {
-    paddingBottom: 20,
-  },
-  historyItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  historyItemLeft: {
-    flex: 1,
-  },
-});

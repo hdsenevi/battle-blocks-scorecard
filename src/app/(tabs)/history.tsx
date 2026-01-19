@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  StyleSheet,
   View,
   ScrollView,
   TouchableOpacity,
@@ -91,8 +90,8 @@ export default function HistoryScreen() {
 
   if (isLoading) {
     return (
-      <ThemedView style={styles.container}>
-        <View style={[styles.content, { paddingTop: insets.top }]}>
+      <ThemedView className="flex-1">
+        <View className="flex-1 justify-center items-center p-5" style={{ paddingTop: insets.top }}>
           <Text className="text-base">Loading history...</Text>
         </View>
       </ThemedView>
@@ -101,8 +100,8 @@ export default function HistoryScreen() {
 
   if (error) {
     return (
-      <ThemedView style={styles.container}>
-        <View style={[styles.content, { paddingTop: insets.top }]}>
+      <ThemedView className="flex-1">
+        <View className="flex-1 justify-center items-center p-5" style={{ paddingTop: insets.top }}>
           <Text className="text-base text-red-500 text-center">{error}</Text>
         </View>
       </ThemedView>
@@ -111,8 +110,8 @@ export default function HistoryScreen() {
 
   if (games.length === 0) {
     return (
-      <ThemedView style={styles.container}>
-        <View style={[styles.content, { paddingTop: insets.top }]}>
+      <ThemedView className="flex-1">
+        <View className="flex-1 justify-center items-center p-5" style={{ paddingTop: insets.top }}>
           <Text className="text-2xl mb-2 text-center">
             No Completed Games
           </Text>
@@ -125,8 +124,8 @@ export default function HistoryScreen() {
   }
     
   return (
-    <ThemedView style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
+    <ThemedView className="flex-1">
+      <View className="p-5 border-b border-[#E0E0E0]" style={{ paddingTop: insets.top + 20 }}>
         <Text className="text-2xl mb-2">
           Game History
         </Text>
@@ -135,26 +134,26 @@ export default function HistoryScreen() {
         </Text>
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.list}>
+      <ScrollView className="flex-1" contentContainerStyle={{ padding: 16, gap: 12 }}>
         {games.map((game) => (
           <TouchableOpacity
             key={game.id}
-            style={styles.gameCard}
+            className={`bg-white rounded-xl p-4 border border-[#E0E0E0] ${Platform.OS === "ios" ? "min-h-[100px]" : Platform.OS === "android" ? "min-h-[108px]" : "min-h-[100px]"}`}
             onPress={() => handleViewGame(game.id)}
             accessibilityLabel={`View game ${game.id}, completed ${formatDate(
               game.updated_at
             )}, winner ${game.winnerName}`}
             accessibilityRole="button"
           >
-            <View style={styles.gameCardContent}>
-              <View style={styles.gameCardHeader}>
+            <View className="gap-2">
+              <View className="flex-row justify-between items-center">
                 <Text className="text-lg font-semibold">Game #{game.id}</Text>
                 <Text className="text-sm opacity-70">
                   {formatDate(game.updated_at)}
                 </Text>
               </View>
               {game.winnerName && (
-                <View style={styles.winnerInfo}>
+                <View className="flex-row items-center gap-2">
                   <Text className="text-sm opacity-70">Winner:</Text>
                   <Text className="text-base font-semibold text-primary">
                     {game.winnerName} ({game.winnerScore} pts)
@@ -171,48 +170,3 @@ export default function HistoryScreen() {
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  header: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  list: {
-    padding: 16,
-    gap: 12,
-  },
-  gameCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    minHeight: Platform.select({ ios: 100, android: 108, default: 100 }),
-  },
-  gameCardContent: {
-    gap: 8,
-  },
-  gameCardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  winnerInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-});

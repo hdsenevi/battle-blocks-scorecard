@@ -3,7 +3,7 @@
  * Main entry point for the app
  */
 
-import { StyleSheet, View, TouchableOpacity, Platform, Text } from "react-native";
+import { View, TouchableOpacity, Platform, Text } from "react-native";
 import { ThemedView } from "@/components/themed-view";
 import { useRouter } from "expo-router";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
@@ -101,8 +101,8 @@ export default function HomeScreen() {
 
   if (isChecking) {
     return (
-      <ThemedView style={styles.container}>
-        <View style={styles.content}>
+      <ThemedView className="flex-1">
+        <View className="flex-1 justify-center items-center p-5">
           <Text className="text-base">Loading...</Text>
         </View>
       </ThemedView>
@@ -110,8 +110,8 @@ export default function HomeScreen() {
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.content}>
+    <ThemedView className="flex-1">
+      <View className="flex-1 justify-center items-center p-5">
         <Text className="text-3xl font-bold mb-4 text-center">
           Battle Blocks Scorecard
         </Text>
@@ -120,9 +120,9 @@ export default function HomeScreen() {
           Track scores for your Battle Blocks games
         </Text>
 
-        <View style={styles.buttonContainer}>
+        <View className="w-full max-w-[300px] gap-4">
           <TouchableOpacity
-            style={[styles.button, styles.primaryButton]}
+            className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center bg-[#007AFF]`}
             onPress={handleStartNewGame}
             accessibilityLabel="Start New Game"
             accessibilityRole="button"
@@ -133,7 +133,7 @@ export default function HomeScreen() {
 
           {hasActiveGames && (
             <TouchableOpacity
-              style={[styles.button, styles.secondaryButton]}
+              className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center bg-transparent border border-[#007AFF]`}
               onPress={handleContinueGame}
               testID="continue-game-button"
               accessibilityLabel="Continue Game"
@@ -149,36 +149,3 @@ export default function HomeScreen() {
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  buttonContainer: {
-    width: "100%",
-    maxWidth: 300,
-    gap: 16,
-  },
-  button: {
-    paddingVertical: Platform.select({ ios: 16, android: 18, default: 16 }),
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
-  },
-  primaryButton: {
-    backgroundColor: "#007AFF",
-  },
-  secondaryButton: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "#007AFF",
-  },
-});

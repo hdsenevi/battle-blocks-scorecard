@@ -5,7 +5,6 @@
 
 import { useEffect } from "react";
 import {
-  StyleSheet,
   View,
   ScrollView,
   TouchableOpacity,
@@ -77,7 +76,7 @@ export default function WinnerScreen() {
 
   if (!currentGame) {
     return (
-      <ThemedView style={styles.container}>
+      <ThemedView className="flex-1">
         <Text className="text-base">Loading...</Text>
       </ThemedView>
     );
@@ -89,12 +88,12 @@ export default function WinnerScreen() {
   );
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView className="flex-1">
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
+        className="flex-1"
+        contentContainerStyle={{ padding: 20 }}
       >
-        <View style={styles.winnerSection}>
+        <View className="items-center mb-8 py-8">
           <Text className="text-4xl mb-4">
             🎉 Winner! 🎉
           </Text>
@@ -104,22 +103,21 @@ export default function WinnerScreen() {
           </Text>
         </View>
 
-        <View style={styles.scoresSection}>
+        <View className="mb-8">
           <Text className="text-xl font-bold mb-4">
             Final Scores
           </Text>
           {sortedPlayers.map((player, index) => (
             <View
               key={player.id}
-              style={[
-                styles.scoreRow,
-                player.id === winner.id && styles.winnerRow,
-              ]}
+              className={`flex-row items-center py-3 px-4 border-b border-[#E0E0E0] ${
+                player.id === winner.id ? "bg-[#F0F8FF] rounded-lg mb-1" : ""
+              }`}
             >
-              <View style={styles.rankContainer}>
+              <View className="w-10">
                 <Text className="text-base font-semibold opacity-70">#{index + 1}</Text>
               </View>
-              <View style={styles.playerInfo}>
+              <View className="flex-1">
                 <Text className="text-lg font-semibold">{player.name}</Text>
                 {player.is_eliminated && (
                   <Text className="text-xs opacity-60 mt-1">
@@ -135,7 +133,7 @@ export default function WinnerScreen() {
         </View>
 
         <TouchableOpacity
-          style={styles.newGameButton}
+          className={`bg-[#007AFF] ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center`}
           onPress={handleNewGame}
           accessibilityLabel="Start new game"
           accessibilityRole="button"
@@ -148,50 +146,3 @@ export default function WinnerScreen() {
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
-    padding: 20,
-  },
-  winnerSection: {
-    alignItems: "center",
-    marginBottom: 32,
-    paddingVertical: 32,
-  },
-  scoresSection: {
-    marginBottom: 32,
-  },
-  scoreRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  winnerRow: {
-    backgroundColor: "#F0F8FF",
-    borderRadius: 8,
-    marginBottom: 4,
-  },
-  rankContainer: {
-    width: 40,
-  },
-  playerInfo: {
-    flex: 1,
-  },
-  newGameButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: Platform.select({ ios: 16, android: 18, default: 16 }),
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
-  },
-});

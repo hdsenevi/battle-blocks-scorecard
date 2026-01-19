@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from "react";
 import { ThemedView } from "./themed-view";
-import { StyleSheet, Text } from "react-native";
+import { Text } from "react-native";
 import { initializeDatabase, getDatabasePath } from "../services/database";
 import { useAppLifecycle } from "../hooks/useAppLifecycle";
 
@@ -57,7 +57,7 @@ export function AppLifecycleHandler() {
   // Show error if initialization failed
   if (initError) {
     return (
-      <ThemedView style={styles.errorContainer}>
+      <ThemedView className="absolute top-0 left-0 right-0 bottom-0 justify-center items-center bg-black/80 z-[9999]">
         <Text className="text-red-500 text-lg font-semibold mb-2 text-center px-5">
           Database Error: {initError}
         </Text>
@@ -75,17 +75,3 @@ export function AppLifecycleHandler() {
 
   return null; // This component doesn't render anything after initialization
 }
-
-const styles = StyleSheet.create({
-  errorContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
-    zIndex: 9999,
-  },
-});

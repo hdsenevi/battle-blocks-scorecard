@@ -5,7 +5,6 @@
 
 import { useEffect, useState } from "react";
 import {
-  StyleSheet,
   View,
   ScrollView,
   Platform,
@@ -126,15 +125,15 @@ export default function GameScreen() {
 
   if (!currentGame) {
     return (
-      <ThemedView style={styles.container}>
+      <ThemedView className="flex-1">
         <Text className="text-base">Loading game...</Text>
       </ThemedView>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.header}>
+    <ThemedView className="flex-1">
+      <View className="flex-row justify-between items-center p-5 border-b border-[#E0E0E0]">
         <View>
           <Text className="text-2xl mb-2" testID="game-title">
             Game #{currentGame.id}
@@ -144,7 +143,7 @@ export default function GameScreen() {
           </Text>
         </View>
         <TouchableOpacity
-          style={styles.historyButton}
+          className={`px-4 py-2 rounded-lg bg-[#F0F0F0] ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
           onPress={() => setIsHistoryVisible(true)}
           testID="score-history-button"
           accessibilityLabel="View score history"
@@ -155,8 +154,8 @@ export default function GameScreen() {
       </View>
 
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
+        className="flex-1"
+        contentContainerStyle={{ padding: 16, gap: 12 }}
       >
         {players.length === 0 ? (
           <Text className="text-center mt-10 opacity-70">No players yet</Text>
@@ -199,32 +198,3 @@ export default function GameScreen() {
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  historyButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: "#F0F0F0",
-    minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
-    justifyContent: "center",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-    gap: 12,
-  },
-});

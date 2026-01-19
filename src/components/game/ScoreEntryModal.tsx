@@ -5,7 +5,6 @@
 
 import { useState } from "react";
 import {
-  StyleSheet,
   View,
   Modal,
   TouchableOpacity,
@@ -77,8 +76,8 @@ export function ScoreEntryModal({
         onRequestClose={onClose}
         accessibilityViewIsModal
       >
-        <View style={styles.overlay}>
-          <ThemedView style={styles.modal}>
+        <View className="flex-1 bg-black/50 justify-center items-center p-5">
+          <ThemedView className="bg-white rounded-2xl p-6 w-full max-w-[400px]">
             <Text className="text-2xl mb-2">
               {gameStatus === "completed" ? "Game Completed" : gameStatus === "notcompleted" ? "Game Not Completed" : "Game Paused"}
             </Text>
@@ -86,7 +85,7 @@ export function ScoreEntryModal({
               {statusMessage}
             </Text>
             <TouchableOpacity
-              style={[styles.button, styles.submitButton]}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-[#007AFF]`}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
@@ -109,8 +108,8 @@ export function ScoreEntryModal({
         onRequestClose={onClose}
         accessibilityViewIsModal
       >
-        <View style={styles.overlay}>
-          <ThemedView style={styles.modal}>
+        <View className="flex-1 bg-black/50 justify-center items-center p-5">
+          <ThemedView className="bg-white rounded-2xl p-6 w-full max-w-[400px]">
             <Text className="text-2xl mb-2">
               Player Eliminated
             </Text>
@@ -118,7 +117,7 @@ export function ScoreEntryModal({
               {player.name} has been eliminated and cannot receive further scores.
             </Text>
             <TouchableOpacity
-              style={[styles.button, styles.submitButton]}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-[#007AFF]`}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
@@ -365,8 +364,8 @@ export function ScoreEntryModal({
       onRequestClose={handleClose}
       accessibilityViewIsModal
     >
-      <View style={styles.overlay}>
-        <ThemedView style={styles.modal}>
+      <View className="flex-1 bg-black/50 justify-center items-center p-5">
+        <ThemedView className="bg-white rounded-2xl p-6 w-full max-w-[400px]">
           <Text className="text-2xl mb-2">
             Enter Score for {player.name}
           </Text>
@@ -375,12 +374,11 @@ export function ScoreEntryModal({
             Current Score: {player.current_score}
           </Text>
 
-          <View style={styles.modeSelector}>
+          <View className="flex-row gap-3 mb-4">
             <TouchableOpacity
-              style={[
-                styles.modeButton,
-                entryMode === "single" && styles.modeButtonActive,
-              ]}
+              className={`flex-1 py-3 px-4 rounded-lg border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
+                entryMode === "single" ? "border-[#007AFF] bg-[#F0F8FF]" : "border-[#E0E0E0]"
+              }`}
               onPress={() => setEntryMode("single")}
               accessibilityLabel="Single block mode"
               accessibilityRole="button"
@@ -394,10 +392,9 @@ export function ScoreEntryModal({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.modeButton,
-                entryMode === "multiple" && styles.modeButtonActive,
-              ]}
+              className={`flex-1 py-3 px-4 rounded-lg border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
+                entryMode === "multiple" ? "border-[#007AFF] bg-[#F0F8FF]" : "border-[#E0E0E0]"
+              }`}
               onPress={() => setEntryMode("multiple")}
               accessibilityLabel="Multiple blocks mode"
               accessibilityRole="button"
@@ -419,7 +416,7 @@ export function ScoreEntryModal({
           </Text>
 
           <TextInput
-            style={styles.input}
+            className={`border border-[#CCCCCC] rounded-lg px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-2xl text-center mb-6`}
             placeholder={entryMode === "single" ? "Block number" : "Number of blocks"}
             placeholderTextColor="#999"
             value={blockValue}
@@ -430,9 +427,9 @@ export function ScoreEntryModal({
             }
           />
 
-          <View style={styles.buttonContainer}>
+          <View className="flex-row gap-3">
             <TouchableOpacity
-              style={[styles.button, styles.cancelButton]}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-[#E0E0E0]`}
               onPress={handleClose}
               accessibilityLabel="Cancel"
               accessibilityRole="button"
@@ -440,11 +437,7 @@ export function ScoreEntryModal({
               <Text className="text-primary text-base font-semibold">Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.button,
-                styles.submitButton,
-                isSubmitting && styles.submitButtonDisabled,
-              ]}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-[#007AFF] ${isSubmitting ? "opacity-60" : ""}`}
               onPress={handleSubmit}
               disabled={isSubmitting}
               accessibilityLabel="Submit score"
@@ -461,71 +454,3 @@ export function ScoreEntryModal({
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  modal: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 24,
-    width: "100%",
-    maxWidth: 400,
-  },
-  modeSelector: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 16,
-  },
-  modeButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: "#E0E0E0",
-    alignItems: "center",
-    minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
-    justifyContent: "center",
-  },
-  modeButtonActive: {
-    borderColor: "#007AFF",
-    backgroundColor: "#F0F8FF",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#CCCCCC",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: Platform.select({ ios: 12, android: 14, default: 12 }),
-    fontSize: 24,
-    textAlign: "center",
-    marginBottom: 24,
-    minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  button: {
-    flex: 1,
-    paddingVertical: Platform.select({ ios: 14, android: 16, default: 14 }),
-    borderRadius: 8,
-    alignItems: "center",
-    minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
-    justifyContent: "center",
-  },
-  cancelButton: {
-    backgroundColor: "#E0E0E0",
-  },
-  submitButton: {
-    backgroundColor: "#007AFF",
-  },
-  submitButtonDisabled: {
-    opacity: 0.6,
-  },
-});

@@ -5,7 +5,6 @@
 
 import { useEffect, useState } from "react";
 import {
-  StyleSheet,
   View,
   TouchableOpacity,
   TextInput,
@@ -105,10 +104,10 @@ export default function NewGameScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView className="flex-1">
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
+        className="flex-1"
+        contentContainerStyle={{ padding: 20 }}
       >
         <Text className="text-3xl font-bold mb-2">
           New Game
@@ -118,9 +117,9 @@ export default function NewGameScreen() {
           Add at least 2 players to start
         </Text>
 
-        <View style={styles.inputContainer}>
+        <View className="flex-row gap-3 mb-6">
           <TextInput
-            style={styles.input}
+            className={`flex-1 border border-[#CCCCCC] rounded-lg px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-base`}
             placeholder="Enter player name"
             placeholderTextColor="#999"
             value={playerName}
@@ -130,7 +129,7 @@ export default function NewGameScreen() {
             testID="player-name-input"
           />
           <TouchableOpacity
-            style={styles.addButton}
+            className={`bg-[#007AFF] px-6 ${Platform.OS === "ios" ? "py-3 min-h-[44px] min-w-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px] min-w-[48px]" : "py-3 min-h-[44px] min-w-[44px]"} rounded-lg justify-center`}
             onPress={handleAddPlayer}
             accessibilityLabel="Add player"
             accessibilityRole="button"
@@ -141,7 +140,7 @@ export default function NewGameScreen() {
         </View>
 
         {players.length > 0 && (
-          <View style={styles.playersContainer}>
+          <View className="mb-6">
             <Text 
               className="text-xl font-bold mb-3"
               testID={`players-count-${players.length}`}
@@ -149,7 +148,7 @@ export default function NewGameScreen() {
               Players ({players.length})
             </Text>
             {players.map((player) => (
-              <View key={player.id} style={styles.playerItem}>
+              <View key={player.id} className="flex-row justify-between items-center py-3 px-4 border-b border-[#E0E0E0]">
                 <Text className="text-base">{player.name}</Text>
                 <TouchableOpacity
                   onPress={() => handleRemovePlayer(player.id)}
@@ -164,10 +163,7 @@ export default function NewGameScreen() {
         )}
 
         <TouchableOpacity
-          style={[
-            styles.startButton,
-            (players.length < 2 || isCreating) && styles.startButtonDisabled,
-          ]}
+          className={`bg-[#007AFF] ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center ${(players.length < 2 || isCreating) ? "bg-[#CCCCCC] opacity-60" : ""}`}
           onPress={handleStartGame}
           disabled={players.length < 2 || isCreating}
           accessibilityLabel="Start game"
@@ -182,63 +178,3 @@ export default function NewGameScreen() {
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
-    padding: 20,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 24,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#CCCCCC",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: Platform.select({ ios: 12, android: 14, default: 12 }),
-    fontSize: 16,
-    minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
-  },
-  addButton: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 24,
-    paddingVertical: Platform.select({ ios: 12, android: 14, default: 12 }),
-    borderRadius: 8,
-    justifyContent: "center",
-    minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
-    minWidth: Platform.select({ ios: 44, android: 48, default: 44 }),
-  },
-  playersContainer: {
-    marginBottom: 24,
-  },
-  playerItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  startButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: Platform.select({ ios: 16, android: 18, default: 16 }),
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    minHeight: Platform.select({ ios: 44, android: 48, default: 44 }),
-  },
-  startButtonDisabled: {
-    backgroundColor: "#CCCCCC",
-    opacity: 0.6,
-  },
-});
