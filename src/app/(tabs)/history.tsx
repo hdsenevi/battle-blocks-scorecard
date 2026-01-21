@@ -125,7 +125,7 @@ export default function HistoryScreen() {
     
   return (
     <ThemedView className="flex-1">
-      <View className="p-5 border-b border-[#E0E0E0]" style={{ paddingTop: insets.top + 20 }}>
+      <View className="p-5 border-b border-gray-border" style={{ paddingTop: insets.top + 20 }}>
         <Text className="text-2xl mb-2">
           Game History
         </Text>
@@ -138,7 +138,7 @@ export default function HistoryScreen() {
         {games.map((game) => (
           <TouchableOpacity
             key={game.id}
-            className={`bg-white rounded-xl p-4 border border-[#E0E0E0] ${Platform.OS === "ios" ? "min-h-[100px]" : Platform.OS === "android" ? "min-h-[108px]" : "min-h-[100px]"}`}
+            className={`bg-white rounded-xl p-4 border border-gray-border ${Platform.OS === "ios" ? "min-h-[100px]" : Platform.OS === "android" ? "min-h-[108px]" : "min-h-[100px]"}`}
             onPress={() => handleViewGame(game.id)}
             accessibilityLabel={`View game ${game.id}, completed ${formatDate(
               game.updated_at

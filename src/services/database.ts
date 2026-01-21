@@ -505,9 +505,10 @@ export async function getPlayer(id: number): Promise<Player | null> {
 
     const player = players[0];
     // Convert is_eliminated from 0/1 to boolean
+    // Note: Elimination is now round-specific, so always reset to false when loading from DB
     return {
       ...player,
-      is_eliminated: Boolean(player.is_eliminated),
+      is_eliminated: false, // Round-specific elimination (not persisted to DB)
     };
   } catch (error) {
     if (error instanceof DatabaseError) {
@@ -557,9 +558,11 @@ export async function updatePlayer(
       updateFields.push("consecutive_misses = ?");
       updateValues.push(updates.consecutive_misses);
     }
+    // Note: is_eliminated is now round-specific and not persisted to database
+    // We keep this check for backward compatibility but elimination is handled in state only
     if (updates.is_eliminated !== undefined) {
-      updateFields.push("is_eliminated = ?");
-      updateValues.push(updates.is_eliminated ? 1 : 0);
+      // Don't persist is_eliminated - it's round-specific and managed in state only
+      // This allows the function signature to remain compatible but elimination won't be saved
     }
 
     if (updateFields.length === 0) {
@@ -611,9 +614,10 @@ export async function getPlayersByGame(gameId: number): Promise<Player[]> {
     );
 
     // Convert is_eliminated from 0/1 to boolean
+    // Note: Elimination is now round-specific, so always reset to false when loading from DB
     return players.map((player) => ({
       ...player,
-      is_eliminated: Boolean(player.is_eliminated),
+      is_eliminated: false, // Round-specific elimination (not persisted to DB)
     }));
   } catch (error) {
     if (error instanceof DatabaseError) {

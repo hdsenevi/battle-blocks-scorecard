@@ -132,7 +132,7 @@ export default function GameSelectionScreen() {
         <View className="flex-1 justify-center items-center p-5">
           <Text className="text-base text-red-500 mb-4 text-center">{error}</Text>
           <TouchableOpacity
-            className={`bg-[#007AFF] ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center mt-4`}
+            className={`bg-primary ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center mt-4`}
             onPress={() => router.back()}
           >
             <Text className="text-white text-base font-semibold">Go Back</Text>
@@ -151,7 +151,7 @@ export default function GameSelectionScreen() {
             Start a new game to begin playing
           </Text>
           <TouchableOpacity
-            className={`bg-[#007AFF] ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center mt-4`}
+            className={`bg-primary ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center mt-4`}
             onPress={() => router.replace("/(tabs)")}
           >
             <Text className="text-white text-base font-semibold">Go to Home</Text>
@@ -163,7 +163,7 @@ export default function GameSelectionScreen() {
 
   return (
     <ThemedView className="flex-1">
-      <View className="p-5 border-b border-[#E0E0E0]">
+      <View className="p-5 border-b border-gray-border">
         <Text className="text-2xl mb-2" testID="select-game-title">
           Select Game to Resume
         </Text>
@@ -176,7 +176,7 @@ export default function GameSelectionScreen() {
         {games.map((game) => (
           <TouchableOpacity
             key={game.id}
-            className={`bg-white rounded-xl p-4 border border-[#E0E0E0] ${Platform.OS === "ios" ? "min-h-[80px]" : Platform.OS === "android" ? "min-h-[88px]" : "min-h-[80px]"}`}
+            className={`bg-white rounded-xl p-4 border border-gray-border ${Platform.OS === "ios" ? "min-h-[80px]" : Platform.OS === "android" ? "min-h-[88px]" : "min-h-[80px]"}`}
             onPress={() => handleSelectGame(game.id)}
             testID={`game-card-${game.id}`}
             accessibilityLabel={`Resume game ${game.id}, started ${formatDate(
@@ -199,7 +199,7 @@ export default function GameSelectionScreen() {
         ))}
       </ScrollView>
 
-      <View className="p-4 border-t border-[#E0E0E0]">
+      <View className="p-4 border-t border-gray-border">
         <TouchableOpacity
           className={`${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} px-6 rounded-lg items-center justify-center`}
           onPress={() => router.replace("/(tabs)")}

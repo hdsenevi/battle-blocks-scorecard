@@ -119,7 +119,7 @@ export default function NewGameScreen() {
 
         <View className="flex-row gap-3 mb-6">
           <TextInput
-            className={`flex-1 border border-[#CCCCCC] rounded-lg px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-base`}
+            className={`flex-1 border border-gray-border-medium rounded-lg px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-base`}
             placeholder="Enter player name"
             placeholderTextColor="#999"
             value={playerName}
@@ -129,7 +129,7 @@ export default function NewGameScreen() {
             testID="player-name-input"
           />
           <TouchableOpacity
-            className={`bg-[#007AFF] px-6 ${Platform.OS === "ios" ? "py-3 min-h-[44px] min-w-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px] min-w-[48px]" : "py-3 min-h-[44px] min-w-[44px]"} rounded-lg justify-center`}
+            className={`bg-primary px-6 ${Platform.OS === "ios" ? "py-3 min-h-[44px] min-w-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px] min-w-[48px]" : "py-3 min-h-[44px] min-w-[44px]"} rounded-lg justify-center`}
             onPress={handleAddPlayer}
             accessibilityLabel="Add player"
             accessibilityRole="button"
@@ -148,7 +148,7 @@ export default function NewGameScreen() {
               Players ({players.length})
             </Text>
             {players.map((player) => (
-              <View key={player.id} className="flex-row justify-between items-center py-3 px-4 border-b border-[#E0E0E0]">
+              <View key={player.id} className="flex-row justify-between items-center py-3 px-4 border-b border-gray-border">
                 <Text className="text-base">{player.name}</Text>
                 <TouchableOpacity
                   onPress={() => handleRemovePlayer(player.id)}
@@ -163,7 +163,7 @@ export default function NewGameScreen() {
         )}
 
         <TouchableOpacity
-          className={`bg-[#007AFF] ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center ${(players.length < 2 || isCreating) ? "bg-[#CCCCCC] opacity-60" : ""}`}
+          className={`bg-primary ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center ${(players.length < 2 || isCreating) ? "bg-gray-border-medium opacity-60" : ""}`}
           onPress={handleStartGame}
           disabled={players.length < 2 || isCreating}
           accessibilityLabel="Start game"

@@ -75,7 +75,7 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
   };
 
   const renderItem = ({ item }: { item: ScoreHistoryItem }) => (
-    <View className="flex-row justify-between items-center py-3 px-4 border-b border-[#E0E0E0]">
+    <View className="flex-row justify-between items-center py-3 px-4 border-b border-gray-border">
       <View className="flex-1">
         <Text className="text-base font-semibold mb-1">{item.playerName}</Text>
         <Text className="text-sm opacity-70 mb-0.5">
@@ -99,7 +99,7 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
     >
       <View className="flex-1 bg-black/50 justify-end">
         <View className="bg-white rounded-t-[20px] max-h-[80%] flex-1">
-          <View className="flex-row justify-between items-center p-5 border-b border-[#E0E0E0]">
+          <View className="flex-row justify-between items-center p-5 border-b border-gray-border">
             <Text className="text-2xl">
               Score History
             </Text>

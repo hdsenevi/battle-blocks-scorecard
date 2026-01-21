@@ -32,6 +32,16 @@ module.exports = {
           dark: "#0051D5",
           light: "#F0F8FF",
         },
+        // Gray scale colors for borders and backgrounds
+        gray: {
+          border: "#E0E0E0",
+          "border-medium": "#CCCCCC",
+          "bg-light": "#F0F0F0",
+        },
+        // Link color
+        link: {
+          DEFAULT: "#0a7ea4",
+        },
       },
       // Spacing system optimized for mobile touch interactions
       // Minimum touch targets: 44x44 points iOS, 48x48 dp Android

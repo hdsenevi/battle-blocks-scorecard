@@ -110,8 +110,8 @@ export default function WinnerScreen() {
           {sortedPlayers.map((player, index) => (
             <View
               key={player.id}
-              className={`flex-row items-center py-3 px-4 border-b border-[#E0E0E0] ${
-                player.id === winner.id ? "bg-[#F0F8FF] rounded-lg mb-1" : ""
+              className={`flex-row items-center py-3 px-4 border-b border-gray-border ${
+                player.id === winner.id ? "bg-primary-light rounded-lg mb-1" : ""
               }`}
             >
               <View className="w-10">
@@ -133,7 +133,7 @@ export default function WinnerScreen() {
         </View>
 
         <TouchableOpacity
-          className={`bg-[#007AFF] ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center`}
+          className={`bg-primary ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center`}
           onPress={handleNewGame}
           accessibilityLabel="Start new game"
           accessibilityRole="button"

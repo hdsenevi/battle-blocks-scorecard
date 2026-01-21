@@ -97,3 +97,24 @@ export function resetGameAction(): GameAction {
     type: "RESET_GAME",
   };
 }
+
+/**
+ * Create PLAYER_SCORED action
+ * Marks a player as having scored in the current round (handled in ADD_SCORE)
+ */
+export function playerScoredAction(playerId: number): GameAction {
+  return {
+    type: "PLAYER_SCORED",
+    payload: { playerId },
+  };
+}
+
+/**
+ * Create START_NEW_ROUND action
+ * Manually starts a new round (resets eliminations and consecutive misses)
+ */
+export function startNewRoundAction(): GameAction {
+  return {
+    type: "START_NEW_ROUND",
+  };
+}

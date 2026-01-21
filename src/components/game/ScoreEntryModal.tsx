@@ -26,7 +26,9 @@ import {
   addScoreAction,
   updatePlayerAction,
   completeGameAction,
+  eliminatePlayerAction,
 } from "@/reducers/actionCreators";
+import { useGameState } from "@/contexts/GameContext";
 import { useGameDispatch } from "@/contexts/GameContext";
 import {
   triggerScoreEntry,
@@ -50,6 +52,7 @@ export function ScoreEntryModal({
   onClose,
 }: ScoreEntryModalProps) {
   const dispatch = useGameDispatch();
+  const gameState = useGameState();
   const [entryMode, setEntryMode] = useState<"single" | "multiple">("single");
   const [blockValue, setBlockValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,7 +88,7 @@ export function ScoreEntryModal({
               {statusMessage}
             </Text>
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-[#007AFF]`}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-primary`}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
@@ -114,10 +117,43 @@ export function ScoreEntryModal({
               Player Eliminated
             </Text>
             <Text className="text-base mb-6 opacity-70">
-              {player.name} has been eliminated and cannot receive further scores.
+              {player.name} has been eliminated for this round and cannot receive further scores until the next round begins.
             </Text>
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-[#007AFF]`}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-primary`}
+              onPress={onClose}
+              accessibilityLabel="Close"
+              accessibilityRole="button"
+            >
+              <Text className="text-white text-base font-semibold">Close</Text>
+            </TouchableOpacity>
+          </ThemedView>
+        </View>
+      </Modal>
+    );
+  }
+
+  // Prevent score entry if player has already scored in this round
+  const hasPlayerScoredThisRound = gameState.playersWhoScoredThisRound.has(player.id);
+  if (hasPlayerScoredThisRound) {
+    return (
+      <Modal
+        visible={visible}
+        animationType="slide"
+        transparent
+        onRequestClose={onClose}
+        accessibilityViewIsModal
+      >
+        <View className="flex-1 bg-black/50 justify-center items-center p-5">
+          <ThemedView className="bg-white rounded-2xl p-6 w-full max-w-[400px]">
+            <Text className="text-2xl mb-2">
+              Already Scored This Round
+            </Text>
+            <Text className="text-base mb-6 opacity-70">
+              {player.name} has already scored in Round {gameState.currentRound}. Please finish the round before scoring again.
+            </Text>
+            <TouchableOpacity
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-primary`}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
@@ -210,17 +246,14 @@ export function ScoreEntryModal({
         onClose();
         setBlockValue("");
 
-        // Story 4.2: Check for elimination (3 consecutive misses)
+        // Story 4.2: Check for elimination (3 consecutive misses) - ROUND-SPECIFIC
         if (newConsecutiveMisses >= 3) {
-          // Mark player as eliminated
-          const eliminatedPlayer = await updatePlayer(player.id, {
-            is_eliminated: true,
-          });
-          dispatch(updatePlayerAction(eliminatedPlayer));
+          // Mark player as eliminated for current round only (in state, not database)
+          dispatch(eliminatePlayerAction(player.id));
           triggerError(); // Use error haptic for elimination
           Alert.alert(
             "Player Eliminated",
-            `${player.name} has been eliminated after 3 consecutive misses.`
+            `${player.name} has been eliminated for this round after 3 consecutive misses. They will be able to play again when the round is finished.`
           );
         } else {
           Alert.alert(
@@ -228,6 +261,9 @@ export function ScoreEntryModal({
             `${player.name} has ${newConsecutiveMisses} consecutive miss${newConsecutiveMisses > 1 ? "es" : ""}.`
           );
         }
+
+        // Note: Player is NOT marked as having scored when they miss (score = 0)
+        // They can still score later in the round if they haven't been eliminated
       } catch (error) {
         console.error("Failed to record miss:", error);
         
@@ -294,7 +330,7 @@ export function ScoreEntryModal({
         entryMode === "single" ? "single_block" : "multiple_blocks"
       );
 
-      // Update context
+      // Update context (this also marks player as having scored this round)
       dispatch(addScoreAction(player.id, score));
       dispatch(updatePlayerAction(updatedPlayer));
 
@@ -377,7 +413,7 @@ export function ScoreEntryModal({
           <View className="flex-row gap-3 mb-4">
             <TouchableOpacity
               className={`flex-1 py-3 px-4 rounded-lg border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
-                entryMode === "single" ? "border-[#007AFF] bg-[#F0F8FF]" : "border-[#E0E0E0]"
+                entryMode === "single" ? "border-primary bg-primary-light" : "border-gray-border"
               }`}
               onPress={() => setEntryMode("single")}
               accessibilityLabel="Single block mode"
@@ -393,7 +429,7 @@ export function ScoreEntryModal({
             </TouchableOpacity>
             <TouchableOpacity
               className={`flex-1 py-3 px-4 rounded-lg border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
-                entryMode === "multiple" ? "border-[#007AFF] bg-[#F0F8FF]" : "border-[#E0E0E0]"
+                entryMode === "multiple" ? "border-primary bg-primary-light" : "border-gray-border"
               }`}
               onPress={() => setEntryMode("multiple")}
               accessibilityLabel="Multiple blocks mode"
@@ -416,7 +452,7 @@ export function ScoreEntryModal({
           </Text>
 
           <TextInput
-            className={`border border-[#CCCCCC] rounded-lg px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-2xl text-center mb-6`}
+            className={`border border-gray-border-medium rounded-lg px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-2xl text-center mb-6`}
             placeholder={entryMode === "single" ? "Block number" : "Number of blocks"}
             placeholderTextColor="#999"
             value={blockValue}
@@ -429,7 +465,7 @@ export function ScoreEntryModal({
 
           <View className="flex-row gap-3">
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-[#E0E0E0]`}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-gray-bg-light`}
               onPress={handleClose}
               accessibilityLabel="Cancel"
               accessibilityRole="button"
@@ -437,7 +473,7 @@ export function ScoreEntryModal({
               <Text className="text-primary text-base font-semibold">Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-[#007AFF] ${isSubmitting ? "opacity-60" : ""}`}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-primary ${isSubmitting ? "opacity-60" : ""}`}
               onPress={handleSubmit}
               disabled={isSubmitting}
               accessibilityLabel="Submit score"

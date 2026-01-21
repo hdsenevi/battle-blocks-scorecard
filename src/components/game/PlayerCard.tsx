@@ -11,6 +11,7 @@ interface PlayerCardProps {
   isLeader: boolean;
   gameId: number;
   onPress?: () => void;
+  hasScoredThisRound?: boolean;
 }
 
 export function PlayerCard({
@@ -18,17 +19,19 @@ export function PlayerCard({
   isLeader,
   gameId,
   onPress,
+  hasScoredThisRound = false,
 }: PlayerCardProps) {
   const minHeight = Platform.select({ ios: 80, android: 88, default: 80 });
+  const isDisabled = player.is_eliminated || hasScoredThisRound || !onPress;
 
   return (
     <TouchableOpacity
-      className={`bg-gray-50 rounded-card p-4 border-2 border-gray-200 ${player.is_eliminated ? "opacity-50" : ""}`}
+      className={`bg-gray-50 rounded-card p-4 border-2 border-gray-200 ${isDisabled ? "opacity-50" : ""}`}
       style={{ minHeight }}
       onPress={onPress}
-      disabled={player.is_eliminated || !onPress}
+      disabled={isDisabled}
       testID={`player-card-${player.name}`}
-      accessibilityLabel={`${player.name}, Score: ${player.current_score}${isLeader ? ", Leader" : ""}${player.is_eliminated ? ", Eliminated" : ""}`}
+      accessibilityLabel={`${player.name}, Score: ${player.current_score}${isLeader ? ", Leader" : ""}${player.is_eliminated ? ", Eliminated" : ""}${hasScoredThisRound ? ", Already scored this round" : ""}`}
       accessibilityRole="button"
     >
       <View className="flex-row justify-between items-center">
@@ -47,6 +50,13 @@ export function PlayerCard({
             <View className="self-start bg-eliminated rounded-badge px-2 py-1 mt-1">
               <Text className="text-white text-xs font-semibold">
                 Eliminated
+              </Text>
+            </View>
+          )}
+          {hasScoredThisRound && !player.is_eliminated && (
+            <View className="self-start bg-gray-400 rounded-badge px-2 py-1 mt-1">
+              <Text className="text-white text-xs font-semibold">
+                Scored This Round
               </Text>
             </View>
           )}

@@ -27,7 +27,7 @@
 - **Estimated architectural components**: 5-7 major components
   - Game state management (game creation, player management, game state tracking)
   - Score calculation engine (score entry, calculation logic, single vs multiple blocks)
-  - Rule enforcement system (50+ penalty, elimination tracking, win detection)
+  - Rule enforcement system (50+ penalty, round-specific elimination tracking, win detection, round management)
   - Local data persistence layer (game state storage, active/completed games, metadata)
   - UI components (score entry interface, game display, winner announcement)
   - Haptic feedback service (score entry, rule enforcement, completion, errors)
@@ -74,4 +74,8 @@
 
 6. **Platform Consistency**: iOS and Android parity while respecting platform conventions (haptic patterns, navigation, visual design). Platform-specific code may be needed for native feel.
 
-7. **Rule Enforcement Logic**: Core business logic for game rules (50+ penalty, elimination, win detection) must be centralized, testable, and 100% accurate. This is the product differentiator.
+7. **Rule Enforcement Logic**: Core business logic for game rules (50+ penalty, round-specific elimination, win detection, round management) must be centralized, testable, and 100% accurate. This is the product differentiator.
+   - **Round Management**: Games are organized into rounds with manual completion via "Finish Round" button
+   - **Round-Specific Elimination**: Players eliminated after 3 consecutive misses are eliminated only for the current round, reactivated when round finishes
+   - **Single Score Per Round**: Players can only score once per round to ensure fair turn-taking
+   - **Elimination State**: Elimination status is tracked in game state only (not persisted to database) and resets on round completion

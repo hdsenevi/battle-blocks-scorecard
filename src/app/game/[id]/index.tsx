@@ -16,7 +16,8 @@ import { useNavigation } from "@react-navigation/native";
 import { ThemedView } from "@/components/themed-view";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import { getGame, getPlayersByGame, updateGame } from "@/services/database";
-import { resumeGameAction } from "@/reducers/actionCreators";
+import { resumeGameAction, startNewRoundAction } from "@/reducers/actionCreators";
+import { Alert } from "react-native";
 import { PlayerCard } from "@/components/game/PlayerCard";
 import { ScoreEntryModal } from "@/components/game/ScoreEntryModal";
 import { ScoreHistory } from "@/components/game/ScoreHistory";
@@ -90,6 +91,37 @@ export default function GameScreen() {
   const currentGame = gameState.currentGame;
   const players = gameState.players;
   const leader = gameState.leader;
+  const currentRound = gameState.currentRound;
+  const playersWhoScoredThisRound = gameState.playersWhoScoredThisRound;
+
+  const handleFinishRound = () => {
+    if (currentGame?.status !== "active") {
+      Alert.alert("Error", "Can only finish rounds in active games.");
+      return;
+    }
+
+    Alert.alert(
+      "Finish Round",
+      `Are you sure you want to finish Round ${currentRound}? This will reset eliminations and allow all players to score again in Round ${currentRound + 1}.`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Finish Round",
+          style: "default",
+          onPress: () => {
+            dispatch(startNewRoundAction());
+            Alert.alert(
+              "Round Finished",
+              `Round ${currentRound} finished. Starting Round ${currentRound + 1}.`
+            );
+          },
+        },
+      ]
+    );
+  };
 
   // Set navigation header title and back button text
   useEffect(() => {
@@ -133,24 +165,37 @@ export default function GameScreen() {
 
   return (
     <ThemedView className="flex-1">
-      <View className="flex-row justify-between items-center p-5 border-b border-[#E0E0E0]">
-        <View>
+      <View className="flex-row justify-between items-center p-5 border-b border-gray-border">
+        <View className="flex-1">
           <Text className="text-2xl mb-2" testID="game-title">
             Game #{currentGame.id}
           </Text>
           <Text className="text-sm opacity-70 capitalize" testID="game-status">
-            Status: {currentGame.status}
+            Status: {currentGame.status} | Round {currentRound}
           </Text>
         </View>
-        <TouchableOpacity
-          className={`px-4 py-2 rounded-lg bg-[#F0F0F0] ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
-          onPress={() => setIsHistoryVisible(true)}
-          testID="score-history-button"
-          accessibilityLabel="View score history"
-          accessibilityRole="button"
-        >
-          <Text className="text-primary text-base font-semibold">History</Text>
-        </TouchableOpacity>
+        <View className="flex-row gap-2">
+          <TouchableOpacity
+            className={`px-4 py-2 rounded-lg bg-gray-bg-light ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
+            onPress={() => setIsHistoryVisible(true)}
+            testID="score-history-button"
+            accessibilityLabel="View score history"
+            accessibilityRole="button"
+          >
+            <Text className="text-primary text-base font-semibold">History</Text>
+          </TouchableOpacity>
+          {currentGame.status === "active" && (
+            <TouchableOpacity
+              className={`px-4 py-2 rounded-lg bg-primary ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
+              onPress={handleFinishRound}
+              testID="finish-round-button"
+              accessibilityLabel="Finish round"
+              accessibilityRole="button"
+            >
+              <Text className="text-white text-base font-semibold">Finish Round</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <ScrollView
@@ -160,22 +205,27 @@ export default function GameScreen() {
         {players.length === 0 ? (
           <Text className="text-center mt-10 opacity-70">No players yet</Text>
         ) : (
-          players.map((player) => (
-            <PlayerCard
-              key={player.id}
-              player={player}
-              isLeader={leader?.id === player.id}
-              gameId={currentGame.id}
-              onPress={() => {
-                // Story 5.3: Prevent score entry for completed/notcompleted/paused games
-                // Story 4.2: Prevent score entry for eliminated players
-                if (currentGame.status === "active" && !player.is_eliminated) {
-                  setSelectedPlayer(player);
-                  setIsScoreModalVisible(true);
-                }
-              }}
-            />
-          ))
+          players.map((player) => {
+            const hasScored = playersWhoScoredThisRound.has(player.id);
+            return (
+              <PlayerCard
+                key={player.id}
+                player={player}
+                isLeader={leader?.id === player.id}
+                gameId={currentGame.id}
+                hasScoredThisRound={hasScored}
+                onPress={() => {
+                  // Story 5.3: Prevent score entry for completed/notcompleted/paused games
+                  // Story 4.2: Prevent score entry for eliminated players
+                  // Prevent score entry if player already scored this round
+                  if (currentGame.status === "active" && !player.is_eliminated && !hasScored) {
+                    setSelectedPlayer(player);
+                    setIsScoreModalVisible(true);
+                  }
+                }}
+              />
+            );
+          })
         )}
       </ScrollView>
 

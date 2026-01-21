@@ -71,6 +71,8 @@
 - Game status (active, completed, paused)
 - Leader identification
 - Rule enforcement triggers
+- Current round number
+- Players who have scored in current round (prevents multiple scores per round)
 
 **Affects:**
 - Real-time score updates
@@ -136,11 +138,70 @@ app/               # Screen-level components (Expo Router)
 - `checkWinCondition(score: number): boolean` - Returns true if exactly 50
 - `calculateScore(blocks: number[], isMultiple: boolean): number` - Calculates score based on rules
 
+**Round Management & Elimination Rules:**
+- **Round-Specific Elimination**: Players eliminated after 3 consecutive misses are eliminated only for the current round, not the entire game
+- **Manual Round Completion**: Rounds are completed manually via "Finish Round" button (not automatic)
+- **Single Score Per Round**: Players can only score once per round; subsequent attempts are blocked
+- **Elimination Reset**: When a round is finished, all eliminations and consecutive misses are reset for the next round
+- **State Tracking**: Game state tracks `currentRound` and `playersWhoScoredThisRound` to enforce round rules
+- **Elimination Persistence**: Elimination status (`is_eliminated`) is stored in state only, not persisted to database (round-specific)
+
 **Affects:**
 - Product differentiator (automatic rule enforcement)
 - Testability and reliability
 - UI component integration
 - Business logic maintainability
+- Round progression and player reactivation
+
+## Round Management & Elimination Architecture
+
+**Decision: Round-Specific Elimination with Manual Round Completion**
+
+**Rationale:**
+- Battle Blocks game rules require players to be eliminated only for the current round, not the entire game
+- Manual round completion gives players control over when rounds end
+- Prevents players from scoring multiple times in the same round, ensuring fair turn-taking
+- Round-specific state management allows eliminated players to rejoin in subsequent rounds
+
+**Implementation Approach:**
+- **Round Tracking**: Game state includes `currentRound` (number) and `playersWhoScoredThisRound` (Set<number>)
+- **Elimination State**: `is_eliminated` is tracked in game state only, not persisted to database
+- **Round Completion**: Manual via "Finish Round" button in game screen
+- **State Reset**: On round completion, all eliminations and consecutive misses are reset
+- **Score Enforcement**: Players can only score once per round; subsequent attempts are blocked
+
+**State Structure:**
+```typescript
+interface GameState {
+  currentRound: number;
+  playersWhoScoredThisRound: Set<number>;
+  players: Player[]; // includes is_eliminated (state only)
+  // ... other state
+}
+```
+
+**Actions:**
+- `ADD_SCORE`: Automatically adds player to `playersWhoScoredThisRound` set
+- `ELIMINATE_PLAYER`: Sets `is_eliminated: true` in state (not database)
+- `START_NEW_ROUND`: Resets eliminations, consecutive misses, and scored set; increments round
+
+**UI Components:**
+- `app/game/[id]/index.tsx`: "Finish Round" button, round number display
+- `src/components/game/ScoreEntryModal.tsx`: Checks if player already scored, blocks eliminated players
+- `src/components/game/PlayerCard.tsx`: Shows "Scored This Round" badge, grays out eliminated/scored players
+
+**Database Considerations:**
+- `is_eliminated` column exists in database schema for backward compatibility
+- Elimination status is NOT persisted when eliminating players (round-specific)
+- When loading players from database, `is_eliminated` is always set to `false`
+- Only `consecutive_misses` is persisted (used for elimination detection)
+
+**Affects:**
+- Game flow and round progression
+- Player reactivation after elimination
+- Score entry validation
+- UI state management
+- Database persistence strategy
 
 ## Haptic Feedback Integration
 

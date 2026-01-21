@@ -182,8 +182,15 @@ battle-blocks-scorecard/
 - Services: `src/services/gameRules.ts` (checkPenaltyRule, checkElimination, checkWinCondition)
 - Components: `src/components/game/RuleIndicator.tsx` (visual feedback)
 - Services: `src/services/haptics.ts` (triggerPenalty, triggerCompletion)
-- Context: `src/contexts/GameContext.tsx` (rule enforcement triggers)
+- Context: `src/contexts/GameContext.tsx` (rule enforcement triggers, round management)
+- Reducers: `src/reducers/gameReducer.ts` (round tracking, elimination state, score tracking per round)
+- Screens: `app/game/[id]/index.tsx` (Finish Round button, round display)
 - Database: `src/database/schema.sql` (tracks consecutive_misses, status)
+- **Round Management**: 
+  - Round-specific elimination (not persisted to database)
+  - Manual round completion via "Finish Round" button
+  - Single score per player per round enforcement
+  - Elimination and consecutive misses reset on round completion
 
 **Data Persistence (FR24-FR30):**
 - Services: `src/services/database.ts` (saveGame, loadGame, persistGameState)
@@ -235,9 +242,11 @@ battle-blocks-scorecard/
 - **NativeWind**: Styling through Tailwind classes in components
 
 **Data Flow:**
-1. **Score Entry Flow**: User input → ScoreEntry component → Context action → Game rules service → State update → Database save → UI update + Haptic feedback
-2. **Game Start Flow**: User action → Home screen → Context action → Database create → State update → Navigate to game screen
-3. **App Restore Flow**: App startup → Context initialization → Database load → State restore → UI render
+1. **Score Entry Flow**: User input → ScoreEntry component → Check if player already scored this round → Context action → Game rules service → State update → Mark player as scored → Database save → UI update + Haptic feedback
+2. **Elimination Flow**: Player misses 3 times consecutively → Context action (ELIMINATE_PLAYER) → State update (is_eliminated: true, state only) → UI update (player grayed out) → Player cannot score until round finishes
+3. **Round Completion Flow**: User presses "Finish Round" → Context action (START_NEW_ROUND) → Reset all eliminations → Reset consecutive misses → Clear playersWhoScoredThisRound → Increment round number → UI update
+4. **Game Start Flow**: User action → Home screen → Context action → Database create → State update (round 1, empty scored set) → Navigate to game screen
+5. **App Restore Flow**: App startup → Context initialization → Database load → State restore (round 1, empty scored set, no eliminations) → UI render
 
 ## File Organization Patterns
 

@@ -122,7 +122,7 @@ export default function HomeScreen() {
 
         <View className="w-full max-w-[300px] gap-4">
           <TouchableOpacity
-            className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center bg-[#007AFF]`}
+            className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center bg-primary`}
             onPress={handleStartNewGame}
             accessibilityLabel="Start New Game"
             accessibilityRole="button"
@@ -133,7 +133,7 @@ export default function HomeScreen() {
 
           {hasActiveGames && (
             <TouchableOpacity
-              className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center bg-transparent border border-[#007AFF]`}
+              className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center bg-transparent border border-primary`}
               onPress={handleContinueGame}
               testID="continue-game-button"
               accessibilityLabel="Continue Game"

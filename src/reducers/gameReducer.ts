@@ -13,6 +13,8 @@ export interface GameState {
   players: Player[];
   gameStatus: GameStatus | null;
   leader: Player | null;
+  currentRound: number;
+  playersWhoScoredThisRound: Set<number>; // Player IDs who have scored in current round
 }
 
 /**
@@ -27,7 +29,9 @@ export type GameAction =
   | { type: "COMPLETE_GAME"; payload: { winner: Player | null } }
   | { type: "RESUME_GAME"; payload: { game: Game; players: Player[] } }
   | { type: "UPDATE_PLAYER"; payload: { player: Player } }
-  | { type: "RESET_GAME" };
+  | { type: "RESET_GAME" }
+  | { type: "PLAYER_SCORED"; payload: { playerId: number } }
+  | { type: "START_NEW_ROUND" };
 
 /**
  * Initial game state
@@ -37,6 +41,8 @@ export const initialState: GameState = {
   players: [],
   gameStatus: null,
   leader: null,
+  currentRound: 1,
+  playersWhoScoredThisRound: new Set<number>(),
 };
 
 /**
@@ -86,6 +92,8 @@ export function gameReducer(
         players: [],
         gameStatus: action.payload.game.status,
         leader: null,
+        currentRound: 1,
+        playersWhoScoredThisRound: new Set<number>(),
       };
     }
 
@@ -106,14 +114,20 @@ export function gameReducer(
             ...player,
             current_score: player.current_score + score,
             consecutive_misses: 0, // Reset consecutive misses on successful score
+            is_eliminated: false, // Reset elimination on successful score (round-specific)
           };
         }
         return player;
       });
 
+      // Track that this player has scored in the current round
+      const newPlayersWhoScored = new Set(state.playersWhoScoredThisRound);
+      newPlayersWhoScored.add(playerId);
+
       return {
         ...state,
         players: updatedPlayers,
+        playersWhoScoredThisRound: newPlayersWhoScored,
         leader: calculateLeader(updatedPlayers),
       };
     }
@@ -143,7 +157,7 @@ export function gameReducer(
         if (player.id === playerId) {
           return {
             ...player,
-            is_eliminated: true,
+            is_eliminated: true, // Round-specific elimination (in state only, not persisted to DB)
           };
         }
         return player;
@@ -190,17 +204,48 @@ export function gameReducer(
     }
 
     case "RESUME_GAME": {
+      // Reset eliminations when resuming (round-specific elimination)
+      const playersWithResetElimination = action.payload.players.map((player) => ({
+        ...player,
+        is_eliminated: false, // Reset elimination on resume (round-specific)
+      }));
+
       return {
         ...state,
         currentGame: action.payload.game,
-        players: action.payload.players,
+        players: playersWithResetElimination,
         gameStatus: action.payload.game.status,
-        leader: calculateLeader(action.payload.players),
+        leader: calculateLeader(playersWithResetElimination),
+        currentRound: 1,
+        playersWhoScoredThisRound: new Set<number>(),
       };
     }
 
     case "RESET_GAME": {
       return initialState;
+    }
+
+    case "PLAYER_SCORED": {
+      // This action is handled in ADD_SCORE, but kept for compatibility
+      // The actual tracking happens in ADD_SCORE case
+      return state;
+    }
+
+    case "START_NEW_ROUND": {
+      // Reset eliminations and consecutive misses for all players
+      const playersWithResetElimination = state.players.map((player) => ({
+        ...player,
+        is_eliminated: false,
+        consecutive_misses: 0,
+      }));
+
+      return {
+        ...state,
+        players: playersWithResetElimination,
+        currentRound: state.currentRound + 1,
+        playersWhoScoredThisRound: new Set<number>(), // Reset who has scored
+        leader: calculateLeader(playersWithResetElimination),
+      };
     }
 
     default: {
