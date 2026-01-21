@@ -135,3 +135,38 @@ So that I understand what happened and trust the automatic enforcement.
 - Component tests verify animations respect reduced motion preferences
 
 **FRs covered:** FR33, NFR8, NFR39, NFR41
+
+---
+
+### Story 4.5: Automatic Round Completion Detection
+
+As a user,
+I want the system to automatically detect when all players have either scored or been eliminated in a round,
+So that I'm prompted to finish the round without having to manually check if everyone has played.
+
+**Acceptance Criteria:**
+
+**Given** I am playing an active game with multiple players
+**When** all players have either scored in the current round OR been eliminated
+**Then** the system automatically detects this condition
+**And** a clear alert is displayed showing:
+- Which players have scored in this round
+- Which players have been eliminated
+- A message explaining that all players have completed their turn
+- Option to "Finish Round" or "Continue Manually"
+**And** if I accept "Finish Round", the round is automatically finished using startNewRoundAction() (Story 2.5)
+**And** if I decline, I can continue manually and finish the round later
+**And** the detection happens immediately after a score entry or elimination that completes the round
+**And** the detection only triggers once per round (prevents duplicate alerts)
+**And** the alert is clear and understandable for ages 6+
+**And** the detection is 100% accurate (NFR22, NFR24)
+**And** the detection happens in real-time without perceptible delay (NFR5)
+**And** automation tests are created:
+- Unit tests verify round completion detection logic (all players scored or eliminated)
+- Component tests verify alert appears when round is complete
+- Component tests verify alert shows correct player status (scored vs eliminated)
+- Component tests verify "Finish Round" action completes the round
+- Component tests verify "Continue Manually" allows manual round completion
+- Integration tests verify round completion detection end-to-end
+
+**FRs covered:** FR35, NFR5, NFR22, NFR24

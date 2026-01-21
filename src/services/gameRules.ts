@@ -4,6 +4,8 @@
  * All functions are pure (no side effects, no React dependencies)
  */
 
+import type { Player } from "@/database/types";
+
 /**
  * Check if score exceeds 50 (penalty rule)
  * @param score - Current player score
@@ -73,4 +75,27 @@ export function calculateScore(
     }
     return validBlocks[0];
   }
+}
+
+/**
+ * Check if round is complete (all players have scored or been eliminated)
+ * @param players - Array of all players in the game
+ * @param playersWhoScoredThisRound - Set of player IDs who have scored in current round
+ * @returns true if all players have either scored OR been eliminated, false otherwise
+ */
+export function checkRoundCompletion(
+  players: Player[],
+  playersWhoScoredThisRound: Set<number>
+): boolean {
+  // Edge case: Empty players array should not trigger completion
+  if (players.length === 0) {
+    return false;
+  }
+
+  // Check if all players have either scored OR been eliminated
+  return players.every((player) => {
+    const hasScored = playersWhoScoredThisRound.has(player.id);
+    const isEliminated = player.is_eliminated;
+    return hasScored || isEliminated;
+  });
 }

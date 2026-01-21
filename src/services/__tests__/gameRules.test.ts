@@ -8,7 +8,9 @@ import {
   checkElimination,
   checkWinCondition,
   calculateScore,
+  checkRoundCompletion,
 } from "../gameRules";
+import type { Player } from "@/database/types";
 
 describe("Game Rules Service", () => {
   describe("checkPenaltyRule", () => {
@@ -234,6 +236,128 @@ describe("Game Rules Service", () => {
       calculateScore(blocks, true);
       expect(blocks.length).toBe(originalLength);
       expect(blocks).toEqual([5, 10, 15]);
+    });
+  });
+
+  describe("checkRoundCompletion", () => {
+    const createMockPlayer = (
+      id: number,
+      name: string,
+      isEliminated: boolean = false
+    ): Player => ({
+      id,
+      game_id: 1,
+      name,
+      current_score: 0,
+      consecutive_misses: 0,
+      is_eliminated: isEliminated,
+      created_at: Math.floor(Date.now() / 1000),
+    });
+
+    it("should return false when players array is empty", () => {
+      expect(checkRoundCompletion([], new Set())).toBe(false);
+    });
+
+    it("should return true when all players have scored", () => {
+      const players = [
+        createMockPlayer(1, "Player 1"),
+        createMockPlayer(2, "Player 2"),
+        createMockPlayer(3, "Player 3"),
+      ];
+      const playersWhoScored = new Set([1, 2, 3]);
+
+      expect(checkRoundCompletion(players, playersWhoScored)).toBe(true);
+    });
+
+    it("should return true when all players are eliminated", () => {
+      const players = [
+        createMockPlayer(1, "Player 1", true),
+        createMockPlayer(2, "Player 2", true),
+        createMockPlayer(3, "Player 3", true),
+      ];
+      const playersWhoScored = new Set();
+
+      expect(checkRoundCompletion(players, playersWhoScored)).toBe(true);
+    });
+
+    it("should return true when mix of scored and eliminated players", () => {
+      const players = [
+        createMockPlayer(1, "Player 1"), // Scored
+        createMockPlayer(2, "Player 2", true), // Eliminated
+        createMockPlayer(3, "Player 3"), // Scored
+      ];
+      const playersWhoScored = new Set([1, 3]);
+
+      expect(checkRoundCompletion(players, playersWhoScored)).toBe(true);
+    });
+
+    it("should return false when some players haven't scored and aren't eliminated", () => {
+      const players = [
+        createMockPlayer(1, "Player 1"), // Scored
+        createMockPlayer(2, "Player 2"), // Not scored, not eliminated
+        createMockPlayer(3, "Player 3"), // Scored
+      ];
+      const playersWhoScored = new Set([1, 3]);
+
+      expect(checkRoundCompletion(players, playersWhoScored)).toBe(false);
+    });
+
+    it("should return false when no players have scored and none are eliminated", () => {
+      const players = [
+        createMockPlayer(1, "Player 1"),
+        createMockPlayer(2, "Player 2"),
+        createMockPlayer(3, "Player 3"),
+      ];
+      const playersWhoScored = new Set();
+
+      expect(checkRoundCompletion(players, playersWhoScored)).toBe(false);
+    });
+
+    it("should handle single player who has scored", () => {
+      const players = [createMockPlayer(1, "Player 1")];
+      const playersWhoScored = new Set([1]);
+
+      expect(checkRoundCompletion(players, playersWhoScored)).toBe(true);
+    });
+
+    it("should handle single player who is eliminated", () => {
+      const players = [createMockPlayer(1, "Player 1", true)];
+      const playersWhoScored = new Set();
+
+      expect(checkRoundCompletion(players, playersWhoScored)).toBe(true);
+    });
+
+    it("should return false for single player who hasn't scored and isn't eliminated", () => {
+      const players = [createMockPlayer(1, "Player 1")];
+      const playersWhoScored = new Set();
+
+      expect(checkRoundCompletion(players, playersWhoScored)).toBe(false);
+    });
+
+    it("should handle player who both scored and is eliminated (scored takes precedence)", () => {
+      const players = [
+        createMockPlayer(1, "Player 1", true), // Eliminated but also scored
+        createMockPlayer(2, "Player 2"), // Scored
+      ];
+      const playersWhoScored = new Set([1, 2]);
+
+      // Player 1 has scored, so round is complete even though they're also eliminated
+      expect(checkRoundCompletion(players, playersWhoScored)).toBe(true);
+    });
+
+    it("should not mutate input arrays or Set", () => {
+      const players = [
+        createMockPlayer(1, "Player 1"),
+        createMockPlayer(2, "Player 2"),
+      ];
+      const playersWhoScored = new Set([1, 2]);
+      const originalPlayersLength = players.length;
+      const originalSetSize = playersWhoScored.size;
+
+      checkRoundCompletion(players, playersWhoScored);
+
+      expect(players.length).toBe(originalPlayersLength);
+      expect(playersWhoScored.size).toBe(originalSetSize);
     });
   });
 });

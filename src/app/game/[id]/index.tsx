@@ -18,6 +18,8 @@ import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import { getGame, getPlayersByGame, updateGame } from "@/services/database";
 import { resumeGameAction, startNewRoundAction } from "@/reducers/actionCreators";
 import { Alert } from "react-native";
+import { checkRoundCompletion } from "@/services/gameRules";
+import { triggerCompletion } from "@/services/haptics";
 import { PlayerCard } from "@/components/game/PlayerCard";
 import { ScoreEntryModal } from "@/components/game/ScoreEntryModal";
 import { ScoreHistory } from "@/components/game/ScoreHistory";
@@ -32,6 +34,7 @@ export default function GameScreen() {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isScoreModalVisible, setIsScoreModalVisible] = useState(false);
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
+  const [roundCompletionAlertShown, setRoundCompletionAlertShown] = useState<number>(0); // Track which round the alert was shown for
 
   useEffect(() => {
     const loadGame = async () => {
@@ -154,6 +157,95 @@ export default function GameScreen() {
 
     return unsubscribe;
   }, [navigation, currentGame]);
+
+  // Story 4.5: Automatic round completion detection
+  useEffect(() => {
+    // Only check when game is active and has players
+    if (
+      !currentGame ||
+      currentGame.status !== "active" ||
+      players.length === 0
+    ) {
+      return;
+    }
+
+    // Check if round is complete
+    const isRoundComplete = checkRoundCompletion(
+      players,
+      playersWhoScoredThisRound
+    );
+
+    // Only show alert once per round
+    if (isRoundComplete && roundCompletionAlertShown !== currentRound) {
+      // Build message showing player status
+      const scoredPlayers = players.filter((p) =>
+        playersWhoScoredThisRound.has(p.id)
+      );
+      const eliminatedPlayers = players.filter((p) => p.is_eliminated);
+
+      let message = `All players have completed Round ${currentRound}.\n\n`;
+      
+      if (scoredPlayers.length > 0) {
+        message += `Players who scored: ${scoredPlayers.map((p) => p.name).join(", ")}\n`;
+      }
+      
+      if (eliminatedPlayers.length > 0) {
+        message += `Players eliminated: ${eliminatedPlayers.map((p) => p.name).join(", ")}\n`;
+      }
+      
+      message += `\nWould you like to finish this round?`;
+
+      // Trigger haptic feedback
+      triggerCompletion();
+
+      // Show alert with options
+      Alert.alert(
+        "Round Complete",
+        message,
+        [
+          {
+            text: "Continue Manually",
+            style: "cancel",
+            onPress: () => {
+              // User wants to continue manually, just mark alert as shown
+              setRoundCompletionAlertShown(currentRound);
+            },
+          },
+          {
+            text: "Finish Round",
+            style: "default",
+            onPress: () => {
+              // Finish the round automatically
+              dispatch(startNewRoundAction());
+              setRoundCompletionAlertShown(currentRound);
+              Alert.alert(
+                "Round Finished",
+                `Round ${currentRound} finished. Starting Round ${currentRound + 1}.`
+              );
+            },
+          },
+        ]
+      );
+
+      // Mark alert as shown for this round
+      setRoundCompletionAlertShown(currentRound);
+    }
+  }, [
+    players,
+    playersWhoScoredThisRound,
+    currentRound,
+    currentGame,
+    roundCompletionAlertShown,
+    dispatch,
+  ]);
+
+  // Reset alert flag when round changes
+  useEffect(() => {
+    if (roundCompletionAlertShown !== currentRound) {
+      // Round changed, reset alert flag
+      setRoundCompletionAlertShown(0);
+    }
+  }, [currentRound, roundCompletionAlertShown]);
 
   if (!currentGame) {
     return (

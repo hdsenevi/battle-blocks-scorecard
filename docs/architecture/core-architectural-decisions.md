@@ -74,11 +74,20 @@
 - Current round number
 - Players who have scored in current round (prevents multiple scores per round)
 
+**Actions:**
+- `UNDO_LAST_SCORE`: Reverses the last score action in current round
+  - Removes player from `playersWhoScoredThisRound` set
+  - Restores player score to previous value
+  - Restores player state (consecutive_misses, is_eliminated if applicable)
+  - Recalculates leader
+  - Reverts game status to active if game was completed
+
 **Affects:**
 - Real-time score updates
 - Rule enforcement UI updates
 - Component state synchronization
 - Performance optimization needs
+- Undo functionality and state restoration
 
 ## Component Architecture
 
@@ -233,6 +242,107 @@ interface GameState {
 - Accessibility (haptic supplements visual feedback)
 - Performance (< 50ms requirement)
 
+## Undo System Architecture
+
+**Decision: Round-Scoped Undo for Score Actions**
+
+**Rationale:**
+- Users need ability to correct mistakes in score entry
+- Round-scoped undo prevents undoing actions from previous rounds (maintains game integrity)
+- Only allows undoing score actions (not eliminations, round completions, or game completions)
+- Simple, predictable undo behavior that matches user mental model
+
+**Implementation Approach:**
+- **Round Tracking**: Score entries are associated with the current round when created
+- **Undo Scope**: Only score entries from the current round can be undone
+- **Last Action Only**: Undo reverses the most recent score action in the current round
+- **State Restoration**: Undo must restore player state (score, consecutive_misses, is_eliminated) to pre-action state
+- **Database Operations**: Delete score entry from database, update player record to previous state
+
+**Round Association Strategy:**
+- Track `currentRound` when score entry is created
+- Store round number in score entry metadata (via timestamp correlation or explicit round tracking)
+- Query score entries by game and filter by round to determine undoable entries
+- Alternative: Track round start timestamp and use timestamp comparison to determine round membership
+
+**Undo Operation Flow:**
+1. Identify last score entry for current round (query `score_entries` table, filter by `game_id` and round)
+2. Validate undo is allowed (game is active, entry is from current round, entry exists)
+3. Calculate previous player state:
+   - Previous score: `current_score - score_value`
+   - Previous consecutive_misses: Restore if score was 0 (miss), otherwise keep current
+   - Previous is_eliminated: Restore if elimination happened after this score entry
+4. Delete score entry from database
+5. Update player record with previous state
+6. Update game state:
+   - Remove player from `playersWhoScoredThisRound` set
+   - Update player score in state
+   - Recalculate leader
+   - If game was completed, revert to active status
+7. Provide user feedback (alert, haptic)
+
+**State Structure:**
+```typescript
+interface GameState {
+  currentRound: number;
+  playersWhoScoredThisRound: Set<number>;
+  players: Player[];
+  // ... other state
+}
+```
+
+**Database Schema Considerations:**
+- `score_entries` table already has `created_at` timestamp
+- Can determine round membership by comparing timestamps with round start time
+- Alternative: Add `round_number` column to `score_entries` table for explicit round tracking (requires migration)
+
+**Actions:**
+- `UNDO_LAST_SCORE`: Reverses the last score action in current round
+  - Payload: `{ gameId: number, currentRound: number }`
+  - Effects: Deletes score entry, restores player state, updates game state
+
+**Database Functions:**
+- `getLastScoreEntryForRound(gameId: number, roundNumber: number): Promise<ScoreEntry | null>`
+  - Queries score entries for game, filters by round, returns most recent
+- `deleteScoreEntry(entryId: number): Promise<void>`
+  - Deletes score entry from database
+- `getScoreEntriesByRound(gameId: number, roundNumber: number): Promise<ScoreEntry[]>`
+  - Returns all score entries for a specific round (for validation)
+
+**Service Functions:**
+- `canUndoLastScore(gameId: number, currentRound: number): Promise<boolean>`
+  - Checks if undo is possible (active game, entries exist in current round)
+- `undoLastScore(gameId: number, currentRound: number): Promise<UndoResult>`
+  - Performs undo operation, returns result with previous state information
+
+**UI Components:**
+- `app/game/[id]/index.tsx`: "Undo Last Score" button (only visible when undo is available)
+- Undo button disabled when:
+  - Game is not active
+  - No score entries in current round
+  - Round has been completed
+
+**Edge Cases:**
+- **Penalty Reversal**: If last score triggered 50+ penalty (reset to 25), undo must restore original score before penalty
+- **Win Condition Reversal**: If last score completed game (exactly 50), undo must revert game status to active
+- **Elimination Reversal**: If player was eliminated after last score, undo must restore elimination state
+- **Consecutive Misses**: If last score was a miss (0), undo must restore previous consecutive_misses count
+- **Multiple Undos**: Each undo removes one score entry; can undo multiple times within current round
+- **Round Completion**: Once round is completed, cannot undo entries from that round
+
+**Validation Rules:**
+- Cannot undo if game is completed, paused, or notcompleted
+- Cannot undo entries from previous rounds
+- Cannot undo if no score entries exist in current round
+- Cannot undo if round has been completed
+
+**Affects:**
+- User experience (error correction capability)
+- Game state management (state restoration logic)
+- Database operations (entry deletion, player updates)
+- UI components (undo button, feedback)
+- Round tracking (round-scoped undo validation)
+
 ## Testing Architecture
 
 **Decision: Multi-Layer Testing Strategy**
@@ -282,3 +392,6 @@ interface GameState {
 - Haptic service called from game rules and UI components
 - State management provides data to all UI components
 - Components trigger state updates through context actions
+- Undo service uses database service to query and delete score entries
+- Undo service uses state management to restore previous game state
+- Undo UI component depends on undo service to determine availability and perform undo

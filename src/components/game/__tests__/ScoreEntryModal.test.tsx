@@ -19,6 +19,14 @@ jest.mock("@/hooks/useThemeColor", () => ({
 
 jest.mock("@/contexts/GameContext", () => ({
   useGameDispatch: jest.fn(() => jest.fn()),
+  useGameState: jest.fn(() => ({
+    currentGame: null,
+    players: [],
+    leader: null,
+    gameStatus: "active",
+    currentRound: 1,
+    playersWhoScoredThisRound: new Set(),
+  })),
 }));
 
 jest.mock("@/services/database", () => ({
@@ -35,12 +43,16 @@ jest.mock("@/services/gameRules", () => ({
     }
     return blocks[0] || 0;
   }),
+  checkPenaltyRule: jest.fn((score: number) => score > 50),
+  checkElimination: jest.fn((consecutiveMisses: number) => consecutiveMisses >= 3),
+  checkWinCondition: jest.fn((score: number) => score === 50),
 }));
 
 jest.mock("@/services/haptics", () => ({
   triggerScoreEntry: jest.fn(),
   triggerError: jest.fn(),
   triggerCompletion: jest.fn(),
+  triggerPenalty: jest.fn(),
 }));
 
 jest.mock("@/reducers/actionCreators", () => ({
@@ -55,6 +67,10 @@ jest.mock("@/reducers/actionCreators", () => ({
   completeGameAction: jest.fn((player: Player) => ({
     type: "COMPLETE_GAME",
     payload: player,
+  })),
+  eliminatePlayerAction: jest.fn((playerId: number) => ({
+    type: "ELIMINATE_PLAYER",
+    payload: { playerId },
   })),
 }));
 
@@ -355,7 +371,7 @@ describe("ScoreEntryModal", () => {
     );
 
     expect(getByText("Player Eliminated")).toBeTruthy();
-    expect(getByText("Player 1 has been eliminated and cannot receive further scores.")).toBeTruthy();
+    expect(getByText(/has been eliminated for this round/)).toBeTruthy();
   });
 
   it("should handle touch target sizes (44x44 iOS, 48x48 Android minimum)", () => {
@@ -432,5 +448,459 @@ describe("ScoreEntryModal", () => {
 
     const inputAfterClose = getInputAfterClose("Block number");
     expect(inputAfterClose.props.value).toBe("");
+  });
+
+  describe("Penalty Rule Enforcement (Story 4.1)", () => {
+    it("should apply penalty rule when score exceeds 50", async () => {
+      const { addScoreEntry, updatePlayer } = require("@/services/database");
+      const { triggerPenalty } = require("@/services/haptics");
+      const { checkPenaltyRule } = require("@/services/gameRules");
+      const { calculateScore } = require("@/services/gameRules");
+
+      // Player with score 48, adding 5 points would make it 53
+      const playerWithHighScore: Player = {
+        ...mockPlayer,
+        current_score: 48,
+      };
+
+      calculateScore.mockReturnValue(5);
+      checkPenaltyRule.mockReturnValue(true); // Score 53 > 50
+
+      updatePlayer.mockResolvedValue({
+        ...playerWithHighScore,
+        current_score: 25, // Reset to 25
+        consecutive_misses: 0,
+      });
+      addScoreEntry.mockResolvedValue(undefined);
+
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={playerWithHighScore}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "5");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(checkPenaltyRule).toHaveBeenCalledWith(53); // 48 + 5 = 53
+        expect(updatePlayer).toHaveBeenCalledWith(1, {
+          current_score: 25,
+          consecutive_misses: 0,
+        });
+        expect(triggerPenalty).toHaveBeenCalled();
+        expect(Alert.alert).toHaveBeenCalledWith(
+          "Penalty Applied",
+          "Player 1's score exceeded 50 and has been reset to 25."
+        );
+        expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 5, "single_block");
+        expect(mockOnClose).toHaveBeenCalled();
+      });
+    });
+
+    it("should not apply penalty when score is exactly 50", async () => {
+      const { addScoreEntry, updatePlayer } = require("@/services/database");
+      const { triggerPenalty, triggerScoreEntry } = require("@/services/haptics");
+      const { checkPenaltyRule } = require("@/services/gameRules");
+      const { calculateScore } = require("@/services/gameRules");
+
+      // Player with score 48, adding 2 points makes it exactly 50
+      const playerWithHighScore: Player = {
+        ...mockPlayer,
+        current_score: 48,
+      };
+
+      calculateScore.mockReturnValue(2);
+      checkPenaltyRule.mockReturnValue(false); // Score 50 is not > 50
+
+      updatePlayer.mockResolvedValue({
+        ...playerWithHighScore,
+        current_score: 50,
+        consecutive_misses: 0,
+      });
+      addScoreEntry.mockResolvedValue(undefined);
+
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={playerWithHighScore}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "2");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(checkPenaltyRule).toHaveBeenCalledWith(50);
+        expect(updatePlayer).toHaveBeenCalledWith(1, {
+          current_score: 50,
+          consecutive_misses: 0,
+        });
+        expect(triggerPenalty).not.toHaveBeenCalled();
+        expect(triggerScoreEntry).toHaveBeenCalled();
+        expect(Alert.alert).not.toHaveBeenCalledWith(
+          "Penalty Applied",
+          expect.any(String)
+        );
+      });
+    });
+
+    it("should apply penalty rule in multiple blocks mode", async () => {
+      const { addScoreEntry, updatePlayer } = require("@/services/database");
+      const { triggerPenalty } = require("@/services/haptics");
+      const { checkPenaltyRule } = require("@/services/gameRules");
+      const { calculateScore } = require("@/services/gameRules");
+
+      // Player with score 49, adding 3 blocks would make it 52
+      const playerWithHighScore: Player = {
+        ...mockPlayer,
+        current_score: 49,
+      };
+
+      calculateScore.mockReturnValue(3);
+      checkPenaltyRule.mockReturnValue(true); // Score 52 > 50
+
+      updatePlayer.mockResolvedValue({
+        ...playerWithHighScore,
+        current_score: 25,
+        consecutive_misses: 0,
+      });
+      addScoreEntry.mockResolvedValue(undefined);
+
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={playerWithHighScore}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      // Switch to multiple blocks mode
+      const multipleButton = getByText("Multiple Blocks");
+      fireEvent.press(multipleButton);
+
+      const input = getByPlaceholderText("Number of blocks");
+      fireEvent.changeText(input, "3");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(checkPenaltyRule).toHaveBeenCalledWith(52); // 49 + 3 = 52
+        expect(updatePlayer).toHaveBeenCalledWith(1, {
+          current_score: 25,
+          consecutive_misses: 0,
+        });
+        expect(triggerPenalty).toHaveBeenCalled();
+        expect(Alert.alert).toHaveBeenCalledWith(
+          "Penalty Applied",
+          "Player 1's score exceeded 50 and has been reset to 25."
+        );
+      });
+    });
+
+    it("should reset score to exactly 25 when penalty is applied", async () => {
+      const { addScoreEntry, updatePlayer } = require("@/services/database");
+      const { triggerPenalty } = require("@/services/haptics");
+      const { checkPenaltyRule } = require("@/services/gameRules");
+      const { calculateScore } = require("@/services/gameRules");
+
+      // Player with score 30, adding 25 points would make it 55
+      const playerWithHighScore: Player = {
+        ...mockPlayer,
+        current_score: 30,
+      };
+
+      calculateScore.mockReturnValue(25);
+      checkPenaltyRule.mockReturnValue(true); // Score 55 > 50
+
+      updatePlayer.mockResolvedValue({
+        ...playerWithHighScore,
+        current_score: 25,
+        consecutive_misses: 0,
+      });
+      addScoreEntry.mockResolvedValue(undefined);
+
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={playerWithHighScore}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "25");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(updatePlayer).toHaveBeenCalledWith(1, {
+          current_score: 25, // Exactly 25, not 55
+          consecutive_misses: 0,
+        });
+        expect(triggerPenalty).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe("Elimination Rule Enforcement (Story 4.2)", () => {
+    it("should eliminate player when consecutive misses reaches 3", async () => {
+      const { addScoreEntry, updatePlayer } = require("@/services/database");
+      const { triggerError } = require("@/services/haptics");
+      const { checkElimination } = require("@/services/gameRules");
+      const { eliminatePlayerAction } = require("@/reducers/actionCreators");
+
+      // Player with 2 consecutive misses, entering 0 would make it 3
+      const playerWithMisses: Player = {
+        ...mockPlayer,
+        consecutive_misses: 2,
+      };
+
+      checkElimination.mockReturnValue(true); // 3 >= 3
+
+      updatePlayer.mockResolvedValue({
+        ...playerWithMisses,
+        consecutive_misses: 3,
+      });
+      addScoreEntry.mockResolvedValue(undefined);
+
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={playerWithMisses}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "0");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(checkElimination).toHaveBeenCalledWith(3);
+        expect(eliminatePlayerAction).toHaveBeenCalledWith(1);
+        expect(triggerError).toHaveBeenCalled();
+        expect(Alert.alert).toHaveBeenCalledWith(
+          "Player Eliminated",
+          expect.stringContaining("has been eliminated for this round")
+        );
+      });
+    });
+
+    it("should not eliminate player when consecutive misses is less than 3", async () => {
+      const { addScoreEntry, updatePlayer } = require("@/services/database");
+      const { triggerError } = require("@/services/haptics");
+      const { checkElimination } = require("@/services/gameRules");
+      const { eliminatePlayerAction } = require("@/reducers/actionCreators");
+
+      // Player with 1 consecutive miss, entering 0 would make it 2
+      const playerWithMisses: Player = {
+        ...mockPlayer,
+        consecutive_misses: 1,
+      };
+
+      checkElimination.mockReturnValue(false); // 2 < 3
+
+      updatePlayer.mockResolvedValue({
+        ...playerWithMisses,
+        consecutive_misses: 2,
+      });
+      addScoreEntry.mockResolvedValue(undefined);
+
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={playerWithMisses}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "0");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(checkElimination).toHaveBeenCalledWith(2);
+        expect(eliminatePlayerAction).not.toHaveBeenCalled();
+        expect(Alert.alert).toHaveBeenCalledWith(
+          "Miss Recorded",
+          expect.stringContaining("has 2 consecutive misses")
+        );
+      });
+    });
+  });
+
+  describe("Win Condition Detection (Story 4.3)", () => {
+    it("should detect win condition when score equals exactly 50", async () => {
+      const { addScoreEntry, updatePlayer, updateGame } = require("@/services/database");
+      const { triggerCompletion } = require("@/services/haptics");
+      const { checkWinCondition, checkPenaltyRule, calculateScore } = require("@/services/gameRules");
+      const { completeGameAction } = require("@/reducers/actionCreators");
+
+      // Player with score 48, adding 2 points would make it exactly 50
+      const playerNearWin: Player = {
+        ...mockPlayer,
+        current_score: 48,
+      };
+
+      calculateScore.mockReturnValue(2);
+      checkPenaltyRule.mockReturnValue(false); // Score 50 is not > 50, no penalty
+      checkWinCondition.mockReturnValue(true); // Score 50 === 50
+
+      updatePlayer.mockResolvedValue({
+        ...playerNearWin,
+        current_score: 50,
+        consecutive_misses: 0,
+      });
+      addScoreEntry.mockResolvedValue(undefined);
+      updateGame.mockResolvedValue(undefined);
+
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={playerNearWin}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "2");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(checkWinCondition).toHaveBeenCalledWith(50);
+        expect(updateGame).toHaveBeenCalledWith(1, { status: "completed" });
+        expect(completeGameAction).toHaveBeenCalled();
+        expect(triggerCompletion).toHaveBeenCalled();
+        expect(Alert.alert).toHaveBeenCalledWith(
+          "Game Over!",
+          "Player 1 wins with exactly 50 points!",
+          expect.any(Array)
+        );
+        expect(mockOnClose).toHaveBeenCalled();
+      });
+    });
+
+    it("should not trigger win condition when score is not exactly 50", async () => {
+      const { addScoreEntry, updatePlayer, updateGame } = require("@/services/database");
+      const { triggerCompletion } = require("@/services/haptics");
+      const { checkWinCondition, checkPenaltyRule, calculateScore } = require("@/services/gameRules");
+      const { completeGameAction } = require("@/reducers/actionCreators");
+
+      // Player with score 48, adding 1 point would make it 49
+      const playerNearWin: Player = {
+        ...mockPlayer,
+        current_score: 48,
+      };
+
+      calculateScore.mockReturnValue(1);
+      checkPenaltyRule.mockReturnValue(false); // Score 49 is not > 50, no penalty
+      checkWinCondition.mockReturnValue(false); // Score 49 !== 50
+
+      updatePlayer.mockResolvedValue({
+        ...playerNearWin,
+        current_score: 49,
+        consecutive_misses: 0,
+      });
+      addScoreEntry.mockResolvedValue(undefined);
+
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={playerNearWin}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "1");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(checkWinCondition).toHaveBeenCalledWith(49);
+        expect(updateGame).not.toHaveBeenCalled();
+        expect(completeGameAction).not.toHaveBeenCalled();
+        expect(triggerCompletion).not.toHaveBeenCalled();
+        expect(Alert.alert).not.toHaveBeenCalledWith(
+          "Game Over!",
+          expect.any(String)
+        );
+      });
+    });
+
+    it("should apply penalty rule instead of win when score would exceed 50", async () => {
+      const { addScoreEntry, updatePlayer, updateGame } = require("@/services/database");
+      const { triggerPenalty, triggerCompletion } = require("@/services/haptics");
+      const { checkWinCondition, checkPenaltyRule, calculateScore } = require("@/services/gameRules");
+      const { completeGameAction } = require("@/reducers/actionCreators");
+
+      // Player with score 48, adding 5 points would make it 53 (penalty applies)
+      const playerNearWin: Player = {
+        ...mockPlayer,
+        current_score: 48,
+      };
+
+      calculateScore.mockReturnValue(5);
+      checkPenaltyRule.mockReturnValue(true); // Score 53 > 50
+      checkWinCondition.mockReturnValue(false); // After penalty, score is 25, not 50
+
+      updatePlayer.mockResolvedValue({
+        ...playerNearWin,
+        current_score: 25, // Penalty applied
+        consecutive_misses: 0,
+      });
+      addScoreEntry.mockResolvedValue(undefined);
+
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={playerNearWin}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "5");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(checkPenaltyRule).toHaveBeenCalledWith(53);
+        expect(checkWinCondition).toHaveBeenCalledWith(25); // After penalty
+        expect(updateGame).not.toHaveBeenCalled();
+        expect(completeGameAction).not.toHaveBeenCalled();
+        expect(triggerCompletion).not.toHaveBeenCalled();
+        expect(triggerPenalty).toHaveBeenCalled();
+      });
+    });
   });
 });

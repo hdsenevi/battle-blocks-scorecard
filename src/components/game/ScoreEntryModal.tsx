@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { ThemedView } from "@/components/themed-view";
 import type { Player } from "@/database/types";
-import { calculateScore } from "@/services/gameRules";
+import { calculateScore, checkPenaltyRule, checkElimination, checkWinCondition } from "@/services/gameRules";
 import {
   addScoreEntry,
   updatePlayer,
@@ -34,6 +34,7 @@ import {
   triggerScoreEntry,
   triggerError,
   triggerCompletion,
+  triggerPenalty,
 } from "@/services/haptics";
 
 interface ScoreEntryModalProps {
@@ -246,8 +247,9 @@ export function ScoreEntryModal({
         onClose();
         setBlockValue("");
 
-        // Story 4.2: Check for elimination (3 consecutive misses) - ROUND-SPECIFIC
-        if (newConsecutiveMisses >= 3) {
+        // Story 4.2: Check for elimination using checkElimination() - ROUND-SPECIFIC
+        const shouldEliminate = checkElimination(newConsecutiveMisses);
+        if (shouldEliminate) {
           // Mark player as eliminated for current round only (in state, not database)
           dispatch(eliminatePlayerAction(player.id));
           triggerError(); // Use error haptic for elimination
@@ -303,18 +305,24 @@ export function ScoreEntryModal({
       // Calculate new score
       let newScore = player.current_score + score;
 
-      // Story 4.1: Check for 50+ penalty rule
-      if (newScore > 50) {
+      // Story 4.1: Check for 50+ penalty rule using checkPenaltyRule()
+      const penaltyApplied = checkPenaltyRule(newScore);
+      if (penaltyApplied) {
         // Reset to 25
         newScore = 25;
+        
+        // Trigger strong haptic feedback for penalty
+        await triggerPenalty();
+        
+        // Show clear message explaining what happened
         Alert.alert(
           "Penalty Applied",
           `${player.name}'s score exceeded 50 and has been reset to 25.`
         );
       }
 
-      // Story 4.3: Check for win condition (exactly 50)
-      const isWin = newScore === 50;
+      // Story 4.3: Check for win condition using checkWinCondition()
+      const isWin = checkWinCondition(newScore);
 
       // Update player score in database
       const updatedPlayer = await updatePlayer(player.id, {
