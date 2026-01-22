@@ -38,6 +38,7 @@ export interface ScoreEntry {
   game_id: number;
   score_value: number;
   entry_type: ScoreEntryType;
+  round_number: number;
   created_at: number;
 }
 

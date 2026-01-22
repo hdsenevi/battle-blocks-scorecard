@@ -31,7 +31,17 @@ export type GameAction =
   | { type: "UPDATE_PLAYER"; payload: { player: Player } }
   | { type: "RESET_GAME" }
   | { type: "PLAYER_SCORED"; payload: { playerId: number } }
-  | { type: "START_NEW_ROUND" };
+  | { type: "START_NEW_ROUND" }
+  | {
+      type: "UNDO_LAST_SCORE";
+      payload: {
+        playerId: number;
+        previousScore: number;
+        previousConsecutiveMisses: number;
+        previousIsEliminated: boolean;
+        gameWasCompleted: boolean;
+      };
+    };
 
 /**
  * Initial game state
@@ -245,6 +255,51 @@ export function gameReducer(
         currentRound: state.currentRound + 1,
         playersWhoScoredThisRound: new Set<number>(), // Reset who has scored
         leader: calculateLeader(playersWithResetElimination),
+      };
+    }
+
+    case "UNDO_LAST_SCORE": {
+      const {
+        playerId,
+        previousScore,
+        previousConsecutiveMisses,
+        previousIsEliminated,
+        gameWasCompleted,
+      } = action.payload;
+
+      // Update player with previous state
+      const updatedPlayers = state.players.map((player) => {
+        if (player.id === playerId) {
+          return {
+            ...player,
+            current_score: previousScore,
+            consecutive_misses: previousConsecutiveMisses,
+            is_eliminated: previousIsEliminated,
+          };
+        }
+        return player;
+      });
+
+      // Remove player from playersWhoScoredThisRound set
+      const newPlayersWhoScored = new Set(state.playersWhoScoredThisRound);
+      newPlayersWhoScored.delete(playerId);
+
+      // If game was completed, revert to active status
+      const updatedGame = gameWasCompleted && state.currentGame
+        ? {
+            ...state.currentGame,
+            status: "active" as GameStatus,
+            updated_at: Math.floor(Date.now() / 1000),
+          }
+        : state.currentGame;
+
+      return {
+        ...state,
+        players: updatedPlayers,
+        playersWhoScoredThisRound: newPlayersWhoScored,
+        leader: calculateLeader(updatedPlayers),
+        currentGame: updatedGame,
+        gameStatus: gameWasCompleted ? "active" : state.gameStatus,
       };
     }
 

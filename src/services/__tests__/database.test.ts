@@ -3,7 +3,7 @@
  * Tests listActiveGames(), listCompletedGames(), and listPausedGames()
  */
 
-import type { Game } from "../../database/types";
+import type { Game, ScoreEntry } from "../../database/types";
 
 // Import SQLite to access the mock
 import * as SQLite from "expo-sqlite";
@@ -13,8 +13,12 @@ import {
   listActiveGames,
   listCompletedGames,
   listPausedGames,
+  getLastScoreEntryForRound,
+  deleteScoreEntry,
+  getScoreEntriesByRound,
   DatabaseError,
 } from "../database";
+import type { ScoreEntry } from "../../database/types";
 
 // Create a mock database instance
 const createMockDb = () => {
@@ -748,6 +752,190 @@ describe("Database Service - Status Filtering Functions", () => {
       expect(result[0].id).toBe(3);
       expect(result[1].id).toBe(2);
       expect(result[2].id).toBe(1);
+    });
+  });
+
+  describe("getLastScoreEntryForRound", () => {
+    it("should return the most recent score entry for a round", async () => {
+      const mockEntry: ScoreEntry = {
+        id: 1,
+        player_id: 1,
+        game_id: 1,
+        score_value: 5,
+        entry_type: "single_block",
+        round_number: 1,
+        created_at: 2000,
+      };
+
+      testMockDb.getAllAsync.mockImplementation((query: string, params?: any[]) => {
+        if (query && query.includes("sqlite_master")) {
+          return Promise.resolve([
+            { name: "games" },
+            { name: "players" },
+            { name: "score_entries" },
+          ]);
+        }
+        if (query && query.includes("round_number") && query.includes("ORDER BY created_at DESC")) {
+          return Promise.resolve([mockEntry]);
+        }
+        return Promise.resolve([]);
+      });
+
+      const result = await getLastScoreEntryForRound(1, 1);
+      expect(result).toEqual(mockEntry);
+    });
+
+    it("should return null if no score entries exist for the round", async () => {
+      testMockDb.getAllAsync.mockImplementation((query: string, params?: any[]) => {
+        if (query && query.includes("sqlite_master")) {
+          return Promise.resolve([
+            { name: "games" },
+            { name: "players" },
+            { name: "score_entries" },
+          ]);
+        }
+        if (query && query.includes("round_number")) {
+          return Promise.resolve([]);
+        }
+        return Promise.resolve([]);
+      });
+
+      const result = await getLastScoreEntryForRound(1, 1);
+      expect(result).toBeNull();
+    });
+
+    it("should throw DatabaseError when query fails", async () => {
+      testMockDb.getAllAsync.mockImplementation((query: string, params?: any[]) => {
+        if (query && query.includes("sqlite_master")) {
+          return Promise.resolve([
+            { name: "games" },
+            { name: "players" },
+            { name: "score_entries" },
+          ]);
+        }
+        if (query && query.includes("round_number")) {
+          return Promise.reject(new Error("Database query failed"));
+        }
+        return Promise.resolve([]);
+      });
+
+      await expect(getLastScoreEntryForRound(1, 1)).rejects.toThrow(DatabaseError);
+      await expect(getLastScoreEntryForRound(1, 1)).rejects.toThrow(
+        "Failed to get last score entry for round"
+      );
+    });
+  });
+
+  describe("deleteScoreEntry", () => {
+    it("should delete a score entry by ID", async () => {
+      testMockDb.runAsync.mockResolvedValue({ lastInsertRowId: 0, changes: 1 });
+
+      await deleteScoreEntry(1);
+      expect(testMockDb.runAsync).toHaveBeenCalledWith(
+        "DELETE FROM score_entries WHERE id = ?",
+        [1]
+      );
+    });
+
+    it("should throw DatabaseError if entry not found", async () => {
+      testMockDb.runAsync.mockResolvedValue({ lastInsertRowId: 0, changes: 0 });
+
+      await expect(deleteScoreEntry(999)).rejects.toThrow(DatabaseError);
+      await expect(deleteScoreEntry(999)).rejects.toThrow(
+        "Score entry with id 999 not found"
+      );
+    });
+
+    it("should throw DatabaseError when deletion fails", async () => {
+      testMockDb.runAsync.mockRejectedValue(new Error("Delete failed"));
+
+      await expect(deleteScoreEntry(1)).rejects.toThrow(DatabaseError);
+      await expect(deleteScoreEntry(1)).rejects.toThrow(
+        "Failed to delete score entry"
+      );
+    });
+  });
+
+  describe("getScoreEntriesByRound", () => {
+    it("should return all score entries for a specific round", async () => {
+      const mockEntries: ScoreEntry[] = [
+        {
+          id: 1,
+          player_id: 1,
+          game_id: 1,
+          score_value: 5,
+          entry_type: "single_block",
+          round_number: 1,
+          created_at: 1000,
+        },
+        {
+          id: 2,
+          player_id: 2,
+          game_id: 1,
+          score_value: 3,
+          entry_type: "multiple_blocks",
+          round_number: 1,
+          created_at: 2000,
+        },
+      ];
+
+      testMockDb.getAllAsync.mockImplementation((query: string, params?: any[]) => {
+        if (query && query.includes("sqlite_master")) {
+          return Promise.resolve([
+            { name: "games" },
+            { name: "players" },
+            { name: "score_entries" },
+          ]);
+        }
+        if (query && query.includes("round_number") && query.includes("ORDER BY created_at ASC")) {
+          return Promise.resolve(mockEntries);
+        }
+        return Promise.resolve([]);
+      });
+
+      const result = await getScoreEntriesByRound(1, 1);
+      expect(result).toEqual(mockEntries);
+      expect(result).toHaveLength(2);
+    });
+
+    it("should return empty array if no entries exist for the round", async () => {
+      testMockDb.getAllAsync.mockImplementation((query: string, params?: any[]) => {
+        if (query && query.includes("sqlite_master")) {
+          return Promise.resolve([
+            { name: "games" },
+            { name: "players" },
+            { name: "score_entries" },
+          ]);
+        }
+        if (query && query.includes("round_number")) {
+          return Promise.resolve([]);
+        }
+        return Promise.resolve([]);
+      });
+
+      const result = await getScoreEntriesByRound(1, 1);
+      expect(result).toEqual([]);
+    });
+
+    it("should throw DatabaseError when query fails", async () => {
+      testMockDb.getAllAsync.mockImplementation((query: string, params?: any[]) => {
+        if (query && query.includes("sqlite_master")) {
+          return Promise.resolve([
+            { name: "games" },
+            { name: "players" },
+            { name: "score_entries" },
+          ]);
+        }
+        if (query && query.includes("round_number")) {
+          return Promise.reject(new Error("Database query failed"));
+        }
+        return Promise.resolve([]);
+      });
+
+      await expect(getScoreEntriesByRound(1, 1)).rejects.toThrow(DatabaseError);
+      await expect(getScoreEntriesByRound(1, 1)).rejects.toThrow(
+        "Failed to get score entries by round"
+      );
     });
   });
 });

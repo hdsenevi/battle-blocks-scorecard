@@ -118,3 +118,26 @@ export function startNewRoundAction(): GameAction {
     type: "START_NEW_ROUND",
   };
 }
+
+/**
+ * Create UNDO_LAST_SCORE action
+ * Reverses the last score action in current round
+ */
+export function undoLastScoreAction(
+  playerId: number,
+  previousScore: number,
+  previousConsecutiveMisses: number,
+  previousIsEliminated: boolean,
+  gameWasCompleted: boolean
+): GameAction {
+  return {
+    type: "UNDO_LAST_SCORE",
+    payload: {
+      playerId,
+      previousScore,
+      previousConsecutiveMisses,
+      previousIsEliminated,
+      gameWasCompleted,
+    },
+  };
+}

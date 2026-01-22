@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS score_entries (
     game_id INTEGER NOT NULL,
     score_value INTEGER NOT NULL,
     entry_type TEXT NOT NULL CHECK(entry_type IN ('single_block', 'multiple_blocks')),
+    round_number INTEGER NOT NULL DEFAULT 1,
     created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE,
     FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE

@@ -226,7 +226,7 @@ describe("ScoreEntryModal", () => {
         current_score: 22,
         consecutive_misses: 0,
       });
-      expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 12, "single_block");
+      expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 12, "single_block", 1);
       expect(mockDispatch).toHaveBeenCalled();
       expect(triggerScoreEntry).toHaveBeenCalled();
       expect(mockOnClose).toHaveBeenCalled();
@@ -265,7 +265,7 @@ describe("ScoreEntryModal", () => {
 
     await waitFor(() => {
       expect(updatePlayer).toHaveBeenCalled();
-      expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 3, "multiple_blocks");
+      expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 3, "multiple_blocks", 1);
       expect(triggerScoreEntry).toHaveBeenCalled();
       expect(mockOnClose).toHaveBeenCalled();
     });
@@ -499,7 +499,7 @@ describe("ScoreEntryModal", () => {
           "Penalty Applied",
           "Player 1's score exceeded 50 and has been reset to 25."
         );
-        expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 5, "single_block");
+        expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 5, "single_block", 1);
         expect(mockOnClose).toHaveBeenCalled();
       });
     });

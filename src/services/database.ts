@@ -102,6 +102,7 @@ async function executeSchemaStatements(
       game_id INTEGER NOT NULL,
       score_value INTEGER NOT NULL,
       entry_type TEXT NOT NULL CHECK(entry_type IN ('single_block', 'multiple_blocks')),
+      round_number INTEGER NOT NULL DEFAULT 1,
       created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE,
       FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
@@ -112,6 +113,12 @@ async function executeSchemaStatements(
     "CREATE INDEX IF NOT EXISTS idx_players_game_id ON players(game_id);",
     "CREATE INDEX IF NOT EXISTS idx_score_entries_player_id ON score_entries(player_id);",
     "CREATE INDEX IF NOT EXISTS idx_score_entries_game_id ON score_entries(game_id);",
+    "CREATE INDEX IF NOT EXISTS idx_score_entries_round_number ON score_entries(game_id, round_number);",
+    
+    // Migration: Add round_number column if it doesn't exist (for existing databases)
+    // SQLite doesn't support IF NOT EXISTS for ALTER TABLE ADD COLUMN, so we use a try-catch approach
+    // This will fail silently if the column already exists, which is fine
+    "ALTER TABLE score_entries ADD COLUMN round_number INTEGER NOT NULL DEFAULT 1;",
   ];
 
   // Execute each statement sequentially
@@ -130,6 +137,7 @@ async function executeSchemaStatements(
       if (
         errorMessage.includes("already exists") ||
         errorMessage.includes("duplicate column") ||
+        errorMessage.includes("duplicate column name") ||
         (errorMessage.includes("no such table") &&
           errorMessage.includes("IF NOT EXISTS"))
       ) {
@@ -643,6 +651,7 @@ export async function getPlayersByGame(gameId: number): Promise<Player[]> {
  * @param gameId Game ID
  * @param scoreValue Score value
  * @param entryType Type of score entry
+ * @param roundNumber Round number for this score entry (default: 1)
  * @returns Created score entry with generated ID and timestamp
  * @throws {DatabaseError} If score entry creation fails
  */
@@ -650,15 +659,16 @@ export async function addScoreEntry(
   playerId: number,
   gameId: number,
   scoreValue: number,
-  entryType: ScoreEntryType
+  entryType: ScoreEntryType,
+  roundNumber: number = 1
 ): Promise<ScoreEntry> {
   try {
     const db = await getDatabase();
     const now = Math.floor(Date.now() / 1000);
 
     const result = await db.runAsync(
-      "INSERT INTO score_entries (player_id, game_id, score_value, entry_type, created_at) VALUES (?, ?, ?, ?, ?)",
-      [playerId, gameId, scoreValue, entryType, now]
+      "INSERT INTO score_entries (player_id, game_id, score_value, entry_type, round_number, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+      [playerId, gameId, scoreValue, entryType, roundNumber, now]
     );
 
     const scoreEntry = await db.getAllAsync<ScoreEntry>(
@@ -740,6 +750,105 @@ export async function getScoreEntriesByGame(
       }`,
       error instanceof Error ? error : undefined,
       "GET_SCORE_ENTRIES_BY_GAME_ERROR"
+    );
+  }
+}
+
+/**
+ * Get all score entries for a specific round
+ * @param gameId Game ID
+ * @param roundNumber Round number
+ * @returns Array of score entries for the round
+ * @throws {DatabaseError} If query fails
+ */
+export async function getScoreEntriesByRound(
+  gameId: number,
+  roundNumber: number
+): Promise<ScoreEntry[]> {
+  try {
+    const db = await getDatabase();
+    const entries = await db.getAllAsync<ScoreEntry>(
+      "SELECT * FROM score_entries WHERE game_id = ? AND round_number = ? ORDER BY created_at ASC",
+      [gameId, roundNumber]
+    );
+    return entries;
+  } catch (error) {
+    if (error instanceof DatabaseError) {
+      throw error;
+    }
+    throw new DatabaseError(
+      `Failed to get score entries by round: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      error instanceof Error ? error : undefined,
+      "GET_SCORE_ENTRIES_BY_ROUND_ERROR"
+    );
+  }
+}
+
+/**
+ * Get the last score entry for a specific round
+ * @param gameId Game ID
+ * @param roundNumber Round number
+ * @returns Most recent score entry for the round, or null if none exists
+ * @throws {DatabaseError} If query fails
+ */
+export async function getLastScoreEntryForRound(
+  gameId: number,
+  roundNumber: number
+): Promise<ScoreEntry | null> {
+  try {
+    const db = await getDatabase();
+    const entries = await db.getAllAsync<ScoreEntry>(
+      "SELECT * FROM score_entries WHERE game_id = ? AND round_number = ? ORDER BY created_at DESC LIMIT 1",
+      [gameId, roundNumber]
+    );
+    return entries.length > 0 ? entries[0] : null;
+  } catch (error) {
+    if (error instanceof DatabaseError) {
+      throw error;
+    }
+    throw new DatabaseError(
+      `Failed to get last score entry for round: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      error instanceof Error ? error : undefined,
+      "GET_LAST_SCORE_ENTRY_FOR_ROUND_ERROR"
+    );
+  }
+}
+
+/**
+ * Delete a score entry by ID
+ * @param entryId Score entry ID
+ * @throws {DatabaseError} If deletion fails
+ */
+export async function deleteScoreEntry(entryId: number): Promise<void> {
+  try {
+    const db = await getDatabase();
+    const result = await db.runAsync(
+      "DELETE FROM score_entries WHERE id = ?",
+      [entryId]
+    );
+    
+    // Check if any row was actually deleted
+    if (result.changes === 0) {
+      throw new DatabaseError(
+        `Score entry with id ${entryId} not found`,
+        undefined,
+        "DELETE_SCORE_ENTRY_NOT_FOUND"
+      );
+    }
+  } catch (error) {
+    if (error instanceof DatabaseError) {
+      throw error;
+    }
+    throw new DatabaseError(
+      `Failed to delete score entry: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      error instanceof Error ? error : undefined,
+      "DELETE_SCORE_ENTRY_ERROR"
     );
   }
 }

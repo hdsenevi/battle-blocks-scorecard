@@ -15,6 +15,7 @@ import {
   completeGameAction,
   resumeGameAction,
   resetGameAction,
+  undoLastScoreAction,
 } from "../actionCreators";
 
 describe("gameReducer", () => {
@@ -502,6 +503,228 @@ describe("gameReducer", () => {
       state = gameReducer(state, addPlayerAction(player2));
 
       expect(state.leader).toEqual(player2);
+    });
+  });
+
+  describe("UNDO_LAST_SCORE", () => {
+    it("should restore player score and remove from playersWhoScoredThisRound", () => {
+      const game: Game = {
+        id: 1,
+        status: "active",
+        created_at: 1000,
+        updated_at: 1000,
+      };
+
+      const player: Player = {
+        id: 1,
+        game_id: 1,
+        name: "Player 1",
+        current_score: 15,
+        consecutive_misses: 0,
+        is_eliminated: false,
+        created_at: 1000,
+      };
+
+      let state = gameReducer(initialState, startGameAction(game));
+      state = gameReducer(state, addPlayerAction(player));
+      state = gameReducer(state, addScoreAction(1, 5)); // Score becomes 20, added to playersWhoScoredThisRound
+
+      expect(state.players[0].current_score).toBe(20);
+      expect(state.playersWhoScoredThisRound.has(1)).toBe(true);
+
+      // Undo the score
+      state = gameReducer(
+        state,
+        undoLastScoreAction(1, 15, 0, false, false)
+      );
+
+      expect(state.players[0].current_score).toBe(15);
+      expect(state.playersWhoScoredThisRound.has(1)).toBe(false);
+    });
+
+    it("should restore consecutive_misses when undoing a miss", () => {
+      const game: Game = {
+        id: 1,
+        status: "active",
+        created_at: 1000,
+        updated_at: 1000,
+      };
+
+      const player: Player = {
+        id: 1,
+        game_id: 1,
+        name: "Player 1",
+        current_score: 10,
+        consecutive_misses: 2,
+        is_eliminated: false,
+        created_at: 1000,
+      };
+
+      let state = gameReducer(initialState, startGameAction(game));
+      state = gameReducer(state, addPlayerAction(player));
+      // Simulate a miss (consecutive_misses would be incremented to 3)
+      const updatedPlayer = {
+        ...player,
+        consecutive_misses: 3,
+      };
+      state = gameReducer(state, updatePlayerAction(updatedPlayer));
+
+      expect(state.players[0].consecutive_misses).toBe(3);
+
+      // Undo the miss
+      state = gameReducer(
+        state,
+        undoLastScoreAction(1, 10, 2, false, false)
+      );
+
+      expect(state.players[0].consecutive_misses).toBe(2);
+    });
+
+    it("should restore is_eliminated state", () => {
+      const game: Game = {
+        id: 1,
+        status: "active",
+        created_at: 1000,
+        updated_at: 1000,
+      };
+
+      const player: Player = {
+        id: 1,
+        game_id: 1,
+        name: "Player 1",
+        current_score: 10,
+        consecutive_misses: 0,
+        is_eliminated: false,
+        created_at: 1000,
+      };
+
+      let state = gameReducer(initialState, startGameAction(game));
+      state = gameReducer(state, addPlayerAction(player));
+      state = gameReducer(state, eliminatePlayerAction(1));
+
+      expect(state.players[0].is_eliminated).toBe(true);
+
+      // Undo (restore elimination state)
+      state = gameReducer(
+        state,
+        undoLastScoreAction(1, 10, 0, false, false)
+      );
+
+      expect(state.players[0].is_eliminated).toBe(false);
+    });
+
+    it("should revert game status from completed to active", () => {
+      const game: Game = {
+        id: 1,
+        status: "active",
+        created_at: 1000,
+        updated_at: 1000,
+      };
+
+      const player: Player = {
+        id: 1,
+        game_id: 1,
+        name: "Player 1",
+        current_score: 50,
+        consecutive_misses: 0,
+        is_eliminated: false,
+        created_at: 1000,
+      };
+
+      let state = gameReducer(initialState, startGameAction(game));
+      state = gameReducer(state, addPlayerAction(player));
+      state = gameReducer(state, completeGameAction(player));
+
+      expect(state.gameStatus).toBe("completed");
+      expect(state.currentGame?.status).toBe("completed");
+
+      // Undo (revert game completion)
+      state = gameReducer(
+        state,
+        undoLastScoreAction(1, 45, 0, false, true)
+      );
+
+      expect(state.gameStatus).toBe("active");
+      expect(state.currentGame?.status).toBe("active");
+    });
+
+    it("should recalculate leader after undo", () => {
+      const game: Game = {
+        id: 1,
+        status: "active",
+        created_at: 1000,
+        updated_at: 1000,
+      };
+
+      const player1: Player = {
+        id: 1,
+        game_id: 1,
+        name: "Player 1",
+        current_score: 20,
+        consecutive_misses: 0,
+        is_eliminated: false,
+        created_at: 1000,
+      };
+
+      const player2: Player = {
+        id: 2,
+        game_id: 1,
+        name: "Player 2",
+        current_score: 15,
+        consecutive_misses: 0,
+        is_eliminated: false,
+        created_at: 1000,
+      };
+
+      let state = gameReducer(initialState, startGameAction(game));
+      state = gameReducer(state, addPlayerAction(player1));
+      state = gameReducer(state, addPlayerAction(player2));
+      state = gameReducer(state, addScoreAction(1, 5)); // Player 1 now has 25
+
+      expect(state.leader?.id).toBe(1);
+
+      // Undo Player 1's score
+      state = gameReducer(
+        state,
+        undoLastScoreAction(1, 20, 0, false, false)
+      );
+
+      expect(state.leader?.id).toBe(1); // Still leader, but with 20 points
+      expect(state.players[0].current_score).toBe(20);
+    });
+
+    it("should not mutate original state", () => {
+      const game: Game = {
+        id: 1,
+        status: "active",
+        created_at: 1000,
+        updated_at: 1000,
+      };
+
+      const player: Player = {
+        id: 1,
+        game_id: 1,
+        name: "Player 1",
+        current_score: 15,
+        consecutive_misses: 0,
+        is_eliminated: false,
+        created_at: 1000,
+      };
+
+      let state = gameReducer(initialState, startGameAction(game));
+      state = gameReducer(state, addPlayerAction(player));
+      state = gameReducer(state, addScoreAction(1, 5));
+
+      const originalState = { ...state };
+      const originalPlayersWhoScored = new Set(state.playersWhoScoredThisRound);
+
+      state = gameReducer(
+        state,
+        undoLastScoreAction(1, 15, 0, false, false)
+      );
+
+      expect(originalState.players[0].current_score).toBe(20);
+      expect(originalPlayersWhoScored.has(1)).toBe(true);
     });
   });
 });

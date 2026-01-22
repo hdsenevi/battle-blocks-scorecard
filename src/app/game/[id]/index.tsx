@@ -16,10 +16,11 @@ import { useNavigation } from "@react-navigation/native";
 import { ThemedView } from "@/components/themed-view";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import { getGame, getPlayersByGame, updateGame } from "@/services/database";
-import { resumeGameAction, startNewRoundAction } from "@/reducers/actionCreators";
+import { resumeGameAction, startNewRoundAction, undoLastScoreAction } from "@/reducers/actionCreators";
 import { Alert } from "react-native";
 import { checkRoundCompletion } from "@/services/gameRules";
-import { triggerCompletion } from "@/services/haptics";
+import { triggerCompletion, triggerScoreEntry } from "@/services/haptics";
+import { canUndoLastScore, undoLastScore } from "@/services/undo";
 import { PlayerCard } from "@/components/game/PlayerCard";
 import { ScoreEntryModal } from "@/components/game/ScoreEntryModal";
 import { ScoreHistory } from "@/components/game/ScoreHistory";
@@ -35,6 +36,7 @@ export default function GameScreen() {
   const [isScoreModalVisible, setIsScoreModalVisible] = useState(false);
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
   const [roundCompletionAlertShown, setRoundCompletionAlertShown] = useState<number>(0); // Track which round the alert was shown for
+  const [canUndo, setCanUndo] = useState(false);
 
   useEffect(() => {
     const loadGame = async () => {
@@ -124,6 +126,75 @@ export default function GameScreen() {
         },
       ]
     );
+  };
+
+  // Check if undo is available
+  useEffect(() => {
+    const checkUndoAvailability = async () => {
+      if (!currentGame || currentGame.status !== "active") {
+        setCanUndo(false);
+        return;
+      }
+
+      try {
+        const undoAvailable = await canUndoLastScore(
+          currentGame.id,
+          currentRound,
+          currentGame.status
+        );
+        setCanUndo(undoAvailable);
+      } catch (error) {
+        console.error("Error checking undo availability:", error);
+        setCanUndo(false);
+      }
+    };
+
+    checkUndoAvailability();
+  }, [currentGame, currentRound, playersWhoScoredThisRound]);
+
+  const handleUndoLastScore = async () => {
+    if (!currentGame || !canUndo) {
+      return;
+    }
+
+    try {
+      // Perform undo operation
+      const undoResult = await undoLastScore(
+        currentGame.id,
+        currentRound,
+        players
+      );
+
+      if (!undoResult.success || !undoResult.scoreEntry) {
+        Alert.alert("Error", "Failed to undo last score entry.");
+        return;
+      }
+
+      // Dispatch action to update game state
+      dispatch(
+        undoLastScoreAction(
+          undoResult.scoreEntry.player_id,
+          undoResult.previousPlayerState.score,
+          undoResult.previousPlayerState.consecutive_misses,
+          undoResult.previousPlayerState.is_eliminated,
+          undoResult.gameWasCompleted
+        )
+      );
+
+      // Show alert confirmation
+      Alert.alert(
+        "Score Undone",
+        "Last score entry undone. Score restored to previous value."
+      );
+
+      // Trigger haptic feedback
+      triggerScoreEntry();
+    } catch (error) {
+      console.error("Failed to undo last score:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      Alert.alert("Error", `Failed to undo last score: ${errorMessage}`);
+    }
   };
 
   // Set navigation header title and back button text
@@ -276,6 +347,17 @@ export default function GameScreen() {
           >
             <Text className="text-primary text-base font-semibold">History</Text>
           </TouchableOpacity>
+          {currentGame.status === "active" && canUndo && (
+            <TouchableOpacity
+              className={`px-4 py-2 rounded-lg bg-gray-bg-light ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
+              onPress={handleUndoLastScore}
+              testID="undo-last-score-button"
+              accessibilityLabel="Undo last score"
+              accessibilityRole="button"
+            >
+              <Text className="text-primary text-base font-semibold">Undo</Text>
+            </TouchableOpacity>
+          )}
           {currentGame.status === "active" && (
             <TouchableOpacity
               className={`px-4 py-2 rounded-lg bg-primary ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}

@@ -1,0 +1,50 @@
+schema: 1
+story: "4.6"
+story_title: "Undo Last Score Entry"
+gate: CONCERNS
+status_reason: "Story is in Draft status, not ready for review. Core functionality implemented but comprehensive tests are incomplete (marked as [ ] in tasks). Some test cases are skipped. Implementation appears correct but needs test completion before full review."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-01-19T00:00:00Z"
+
+waiver: { active: false }
+
+top_issues:
+  - id: "TEST-001"
+    severity: medium
+    finding: "Comprehensive tests are incomplete - unit tests for undo service, database functions, and reducer action are marked as [ ] in tasks"
+    suggested_action: "Complete all test tasks before moving story to Review status"
+  - id: "TEST-002"
+    severity: low
+    finding: "Some test cases in undo.test.ts are skipped (it.skip) - error cases need proper mock setup"
+    suggested_action: "Fix skipped tests with proper mock setup or remove skip if not needed"
+
+evidence:
+  tests_reviewed: 8
+  risks_identified: 1
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    ac_gaps: [14] # Comprehensive tests incomplete
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "No security concerns - database operations with proper error handling"
+  performance:
+    status: PASS
+    notes: "Undo operation should complete without perceptible delay (NFR5) - implementation appears correct"
+  reliability:
+    status: CONCERNS
+    notes: "100% accuracy requirement (NFR22, NFR24) - needs comprehensive test coverage to verify"
+  maintainability:
+    status: PASS
+    notes: "Clean service layer, proper error handling, round-scoped undo correctly implemented"
+
+quality_score: 75
+
+recommendations:
+  immediate:
+    - action: "Complete all test tasks marked as [ ] in story tasks before moving to Review status"
+      refs: ["docs/stories/epic-4/4.6.undo-last-score-entry.md#tasks--subtasks"]
+    - action: "Fix skipped tests in undo.test.ts with proper mock setup"
+      refs: ["src/services/__tests__/undo.test.ts:118-135, 275-285"]
+  future: []

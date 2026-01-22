@@ -234,7 +234,8 @@ export function ScoreEntryModal({
           player.id,
           gameId,
           0,
-          entryMode === "single" ? "single_block" : "multiple_blocks"
+          entryMode === "single" ? "single_block" : "multiple_blocks",
+          gameState.currentRound
         );
 
         // Update context
@@ -335,7 +336,8 @@ export function ScoreEntryModal({
         player.id,
         gameId,
         score,
-        entryMode === "single" ? "single_block" : "multiple_blocks"
+        entryMode === "single" ? "single_block" : "multiple_blocks",
+        gameState.currentRound
       );
 
       // Update context (this also marks player as having scored this round)
