@@ -331,6 +331,7 @@ export async function getGame(id: number): Promise<Game | null> {
  * @param updates Partial game data to update
  * @returns Updated game
  * @throws {DatabaseError} If update fails or game not found
+ * @throws {DatabaseError} If attempting to modify a completed game (Story 5.3: AC6, AC7)
  */
 export async function updateGame(
   id: number,
@@ -338,6 +339,36 @@ export async function updateGame(
 ): Promise<Game> {
   try {
     const db = await getDatabase();
+    
+    // Story 5.3: Prevent modifications to completed games (AC: 6, 7)
+    const currentGame = await getGame(id);
+    if (!currentGame) {
+      throw new DatabaseError(`Game with id ${id} not found`);
+    }
+    
+    // Prevent status changes for completed games
+    if (currentGame.status === "completed" && updates.status !== undefined) {
+      // Allow setting to completed (idempotent), but prevent changing from completed
+      if (updates.status !== "completed") {
+        throw new DatabaseError(
+          "Cannot modify status of a completed game. Completed games cannot be changed.",
+          undefined,
+          "COMPLETED_GAME_MODIFICATION_ERROR"
+        );
+      }
+    }
+    
+    // Prevent any updates to completed games (except timestamp updates)
+    if (currentGame.status === "completed" && updates.status === undefined) {
+      // Allow timestamp updates only (for tracking purposes)
+      const now = Math.floor(Date.now() / 1000);
+      await db.runAsync("UPDATE games SET updated_at = ? WHERE id = ?", [
+        now,
+        id,
+      ]);
+      return currentGame;
+    }
+
     const now = Math.floor(Date.now() / 1000);
 
     if (updates.status !== undefined) {

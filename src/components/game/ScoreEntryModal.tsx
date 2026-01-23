@@ -13,6 +13,7 @@ import {
   Alert,
   Text,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { ThemedView } from "@/components/themed-view";
 import type { Player } from "@/database/types";
 import { calculateScore, checkPenaltyRule, checkElimination, checkWinCondition } from "@/services/gameRules";
@@ -28,8 +29,7 @@ import {
   completeGameAction,
   eliminatePlayerAction,
 } from "@/reducers/actionCreators";
-import { useGameState } from "@/contexts/GameContext";
-import { useGameDispatch } from "@/contexts/GameContext";
+import { useGameState , useGameDispatch } from "@/contexts/GameContext";
 import {
   triggerScoreEntry,
   triggerError,
@@ -54,6 +54,7 @@ export function ScoreEntryModal({
 }: ScoreEntryModalProps) {
   const dispatch = useGameDispatch();
   const gameState = useGameState();
+  const router = useRouter();
   const [entryMode, setEntryMode] = useState<"single" | "multiple">("single");
   const [blockValue, setBlockValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -168,6 +169,28 @@ export function ScoreEntryModal({
   }
 
   const handleSubmit = async () => {
+    // Story 5.3: Prevent score entry at service level (AC: 4)
+    // Double-check game status even if UI was bypassed
+    if (gameStatus === "completed" || gameStatus === "notcompleted") {
+      Alert.alert(
+        "Game Completed",
+        "This game has been completed. No further score entries are allowed."
+      );
+      triggerError();
+      onClose();
+      return;
+    }
+
+    if (gameStatus === "paused") {
+      Alert.alert(
+        "Game Paused",
+        "This game is paused. Resume the game to continue playing."
+      );
+      triggerError();
+      onClose();
+      return;
+    }
+
     // Story 6.2: Prevent rapid duplicate score entries
     const now = Date.now();
     if (now - lastSubmitTime < 500) {
@@ -349,19 +372,15 @@ export function ScoreEntryModal({
         // Mark game as completed
         await updateGame(gameId, { status: "completed" });
         dispatch(completeGameAction(updatedPlayer));
+        // Trigger haptic feedback (Story 5.1: AC5)
         triggerCompletion();
+        // Close modal first
         onClose();
         setBlockValue("");
         setIsSubmitting(false);
-        Alert.alert(
-          "Game Over!",
-          `${player.name} wins with exactly 50 points!`,
-          [
-            {
-              text: "OK",
-            },
-          ]
-        );
+        // Story 5.1: Navigate to winner screen automatically (AC: 2, 4)
+        // Use replace to prevent going back to game screen
+        router.replace(`/game/${gameId}/winner`);
         return;
       }
 

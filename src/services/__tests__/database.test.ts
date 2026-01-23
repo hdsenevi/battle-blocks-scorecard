@@ -16,9 +16,9 @@ import {
   getLastScoreEntryForRound,
   deleteScoreEntry,
   getScoreEntriesByRound,
+  updateGame,
   DatabaseError,
 } from "../database";
-import type { ScoreEntry } from "../../database/types";
 
 // Create a mock database instance
 const createMockDb = () => {
@@ -820,7 +820,7 @@ describe("Database Service - Status Filtering Functions", () => {
       });
 
       await expect(getLastScoreEntryForRound(1, 1)).rejects.toThrow(DatabaseError);
-      await expect(getLastScoreEntryForRound(1, 1)).rejects.toThrow(
+      await expect(getLastScoreEntryForRound(1, 2)).rejects.toThrow(
         "Failed to get last score entry for round"
       );
     });
@@ -841,8 +841,8 @@ describe("Database Service - Status Filtering Functions", () => {
       testMockDb.runAsync.mockResolvedValue({ lastInsertRowId: 0, changes: 0 });
 
       await expect(deleteScoreEntry(999)).rejects.toThrow(DatabaseError);
-      await expect(deleteScoreEntry(999)).rejects.toThrow(
-        "Score entry with id 999 not found"
+      await expect(deleteScoreEntry(998)).rejects.toThrow(
+        "Score entry with id 998 not found"
       );
     });
 
@@ -850,7 +850,7 @@ describe("Database Service - Status Filtering Functions", () => {
       testMockDb.runAsync.mockRejectedValue(new Error("Delete failed"));
 
       await expect(deleteScoreEntry(1)).rejects.toThrow(DatabaseError);
-      await expect(deleteScoreEntry(1)).rejects.toThrow(
+      await expect(deleteScoreEntry(2)).rejects.toThrow(
         "Failed to delete score entry"
       );
     });
@@ -933,8 +933,115 @@ describe("Database Service - Status Filtering Functions", () => {
       });
 
       await expect(getScoreEntriesByRound(1, 1)).rejects.toThrow(DatabaseError);
-      await expect(getScoreEntriesByRound(1, 1)).rejects.toThrow(
+      await expect(getScoreEntriesByRound(1, 2)).rejects.toThrow(
         "Failed to get score entries by round"
+      );
+    });
+  });
+
+  describe("updateGame - Story 5.3: Prevent modifications to completed games", () => {
+    const completedGame: Game = {
+      id: 1,
+      status: "completed",
+      created_at: 1000,
+      updated_at: 1000,
+    };
+
+    const activeGame: Game = {
+      id: 2,
+      status: "active",
+      created_at: 1000,
+      updated_at: 1000,
+    };
+
+    beforeEach(() => {
+      testMockDb.getAllAsync.mockImplementation((query: string, params?: any[]) => {
+        if (query && query.includes("sqlite_master")) {
+          return Promise.resolve([
+            { name: "games" },
+            { name: "players" },
+            { name: "score_entries" },
+          ]);
+        }
+        if (query && query.includes("SELECT * FROM games WHERE id = ?")) {
+          const gameId = params?.[0];
+          if (gameId === 1) {
+            return Promise.resolve([completedGame]);
+          }
+          if (gameId === 2) {
+            return Promise.resolve([activeGame]);
+          }
+          return Promise.resolve([]);
+        }
+        return Promise.resolve([]);
+      });
+    });
+
+    it("should prevent status changes for completed games", async () => {
+      testMockDb.runAsync.mockResolvedValue({ lastInsertRowId: 0, changes: 1 });
+
+      await expect(
+        updateGame(1, { status: "active" })
+      ).rejects.toThrow(DatabaseError);
+      
+      await expect(
+        updateGame(1, { status: "active" })
+      ).rejects.toThrow("Cannot modify status of a completed game");
+    });
+
+    it("should allow idempotent status update to completed", async () => {
+      testMockDb.runAsync.mockResolvedValue({ lastInsertRowId: 0, changes: 1 });
+
+      const result = await updateGame(1, { status: "completed" });
+      
+      expect(result.status).toBe("completed");
+      expect(testMockDb.runAsync).toHaveBeenCalled();
+    });
+
+    it("should allow timestamp updates for completed games", async () => {
+      testMockDb.runAsync.mockResolvedValue({ lastInsertRowId: 0, changes: 1 });
+
+      const result = await updateGame(1, {});
+      
+      expect(result.status).toBe("completed");
+      expect(testMockDb.runAsync).toHaveBeenCalledWith(
+        "UPDATE games SET updated_at = ? WHERE id = ?",
+        expect.arrayContaining([expect.any(Number), 1])
+      );
+    });
+
+    it("should allow status changes for active games", async () => {
+      testMockDb.runAsync.mockResolvedValue({ lastInsertRowId: 0, changes: 1 });
+
+      const result = await updateGame(2, { status: "paused" });
+      
+      expect(result.status).toBe("paused");
+      expect(testMockDb.runAsync).toHaveBeenCalledWith(
+        "UPDATE games SET status = ?, updated_at = ? WHERE id = ?",
+        expect.arrayContaining(["paused", expect.any(Number), 2])
+      );
+    });
+
+    it("should throw DatabaseError if game not found", async () => {
+      testMockDb.getAllAsync.mockImplementation((query: string, params?: any[]) => {
+        if (query && query.includes("sqlite_master")) {
+          return Promise.resolve([
+            { name: "games" },
+            { name: "players" },
+            { name: "score_entries" },
+          ]);
+        }
+        if (query && query.includes("SELECT * FROM games WHERE id = ?")) {
+          return Promise.resolve([]);
+        }
+        return Promise.resolve([]);
+      });
+
+      await expect(updateGame(999, { status: "active" })).rejects.toThrow(
+        DatabaseError
+      );
+      await expect(updateGame(999, { status: "active" })).rejects.toThrow(
+        "Game with id 999 not found"
       );
     });
   });

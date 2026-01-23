@@ -7,7 +7,6 @@ import type { ScoreEntry, Player, GameStatus } from "../database/types";
 import {
   getLastScoreEntryForRound,
   deleteScoreEntry,
-  getPlayer,
   updatePlayer,
   getGame,
   updateGame,

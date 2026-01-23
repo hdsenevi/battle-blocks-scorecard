@@ -193,6 +193,36 @@ describe("HomeScreen", () => {
     });
   });
 
+  it("should navigate to winner screen for completed games", async () => {
+    const completedGame: Game = {
+      ...mockGame,
+      status: "completed",
+    };
+
+    require("@/contexts/GameContext").useGameState.mockReturnValue({
+      currentGame: completedGame,
+      gameStatus: "completed",
+      players: [mockPlayer1, mockPlayer2],
+      leader: mockPlayer1,
+      currentRound: 1,
+      playersWhoScoredThisRound: new Set(),
+    });
+
+    const { getByTestId } = render(<HomeScreen />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByTestId("continue-game-button")).toBeTruthy();
+    });
+
+    act(() => {
+      fireEvent.press(getByTestId("continue-game-button"));
+    });
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith("/game/1/winner");
+    });
+  });
+
   it("should navigate to game selection screen when multiple games exist", async () => {
     const mockGame2: Game = {
       id: 2,

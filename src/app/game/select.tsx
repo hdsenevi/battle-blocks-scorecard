@@ -81,6 +81,13 @@ export default function GameSelectionScreen() {
         return;
       }
 
+      // Story 5.3: Prevent resume for completed games (AC: 7)
+      if (game.status === "completed") {
+        // Navigate to winner screen instead of game screen
+        router.replace(`/game/${gameId}/winner`);
+        return;
+      }
+
       // If paused, make it active
       if (game.status === "paused") {
         await updateGame(gameId, { status: "active" });

@@ -10,14 +10,13 @@ import {
   Platform,
   TouchableOpacity,
   Text,
-} from "react-native";
+ Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 import { ThemedView } from "@/components/themed-view";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import { getGame, getPlayersByGame, updateGame } from "@/services/database";
 import { resumeGameAction, startNewRoundAction, undoLastScoreAction } from "@/reducers/actionCreators";
-import { Alert } from "react-native";
 import { checkRoundCompletion } from "@/services/gameRules";
 import { triggerCompletion, triggerScoreEntry } from "@/services/haptics";
 import { canUndoLastScore, undoLastScore } from "@/services/undo";

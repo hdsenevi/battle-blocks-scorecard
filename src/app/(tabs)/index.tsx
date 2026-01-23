@@ -55,6 +55,13 @@ export default function HomeScreen() {
   };
 
   const handleContinueGame = async () => {
+    // Story 5.3: Prevent resume for completed games (AC: 7)
+    if (gameState.currentGame && gameState.gameStatus === "completed") {
+      // Navigate to winner screen instead of game screen
+      router.push(`/game/${gameState.currentGame.id}/winner`);
+      return;
+    }
+
     if (gameState.currentGame && (gameState.gameStatus === "active" || gameState.gameStatus === "paused")) {
       // If game already in context, navigate directly
       // If paused, make it active first
@@ -65,7 +72,7 @@ export default function HomeScreen() {
       return;
     }
 
-    // Check for active or paused games
+    // Check for active or paused games (exclude completed games)
     try {
       const activeGames = await listActiveGames();
       const pausedGames = await listPausedGames();
