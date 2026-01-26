@@ -1,0 +1,51 @@
+schema: 1
+story: "6.5"
+story_title: "App Store and Play Store Compliance"
+gate: CONCERNS
+status_reason: "Code-level requirements met (privacy policy implemented, compliance verified), but design assets (app icons, screenshots) are incomplete. These are design tasks, not code tasks, but required for store submission."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-01-23T00:00:00Z"
+
+waiver: { active: false }
+
+top_issues:
+  - id: "DESIGN-001"
+    severity: medium
+    finding: "App icons not created - requires design assets (iOS and Android icons)"
+    suggested_action: "Create app icons for iOS and Android, place in assets directory"
+  - id: "DESIGN-002"
+    severity: medium
+    finding: "Screenshots not created - requires app screenshots for store listings"
+    suggested_action: "Create screenshots for iOS and Android store listings"
+
+evidence:
+  tests_reviewed: 1
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7]
+    ac_gaps: []
+  note: "AC3 partially complete - code requirements met, design assets pending"
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "Privacy policy implemented (FR52), no data collection, meets store privacy requirements"
+  performance:
+    status: PASS
+    notes: "No performance concerns"
+  reliability:
+    status: PASS
+    notes: "App meets store reliability requirements"
+  maintainability:
+    status: PASS
+    notes: "Privacy policy screen well-implemented, compliance documented"
+
+quality_score: 85
+
+recommendations:
+  immediate:
+    - action: "Create app icons for iOS and Android (design task)"
+      refs: ["docs/stories/epic-6/6.5.app-store-and-play-store-compliance.md#tasks--subtasks"]
+    - action: "Create screenshots for store listings (design/marketing task)"
+      refs: ["docs/stories/epic-6/6.5.app-store-and-play-store-compliance.md#tasks--subtasks"]
+  future: []

@@ -127,7 +127,7 @@ export default function GameSelectionScreen() {
     return (
       <ThemedView className="flex-1">
         <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-base">Loading games...</Text>
+          <Text className="text-base text-gray-900 dark:text-gray-100">Loading games...</Text>
         </View>
       </ThemedView>
     );
@@ -153,8 +153,8 @@ export default function GameSelectionScreen() {
     return (
       <ThemedView className="flex-1">
         <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-2xl mb-2 text-center">No Active Games</Text>
-          <Text className="text-base mb-6 text-center opacity-70">
+          <Text className="text-2xl mb-2 text-center text-gray-900 dark:text-gray-100">No Active Games</Text>
+          <Text className="text-base mb-6 text-center opacity-70 text-gray-900 dark:text-gray-300">
             Start a new game to begin playing
           </Text>
           <TouchableOpacity
@@ -170,11 +170,11 @@ export default function GameSelectionScreen() {
 
   return (
     <ThemedView className="flex-1">
-      <View className="p-5 border-b border-gray-border">
-        <Text className="text-2xl mb-2" testID="select-game-title">
+      <View className="p-5 border-b border-gray-border dark:border-gray-700">
+        <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100" testID="select-game-title">
           Select Game to Resume
         </Text>
-        <Text className="text-sm opacity-70" testID="select-game-subtitle">
+        <Text className="text-sm opacity-70 text-gray-900 dark:text-gray-300" testID="select-game-subtitle">
           {games.length} {games.length === 1 ? "game" : "games"} to resume
         </Text>
       </View>
@@ -183,7 +183,7 @@ export default function GameSelectionScreen() {
         {games.map((game) => (
           <TouchableOpacity
             key={game.id}
-            className={`bg-white rounded-xl p-4 border border-gray-border ${Platform.OS === "ios" ? "min-h-[80px]" : Platform.OS === "android" ? "min-h-[88px]" : "min-h-[80px]"}`}
+            className={`bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-border dark:border-gray-700 ${Platform.OS === "ios" ? "min-h-[80px]" : Platform.OS === "android" ? "min-h-[88px]" : "min-h-[80px]"}`}
             onPress={() => handleSelectGame(game.id)}
             testID={`game-card-${game.id}`}
             accessibilityLabel={`Resume game ${game.id}, started ${formatDate(
@@ -193,12 +193,12 @@ export default function GameSelectionScreen() {
           >
             <View className="gap-2">
               <View className="flex-row justify-between items-center">
-                <Text className="text-lg font-semibold">Game #{game.id}</Text>
-                <Text className="text-sm opacity-70">
+                <Text className="text-lg font-semibold text-gray-900 dark:text-gray-100">Game #{game.id}</Text>
+                <Text className="text-sm opacity-70 text-gray-900 dark:text-gray-300">
                   {formatDate(game.created_at)}
                 </Text>
               </View>
-              <Text className="text-sm opacity-70">
+              <Text className="text-sm opacity-70 text-gray-900 dark:text-gray-300">
                 {game.playerCount} {game.playerCount === 1 ? "player" : "players"}
               </Text>
             </View>

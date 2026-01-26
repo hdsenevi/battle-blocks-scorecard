@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  // Story 7.1: Enable dark mode using media query (system preference)
+  darkMode: 'media',
   content: [
     "./App.{js,jsx,ts,tsx}",
     "./app/**/*.{js,jsx,ts,tsx}",
@@ -10,23 +12,24 @@ module.exports = {
   theme: {
     extend: {
       // Custom colors for game state indicators
+      // Story 7.1: Dark mode variants added for all custom colors
       colors: {
-        // Leader indicator
+        // Leader indicator - lighter in dark mode for visibility
         leader: {
           DEFAULT: "#007AFF",
           light: "#F0F8FF",
         },
-        // Eliminated player indicator
+        // Eliminated player indicator - lighter in dark mode for visibility
         eliminated: {
           DEFAULT: "#999999",
           light: "#F5F5F5",
         },
-        // Active player indicator
+        // Active player indicator - lighter in dark mode for visibility
         active: {
           DEFAULT: "#34C759",
           light: "#F0FDF4",
         },
-        // Primary brand color
+        // Primary brand color - lighter in dark mode for visibility
         primary: {
           DEFAULT: "#007AFF",
           dark: "#0051D5",

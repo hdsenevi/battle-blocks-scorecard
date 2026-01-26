@@ -400,6 +400,343 @@ describe("ScoreEntryModal", () => {
     });
   });
 
+  describe("Story 6.1: Handle Invalid Score Entries", () => {
+    it("should reject negative values", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "-5");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(Alert.alert).toHaveBeenCalledWith(
+          "Invalid Input",
+          "Please enter a valid number (0 or greater)"
+        );
+      });
+    });
+
+    it("should reject non-numeric values", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "abc123");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(Alert.alert).toHaveBeenCalledWith(
+          "Invalid Input",
+          "Please enter a valid number"
+        );
+      });
+    });
+
+    it("should reject very large numbers", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "10000");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(Alert.alert).toHaveBeenCalledWith(
+          "Value Too Large",
+          "Please enter a value less than 1000"
+        );
+      });
+    });
+
+    it("should trigger error haptic for invalid input", async () => {
+      const { triggerError } = require("@/services/haptics");
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "-5");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(triggerError).toHaveBeenCalled();
+      });
+    });
+
+    it("should allow input correction after error", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      
+      // Enter invalid value
+      fireEvent.changeText(input, "-5");
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(Alert.alert).toHaveBeenCalled();
+      });
+
+      // Correct the input
+      fireEvent.changeText(input, "5");
+      
+      // Input field should still be accessible
+      expect(input).toBeTruthy();
+      expect(input.props.value).toBe("5");
+    });
+
+    it("should not crash on invalid input", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      
+      // Try various invalid inputs
+      const invalidInputs = ["-5", "abc", "999999", ""];
+      
+      for (const invalidInput of invalidInputs) {
+        fireEvent.changeText(input, invalidInput);
+        const submitButton = getByText("Submit");
+        
+        // Should not throw error
+        expect(() => {
+          fireEvent.press(submitButton);
+        }).not.toThrow();
+      }
+    });
+  });
+
+  describe("Story 6.2: Prevent Rapid Duplicate Score Entries", () => {
+    it("should prevent rapid duplicate submissions", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "5");
+
+      const submitButton = getByText("Submit");
+      
+      // Rapidly press submit multiple times
+      fireEvent.press(submitButton);
+      fireEvent.press(submitButton);
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        // Should only process one submission
+        expect(Alert.alert).toHaveBeenCalledWith("Please wait", "Please wait a moment before submitting again");
+      });
+    });
+
+    it("should show processing state during submission", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "5");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      // Button should show processing state
+      await waitFor(() => {
+        const processingButton = getByText("Submitting...");
+        expect(processingButton).toBeTruthy();
+      });
+    });
+
+    it("should disable submit button during processing", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "5");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        const processingButton = getByText("Submitting...");
+        expect(processingButton.props.disabled).toBe(true);
+      });
+    });
+  });
+
+  describe("Story 6.3: Handle Edge Cases", () => {
+    it("should handle zero as a miss (not error)", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const { addScoreEntry, updatePlayer } = require("@/services/database");
+      const { checkElimination } = require("@/services/gameRules");
+
+      updatePlayer.mockResolvedValue({
+        ...mockPlayer,
+        consecutive_misses: 1,
+      });
+      addScoreEntry.mockResolvedValue(undefined);
+      checkElimination.mockReturnValue(false);
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "0");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(updatePlayer).toHaveBeenCalled();
+        expect(addScoreEntry).toHaveBeenCalledWith(
+          mockPlayer.id,
+          1,
+          0,
+          expect.any(String),
+          1
+        );
+      });
+    });
+
+    it("should reject negative values with clear error", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "-10");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(Alert.alert).toHaveBeenCalledWith(
+          "Invalid Input",
+          "Please enter a valid number (0 or greater)"
+        );
+      });
+    });
+
+    it("should validate and reject very large numbers", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      fireEvent.changeText(input, "5000");
+
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(Alert.alert).toHaveBeenCalledWith(
+          "Value Too Large",
+          "Please enter a value less than 1000"
+        );
+      });
+    });
+
+    it("should preserve game state after edge case errors", async () => {
+      const { getByPlaceholderText, getByText } = render(
+        <ScoreEntryModal
+          visible={true}
+          player={mockPlayer}
+          gameId={1}
+          onClose={mockOnClose}
+        />
+      );
+
+      const input = getByPlaceholderText("Block number");
+      
+      // Try invalid input
+      fireEvent.changeText(input, "-5");
+      const submitButton = getByText("Submit");
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(Alert.alert).toHaveBeenCalled();
+      });
+
+      // Game state should be preserved - modal should still be open
+      expect(input).toBeTruthy();
+    });
+  });
+
   it("should prevent score entry for eliminated players", () => {
     const eliminatedPlayer: Player = {
       ...mockPlayer,

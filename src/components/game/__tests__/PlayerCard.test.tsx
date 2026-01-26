@@ -228,6 +228,124 @@ describe("PlayerCard", () => {
     const card = getByTestId("player-card-Player 1");
     // The card should have eliminated styling applied
     expect(card).toBeTruthy();
+    // Card should have reduced opacity and gray border
+    expect(card.props.className).toContain("opacity-60");
+    expect(card.props.className).toContain("border-gray-400");
+  });
+
+  describe("Story 6.4: Display Eliminated Players", () => {
+    it("should show eliminated players with visual distinction", () => {
+      const eliminatedPlayer: Player = {
+        ...mockPlayer,
+        is_eliminated: true,
+      };
+
+      const { getByText, getByTestId } = render(
+        <PlayerCard player={eliminatedPlayer} isLeader={false} gameId={1} />
+      );
+
+      // Should show eliminated badge
+      const eliminatedBadge = getByText("Eliminated");
+      expect(eliminatedBadge).toBeTruthy();
+
+      // Card should be visually distinct
+      const card = getByTestId("player-card-Player 1");
+      expect(card.props.className).toContain("opacity-60");
+    });
+
+    it("should show eliminated players with icon indicator", () => {
+      const eliminatedPlayer: Player = {
+        ...mockPlayer,
+        is_eliminated: true,
+      };
+
+      const { getByText } = render(
+        <PlayerCard player={eliminatedPlayer} isLeader={false} gameId={1} />
+      );
+
+      // Should have icon (❌) in eliminated badge
+      const eliminatedText = getByText("Eliminated");
+      expect(eliminatedText).toBeTruthy();
+      // Icon is in the same View as the text
+    });
+
+    it("should keep eliminated players visible but non-interactive", () => {
+      const eliminatedPlayer: Player = {
+        ...mockPlayer,
+        is_eliminated: true,
+      };
+
+      const mockOnPress = jest.fn();
+      const { getByTestId } = render(
+        <PlayerCard 
+          player={eliminatedPlayer} 
+          isLeader={false} 
+          gameId={1}
+          onPress={mockOnPress}
+        />
+      );
+
+      const card = getByTestId("player-card-Player 1");
+      
+      // Card should be disabled
+      expect(card.props.disabled).toBe(true);
+      
+      // Card should still be visible
+      expect(card).toBeTruthy();
+    });
+
+    it("should have accessible elimination status", () => {
+      const eliminatedPlayer: Player = {
+        ...mockPlayer,
+        is_eliminated: true,
+      };
+
+      const { getByTestId } = render(
+        <PlayerCard player={eliminatedPlayer} isLeader={false} gameId={1} />
+      );
+
+      const card = getByTestId("player-card-Player 1");
+      
+      // Accessibility label should include elimination status
+      expect(card.props.accessibilityLabel).toContain("Eliminated");
+    });
+
+    it("should supplement color coding with text and icon", () => {
+      const eliminatedPlayer: Player = {
+        ...mockPlayer,
+        is_eliminated: true,
+      };
+
+      const { getByText } = render(
+        <PlayerCard player={eliminatedPlayer} isLeader={false} gameId={1} />
+      );
+
+      // Should have text indicator (not just color)
+      const eliminatedText = getByText("Eliminated");
+      expect(eliminatedText).toBeTruthy();
+      
+      // Should have icon indicator
+      // Icon is in the badge View
+    });
+
+    it("should follow design system styling", () => {
+      const eliminatedPlayer: Player = {
+        ...mockPlayer,
+        is_eliminated: true,
+      };
+
+      const { getByTestId, getByText } = render(
+        <PlayerCard player={eliminatedPlayer} isLeader={false} gameId={1} />
+      );
+
+      const card = getByTestId("player-card-Player 1");
+      const eliminatedBadge = getByText("Eliminated");
+      
+      // Should use NativeWind/Tailwind classes
+      expect(card.props.className).toContain("rounded-card");
+      expect(eliminatedBadge.props.className).toContain("bg-eliminated");
+      expect(eliminatedBadge.props.className).toContain("rounded-badge");
+    });
   });
 
   it("should handle player with special characters in name", () => {

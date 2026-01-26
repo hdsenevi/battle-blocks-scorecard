@@ -81,12 +81,12 @@ export function ScoreEntryModal({
         onRequestClose={onClose}
         accessibilityViewIsModal
       >
-        <View className="flex-1 bg-black/50 justify-center items-center p-5">
-          <ThemedView className="bg-white rounded-2xl p-6 w-full max-w-[400px]">
-            <Text className="text-2xl mb-2">
+        <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
+          <ThemedView className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-[400px]">
+            <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100">
               {gameStatus === "completed" ? "Game Completed" : gameStatus === "notcompleted" ? "Game Not Completed" : "Game Paused"}
             </Text>
-            <Text className="text-base mb-6 opacity-70">
+            <Text className="text-base mb-6 opacity-70 text-gray-900 dark:text-gray-300">
               {statusMessage}
             </Text>
             <TouchableOpacity
@@ -113,12 +113,12 @@ export function ScoreEntryModal({
         onRequestClose={onClose}
         accessibilityViewIsModal
       >
-        <View className="flex-1 bg-black/50 justify-center items-center p-5">
-          <ThemedView className="bg-white rounded-2xl p-6 w-full max-w-[400px]">
-            <Text className="text-2xl mb-2">
+        <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
+          <ThemedView className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-[400px]">
+            <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100">
               Player Eliminated
             </Text>
-            <Text className="text-base mb-6 opacity-70">
+            <Text className="text-base mb-6 opacity-70 text-gray-900 dark:text-gray-300">
               {player.name} has been eliminated for this round and cannot receive further scores until the next round begins.
             </Text>
             <TouchableOpacity
@@ -146,12 +146,12 @@ export function ScoreEntryModal({
         onRequestClose={onClose}
         accessibilityViewIsModal
       >
-        <View className="flex-1 bg-black/50 justify-center items-center p-5">
-          <ThemedView className="bg-white rounded-2xl p-6 w-full max-w-[400px]">
-            <Text className="text-2xl mb-2">
+        <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
+          <ThemedView className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-[400px]">
+            <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100">
               Already Scored This Round
             </Text>
-            <Text className="text-base mb-6 opacity-70">
+            <Text className="text-base mb-6 opacity-70 text-gray-900 dark:text-gray-300">
               {player.name} has already scored in Round {gameState.currentRound}. Please finish the round before scoring again.
             </Text>
             <TouchableOpacity
@@ -429,20 +429,22 @@ export function ScoreEntryModal({
       onRequestClose={handleClose}
       accessibilityViewIsModal
     >
-      <View className="flex-1 bg-black/50 justify-center items-center p-5">
-        <ThemedView className="bg-white rounded-2xl p-6 w-full max-w-[400px]">
-          <Text className="text-2xl mb-2">
+      <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
+        <ThemedView className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-[400px]">
+          <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100">
             Enter Score for {player.name}
           </Text>
 
-          <Text className="text-base mb-6 opacity-70">
+          <Text className="text-base mb-6 opacity-70 text-gray-900 dark:text-gray-300">
             Current Score: {player.current_score}
           </Text>
 
           <View className="flex-row gap-3 mb-4">
             <TouchableOpacity
               className={`flex-1 py-3 px-4 rounded-lg border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
-                entryMode === "single" ? "border-primary bg-primary-light" : "border-gray-border"
+                entryMode === "single" 
+                  ? "border-primary bg-primary-light dark:bg-blue-500 dark:border-blue-500" 
+                  : "border-gray-border dark:border-gray-700"
               }`}
               onPress={() => setEntryMode("single")}
               accessibilityLabel="Single block mode"
@@ -450,7 +452,9 @@ export function ScoreEntryModal({
             >
               <Text
                 className={`text-base font-semibold ${
-                  entryMode === "single" ? "text-white" : "text-primary"
+                  entryMode === "single" 
+                    ? "text-white" 
+                    : "text-primary dark:text-blue-400"
                 }`}
               >
                 Single Block
@@ -458,7 +462,9 @@ export function ScoreEntryModal({
             </TouchableOpacity>
             <TouchableOpacity
               className={`flex-1 py-3 px-4 rounded-lg border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
-                entryMode === "multiple" ? "border-primary bg-primary-light" : "border-gray-border"
+                entryMode === "multiple" 
+                  ? "border-primary bg-primary-light dark:bg-blue-500 dark:border-blue-500" 
+                  : "border-gray-border dark:border-gray-700"
               }`}
               onPress={() => setEntryMode("multiple")}
               accessibilityLabel="Multiple blocks mode"
@@ -466,7 +472,9 @@ export function ScoreEntryModal({
             >
               <Text
                 className={`text-base font-semibold ${
-                  entryMode === "multiple" ? "text-white" : "text-primary"
+                  entryMode === "multiple" 
+                    ? "text-white" 
+                    : "text-primary dark:text-blue-400"
                 }`}
               >
                 Multiple Blocks
@@ -474,14 +482,14 @@ export function ScoreEntryModal({
             </TouchableOpacity>
           </View>
 
-          <Text className="text-base mb-4 opacity-70">
+          <Text className="text-base mb-4 opacity-70 text-gray-900 dark:text-gray-300">
             {entryMode === "single"
               ? "Enter the block number (e.g., 12 = 12 points)"
               : "Enter the number of blocks (e.g., 3 blocks = 3 points)"}
           </Text>
 
           <TextInput
-            className={`border border-gray-border-medium rounded-lg px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-2xl text-center mb-6`}
+            className={`border border-gray-border-medium dark:border-gray-700 rounded-lg px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-2xl text-center mb-6 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
             placeholder={entryMode === "single" ? "Block number" : "Number of blocks"}
             placeholderTextColor="#999"
             value={blockValue}
@@ -494,15 +502,15 @@ export function ScoreEntryModal({
 
           <View className="flex-row gap-3">
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-gray-bg-light`}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-gray-bg-light dark:bg-gray-700`}
               onPress={handleClose}
               accessibilityLabel="Cancel"
               accessibilityRole="button"
             >
-              <Text className="text-primary text-base font-semibold">Cancel</Text>
+              <Text className="text-primary dark:text-blue-400 text-base font-semibold">Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-primary ${isSubmitting ? "opacity-60" : ""}`}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-primary dark:bg-blue-500 ${isSubmitting ? "opacity-60" : ""}`}
               onPress={handleSubmit}
               disabled={isSubmitting}
               accessibilityLabel="Submit score"

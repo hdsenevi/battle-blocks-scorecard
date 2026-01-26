@@ -320,46 +320,46 @@ export default function GameScreen() {
   if (!currentGame) {
     return (
       <ThemedView className="flex-1">
-        <Text className="text-base">Loading game...</Text>
+        <Text className="text-base text-gray-900 dark:text-gray-100">Loading game...</Text>
       </ThemedView>
     );
   }
 
   return (
     <ThemedView className="flex-1">
-      <View className="flex-row justify-between items-center p-5 border-b border-gray-border">
+      <View className="flex-row justify-between items-center p-5 border-b border-gray-border dark:border-gray-700">
         <View className="flex-1">
-          <Text className="text-2xl mb-2" testID="game-title">
+          <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100" testID="game-title">
             Game #{currentGame.id}
           </Text>
-          <Text className="text-sm opacity-70 capitalize" testID="game-status">
+          <Text className="text-sm opacity-70 capitalize text-gray-900 dark:text-gray-300" testID="game-status">
             Status: {currentGame.status} | Round {currentRound}
           </Text>
         </View>
         <View className="flex-row gap-2">
           <TouchableOpacity
-            className={`px-4 py-2 rounded-lg bg-gray-bg-light ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
+            className={`px-4 py-2 rounded-lg bg-gray-bg-light dark:bg-gray-700 ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
             onPress={() => setIsHistoryVisible(true)}
             testID="score-history-button"
             accessibilityLabel="View score history"
             accessibilityRole="button"
           >
-            <Text className="text-primary text-base font-semibold">History</Text>
+            <Text className="text-primary dark:text-blue-400 text-base font-semibold">History</Text>
           </TouchableOpacity>
           {currentGame.status === "active" && canUndo && (
             <TouchableOpacity
-              className={`px-4 py-2 rounded-lg bg-gray-bg-light ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
+              className={`px-4 py-2 rounded-lg bg-gray-bg-light dark:bg-gray-700 ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
               onPress={handleUndoLastScore}
               testID="undo-last-score-button"
               accessibilityLabel="Undo last score"
               accessibilityRole="button"
             >
-              <Text className="text-primary text-base font-semibold">Undo</Text>
+              <Text className="text-primary dark:text-blue-400 text-base font-semibold">Undo</Text>
             </TouchableOpacity>
           )}
           {currentGame.status === "active" && (
             <TouchableOpacity
-              className={`px-4 py-2 rounded-lg bg-primary ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
+              className={`px-4 py-2 rounded-lg bg-primary dark:bg-blue-500 ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
               onPress={handleFinishRound}
               testID="finish-round-button"
               accessibilityLabel="Finish round"
