@@ -135,7 +135,7 @@ export default function WinnerScreen() {
   if (!currentGame) {
     return (
       <ThemedView className="flex-1">
-        <Text className="text-base">Loading...</Text>
+        <Text className="text-base font-sans text-stone-600 dark:text-stone-400">Loading...</Text>
       </ThemedView>
     );
   }
@@ -167,7 +167,7 @@ export default function WinnerScreen() {
             <Text className="text-5xl" accessibilityLabel="Celebration emoji">
               🎉
             </Text>
-            <Text className="text-5xl font-bold mx-4 text-primary" accessibilityLabel="Winner announcement">
+            <Text className="text-5xl font-sans-bold mx-4 text-primary dark:text-primary-bright" accessibilityLabel="Winner announcement">
               Winner!
             </Text>
             <Text className="text-5xl" accessibilityLabel="Celebration emoji">
@@ -177,7 +177,7 @@ export default function WinnerScreen() {
           
           {/* Story 5.1: Large, prominent display of winner's name (AC: 3) */}
           <Text 
-            className="text-4xl font-bold mb-3 text-primary"
+            className="text-4xl font-sans-bold mb-3 text-primary dark:text-primary-bright"
             accessibilityRole="text"
             accessibilityLabel={`Winner name: ${winner.name}`}
           >
@@ -186,7 +186,7 @@ export default function WinnerScreen() {
           
           {/* Story 5.1: "Game Over!" message (AC: 3) */}
           <Text 
-            className="text-xl mb-2 opacity-80"
+            className="text-xl font-sans mb-2 opacity-80 text-stone-600 dark:text-stone-400"
             accessibilityRole="text"
             accessibilityLabel="Game Over message"
           >
@@ -194,7 +194,7 @@ export default function WinnerScreen() {
           </Text>
           
           <Text 
-            className="text-2xl opacity-80"
+            className="text-2xl font-sans opacity-80 text-stone-700 dark:text-stone-300"
             accessibilityRole="text"
             accessibilityLabel={`Final score: ${winner.current_score} points`}
           >
@@ -203,9 +203,9 @@ export default function WinnerScreen() {
         </Animated.View>
 
         {/* Story 5.4: Game metadata display (AC: 3) */}
-        <View className="mb-8 p-4 bg-gray-bg-light rounded-lg border border-gray-border">
+        <View className="mb-8 p-4 bg-gray-bg-light dark:bg-stone-700 rounded-card border border-gray-border dark:border-stone-600">
           <Text 
-            className="text-lg font-bold mb-3"
+            className="text-lg font-sans-semibold mb-3 text-stone-900 dark:text-stone-50"
             accessibilityRole="header"
             accessibilityLabel="Game information"
           >
@@ -213,28 +213,28 @@ export default function WinnerScreen() {
           </Text>
           <View className="gap-2">
             <View className="flex-row justify-between">
-              <Text className="text-sm opacity-70">Status:</Text>
-              <Text className="text-sm font-semibold capitalize">{currentGame.status}</Text>
+              <Text className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400">Status:</Text>
+              <Text className="text-sm font-sans-semibold text-stone-900 dark:text-stone-50 capitalize">{currentGame.status}</Text>
             </View>
             <View className="flex-row justify-between">
-              <Text className="text-sm opacity-70">Date:</Text>
-              <Text className="text-sm font-semibold">{formatDate(currentGame.updated_at)}</Text>
+              <Text className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400">Date:</Text>
+              <Text className="text-sm font-sans-semibold text-stone-900 dark:text-stone-50">{formatDate(currentGame.updated_at)}</Text>
             </View>
             <View className="flex-row justify-between">
-              <Text className="text-sm opacity-70">Time:</Text>
-              <Text className="text-sm font-semibold">{formatTime(currentGame.updated_at)}</Text>
+              <Text className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400">Time:</Text>
+              <Text className="text-sm font-sans-semibold text-stone-900 dark:text-stone-50">{formatTime(currentGame.updated_at)}</Text>
             </View>
             {currentGame.created_at && currentGame.updated_at && (
               <View className="flex-row justify-between">
-                <Text className="text-sm opacity-70">Duration:</Text>
-                <Text className="text-sm font-semibold">
+                <Text className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400">Duration:</Text>
+                <Text className="text-sm font-sans-semibold text-stone-900 dark:text-stone-50">
                   {calculateDuration(currentGame.created_at, currentGame.updated_at)}
                 </Text>
               </View>
             )}
             <View className="flex-row justify-between">
-              <Text className="text-sm opacity-70">Game ID:</Text>
-              <Text className="text-sm font-semibold">#{currentGame.id}</Text>
+              <Text className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400">Game ID:</Text>
+              <Text className="text-sm font-sans-semibold text-stone-900 dark:text-stone-50">#{currentGame.id}</Text>
             </View>
           </View>
         </View>
@@ -242,7 +242,7 @@ export default function WinnerScreen() {
         {/* Story 5.2: Final scores display with accessibility (AC: 3, 5, 7) */}
         <View className="mb-8" accessibilityRole="list">
           <Text 
-            className="text-xl font-bold mb-4"
+            className="text-xl font-sans-semibold mb-4 text-stone-900 dark:text-stone-50"
             accessibilityRole="header"
             accessibilityLabel="Final scores list"
           >
@@ -251,18 +251,18 @@ export default function WinnerScreen() {
           {sortedPlayers.map((player, index) => (
             <View
               key={player.id}
-              className={`flex-row items-center py-4 px-4 mb-2 rounded-lg border ${
+              className={`flex-row items-center py-4 px-4 mb-2 rounded-card border-2 ${
                 player.id === winner.id 
-                  ? "bg-primary-light border-primary border-2" 
-                  : "bg-gray-bg-light border-gray-border"
+                  ? "bg-primary-light dark:bg-violet-900 border-primary dark:border-primary-bright" 
+                  : "bg-gray-bg-light dark:bg-stone-700 border-gray-border dark:border-stone-600"
               }`}
               accessibilityRole="listitem"
               accessibilityLabel={`${index + 1}. ${player.name}, ${player.current_score} points${player.is_eliminated ? ", eliminated" : ""}`}
             >
               <View className="w-12 items-center justify-center">
                 <Text 
-                  className={`text-base font-bold ${
-                    player.id === winner.id ? "text-primary" : "text-gray-text opacity-70"
+                  className={`text-base font-sans-bold ${
+                    player.id === winner.id ? "text-primary dark:text-primary-bright" : "text-stone-500 dark:text-stone-400"
                   }`}
                 >
                   #{index + 1}
@@ -270,39 +270,39 @@ export default function WinnerScreen() {
               </View>
               <View className="flex-1 ml-3">
                 <Text 
-                  className={`text-lg font-semibold ${
-                    player.id === winner.id ? "text-primary" : "text-gray-text"
+                  className={`text-lg font-sans-semibold ${
+                    player.id === winner.id ? "text-primary dark:text-primary-bright" : "text-stone-900 dark:text-stone-50"
                   }`}
                 >
                   {player.name}
                 </Text>
                 {player.is_eliminated && (
-                  <Text className="text-xs opacity-60 mt-1">
+                  <Text className="text-xs font-sans opacity-60 mt-1 text-stone-500 dark:text-stone-400">
                     Eliminated
                   </Text>
                 )}
               </View>
               <View className="items-end">
                 <Text 
-                  className={`text-2xl font-bold ${
-                    player.id === winner.id ? "text-primary" : "text-gray-text"
+                  className={`text-2xl font-sans-bold ${
+                    player.id === winner.id ? "text-primary dark:text-primary-bright" : "text-stone-900 dark:text-stone-50"
                   }`}
                 >
                   {player.current_score}
                 </Text>
-                <Text className="text-xs opacity-60 mt-0.5">points</Text>
+                <Text className="text-xs font-sans opacity-60 mt-0.5 text-stone-500 dark:text-stone-400">points</Text>
               </View>
             </View>
           ))}
         </View>
 
         <TouchableOpacity
-          className={`bg-primary ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center`}
+          className={`bg-primary dark:bg-primary-bright ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-button items-center shadow-elevated`}
           onPress={handleNewGame}
           accessibilityLabel="Start new game"
           accessibilityRole="button"
         >
-          <Text className="text-white text-lg font-semibold">
+          <Text className="text-white text-lg font-sans-semibold">
             Start New Game
           </Text>
         </TouchableOpacity>

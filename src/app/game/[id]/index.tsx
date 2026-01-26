@@ -320,52 +320,52 @@ export default function GameScreen() {
   if (!currentGame) {
     return (
       <ThemedView className="flex-1">
-        <Text className="text-base text-gray-900 dark:text-gray-100">Loading game...</Text>
+        <Text className="text-base font-sans text-stone-900 dark:text-stone-50">Loading game...</Text>
       </ThemedView>
     );
   }
 
   return (
     <ThemedView className="flex-1">
-      <View className="flex-row justify-between items-center p-5 border-b border-gray-border dark:border-gray-700">
+      <View className="flex-row justify-between items-center p-5 border-b border-gray-border dark:border-stone-600">
         <View className="flex-1">
-          <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100" testID="game-title">
+          <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50" testID="game-title">
             Game #{currentGame.id}
           </Text>
-          <Text className="text-sm opacity-70 capitalize text-gray-900 dark:text-gray-300" testID="game-status">
+          <Text className="text-sm font-sans opacity-70 capitalize text-stone-600 dark:text-stone-400" testID="game-status">
             Status: {currentGame.status} | Round {currentRound}
           </Text>
         </View>
         <View className="flex-row gap-2">
           <TouchableOpacity
-            className={`px-4 py-2 rounded-lg bg-gray-bg-light dark:bg-gray-700 ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
+            className={`px-4 py-2 rounded-button bg-gray-bg-light dark:bg-stone-700 ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
             onPress={() => setIsHistoryVisible(true)}
             testID="score-history-button"
             accessibilityLabel="View score history"
             accessibilityRole="button"
           >
-            <Text className="text-primary dark:text-blue-400 text-base font-semibold">History</Text>
+            <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">History</Text>
           </TouchableOpacity>
           {currentGame.status === "active" && canUndo && (
             <TouchableOpacity
-              className={`px-4 py-2 rounded-lg bg-gray-bg-light dark:bg-gray-700 ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
+              className={`px-4 py-2 rounded-button bg-gray-bg-light dark:bg-stone-700 ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
               onPress={handleUndoLastScore}
               testID="undo-last-score-button"
               accessibilityLabel="Undo last score"
               accessibilityRole="button"
             >
-              <Text className="text-primary dark:text-blue-400 text-base font-semibold">Undo</Text>
+              <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">Undo</Text>
             </TouchableOpacity>
           )}
           {currentGame.status === "active" && (
             <TouchableOpacity
-              className={`px-4 py-2 rounded-lg bg-primary dark:bg-blue-500 ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center`}
+              className={`px-4 py-2 rounded-button bg-primary dark:bg-primary-bright ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center shadow-elevated`}
               onPress={handleFinishRound}
               testID="finish-round-button"
               accessibilityLabel="Finish round"
               accessibilityRole="button"
             >
-              <Text className="text-white text-base font-semibold">Finish Round</Text>
+              <Text className="text-white text-base font-sans-semibold">Finish Round</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -376,7 +376,7 @@ export default function GameScreen() {
         contentContainerStyle={{ padding: 16, gap: 12 }}
       >
         {players.length === 0 ? (
-          <Text className="text-center mt-10 opacity-70">No players yet</Text>
+          <Text className="text-center mt-10 font-sans opacity-70 text-stone-600 dark:text-stone-400">No players yet</Text>
         ) : (
           players.map((player) => {
             const hasScored = playersWhoScoredThisRound.has(player.id);

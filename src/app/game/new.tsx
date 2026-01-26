@@ -109,19 +109,19 @@ export default function NewGameScreen() {
         className="flex-1"
         contentContainerStyle={{ padding: 20 }}
       >
-        <Text className="text-3xl font-bold mb-2">
+        <Text className="text-3xl font-sans-bold mb-2 text-stone-900 dark:text-stone-50">
           New Game
         </Text>
 
-        <Text className="text-base mb-6 opacity-70">
+        <Text className="text-base font-sans mb-6 opacity-70 text-stone-600 dark:text-stone-400">
           Add at least 2 players to start
         </Text>
 
         <View className="flex-row gap-3 mb-6">
           <TextInput
-            className={`flex-1 border border-gray-border-medium rounded-lg px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-base`}
+            className={`flex-1 border border-gray-border-medium dark:border-stone-600 rounded-button px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-base font-sans bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50`}
             placeholder="Enter player name"
-            placeholderTextColor="#999"
+            placeholderTextColor="#78716C"
             value={playerName}
             onChangeText={setPlayerName}
             onSubmitEditing={handleAddPlayer}
@@ -129,33 +129,33 @@ export default function NewGameScreen() {
             testID="player-name-input"
           />
           <TouchableOpacity
-            className={`bg-primary px-6 ${Platform.OS === "ios" ? "py-3 min-h-[44px] min-w-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px] min-w-[48px]" : "py-3 min-h-[44px] min-w-[44px]"} rounded-lg justify-center`}
+            className={`bg-primary dark:bg-primary-bright px-6 ${Platform.OS === "ios" ? "py-3 min-h-[44px] min-w-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px] min-w-[48px]" : "py-3 min-h-[44px] min-w-[44px]"} rounded-button justify-center shadow-elevated`}
             onPress={handleAddPlayer}
             accessibilityLabel="Add player"
             accessibilityRole="button"
             testID="add-player-button"
           >
-            <Text className="text-white text-base font-semibold">Add</Text>
+            <Text className="text-white text-base font-sans-semibold">Add</Text>
           </TouchableOpacity>
         </View>
 
         {players.length > 0 && (
           <View className="mb-6">
             <Text 
-              className="text-xl font-bold mb-3"
+              className="text-xl font-sans-semibold mb-3 text-stone-900 dark:text-stone-50"
               testID={`players-count-${players.length}`}
             >
               Players ({players.length})
             </Text>
             {players.map((player) => (
-              <View key={player.id} className="flex-row justify-between items-center py-3 px-4 border-b border-gray-border">
-                <Text className="text-base">{player.name}</Text>
+              <View key={player.id} className="flex-row justify-between items-center py-3 px-4 border-b border-gray-border dark:border-stone-600">
+                <Text className="text-base font-sans text-stone-900 dark:text-stone-50">{player.name}</Text>
                 <TouchableOpacity
                   onPress={() => handleRemovePlayer(player.id)}
                   accessibilityLabel={`Remove ${player.name}`}
                   accessibilityRole="button"
                 >
-                  <Text className="text-red-500 text-sm">Remove</Text>
+                  <Text className="text-red-500 text-sm font-sans">Remove</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -163,14 +163,14 @@ export default function NewGameScreen() {
         )}
 
         <TouchableOpacity
-          className={`bg-primary ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center ${(players.length < 2 || isCreating) ? "bg-gray-border-medium opacity-60" : ""}`}
+          className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-button items-center shadow-elevated ${(players.length < 2 || isCreating) ? "bg-stone-400 dark:bg-stone-600 opacity-60" : "bg-primary dark:bg-primary-bright"}`}
           onPress={handleStartGame}
           disabled={players.length < 2 || isCreating}
           accessibilityLabel="Start game"
           accessibilityRole="button"
           testID="start-game-button"
         >
-          <Text className="text-white text-lg font-semibold">
+          <Text className="text-white text-lg font-sans-semibold">
             {isCreating ? "Creating..." : "Start Game"}
           </Text>
         </TouchableOpacity>

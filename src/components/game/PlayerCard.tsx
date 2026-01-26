@@ -26,10 +26,10 @@ export function PlayerCard({
 
   return (
     <TouchableOpacity
-      className={`bg-gray-50 dark:bg-gray-800 rounded-card p-4 border-2 ${
+      className={`bg-white dark:bg-stone-800 rounded-card p-4 border-2 shadow-card ${
         player.is_eliminated 
-          ? "border-gray-400 dark:border-gray-600 opacity-60" 
-          : "border-gray-200 dark:border-gray-700"
+          ? "border-stone-500 dark:border-stone-500 opacity-60" 
+          : "border-gray-border dark:border-stone-600"
       } ${isDisabled && !player.is_eliminated ? "opacity-50" : ""}`}
       style={{ minHeight }}
       onPress={onPress}
@@ -42,42 +42,42 @@ export function PlayerCard({
       <View className="flex-row justify-between items-center">
         <View className="flex-1 gap-2">
           <Text 
-            className={`text-lg font-semibold ${
+            className={`text-lg font-sans-semibold ${
               player.is_eliminated 
-                ? "text-gray-500 dark:text-gray-400" 
-                : "text-gray-900 dark:text-gray-100"
+                ? "text-stone-500 dark:text-stone-400" 
+                : "text-stone-900 dark:text-stone-50"
             }`}
           >
             {player.name}
           </Text>
           {isLeader && (
-            <View className="self-start bg-primary dark:bg-blue-500 rounded-badge px-2 py-1 mt-1">
-              <Text className="text-white text-xs font-semibold">
+            <View className="self-start bg-leader dark:bg-amber-400 rounded-badge px-2 py-1 mt-1">
+              <Text className="text-white dark:text-stone-900 text-xs font-sans-semibold">
                 👑 Leader
               </Text>
             </View>
           )}
           {player.is_eliminated && (
-            <View className="self-start bg-eliminated dark:bg-gray-500 rounded-badge px-2 py-1 mt-1 flex-row items-center gap-1">
+            <View className="self-start bg-eliminated dark:bg-stone-500 rounded-badge px-2 py-1 mt-1 flex-row items-center gap-1">
               <Text className="text-white text-xs">❌</Text>
-              <Text className="text-white text-xs font-semibold">
+              <Text className="text-white text-xs font-sans-semibold">
                 Eliminated
               </Text>
             </View>
           )}
           {hasScoredThisRound && !player.is_eliminated && (
-            <View className="self-start bg-gray-400 dark:bg-gray-600 rounded-badge px-2 py-1 mt-1">
-              <Text className="text-white text-xs font-semibold">
+            <View className="self-start bg-stone-500 dark:bg-stone-600 rounded-badge px-2 py-1 mt-1">
+              <Text className="text-white text-xs font-sans-semibold">
                 Scored This Round
               </Text>
             </View>
           )}
         </View>
         <Text 
-          className={`text-3xl font-bold ${
+          className={`text-3xl font-sans-bold ${
             player.is_eliminated 
-              ? "text-gray-400 dark:text-gray-500" 
-              : "text-primary dark:text-blue-400"
+              ? "text-stone-400 dark:text-stone-500" 
+              : "text-primary dark:text-primary-bright"
           }`}
         >
           {player.current_score}

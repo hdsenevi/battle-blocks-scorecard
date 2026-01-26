@@ -127,7 +127,7 @@ export default function GameSelectionScreen() {
     return (
       <ThemedView className="flex-1">
         <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-base text-gray-900 dark:text-gray-100">Loading games...</Text>
+          <Text className="text-base font-sans text-stone-600 dark:text-stone-400">Loading games...</Text>
         </View>
       </ThemedView>
     );
@@ -137,12 +137,12 @@ export default function GameSelectionScreen() {
     return (
       <ThemedView className="flex-1">
         <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-base text-red-500 mb-4 text-center">{error}</Text>
+          <Text className="text-base font-sans text-red-500 mb-4 text-center">{error}</Text>
           <TouchableOpacity
-            className={`bg-primary ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center mt-4`}
+            className={`bg-primary dark:bg-primary-bright ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-button items-center justify-center mt-4 shadow-elevated`}
             onPress={() => router.back()}
           >
-            <Text className="text-white text-base font-semibold">Go Back</Text>
+            <Text className="text-white text-base font-sans-semibold">Go Back</Text>
           </TouchableOpacity>
         </View>
       </ThemedView>
@@ -153,15 +153,15 @@ export default function GameSelectionScreen() {
     return (
       <ThemedView className="flex-1">
         <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-2xl mb-2 text-center text-gray-900 dark:text-gray-100">No Active Games</Text>
-          <Text className="text-base mb-6 text-center opacity-70 text-gray-900 dark:text-gray-300">
+          <Text className="text-2xl font-sans-semibold mb-2 text-center text-stone-900 dark:text-stone-50">No Active Games</Text>
+          <Text className="text-base font-sans mb-6 text-center opacity-70 text-stone-600 dark:text-stone-400">
             Start a new game to begin playing
           </Text>
           <TouchableOpacity
-            className={`bg-primary ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center mt-4`}
+            className={`bg-primary dark:bg-primary-bright ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-button items-center justify-center mt-4 shadow-elevated`}
             onPress={() => router.replace("/(tabs)")}
           >
-            <Text className="text-white text-base font-semibold">Go to Home</Text>
+            <Text className="text-white text-base font-sans-semibold">Go to Home</Text>
           </TouchableOpacity>
         </View>
       </ThemedView>
@@ -170,11 +170,11 @@ export default function GameSelectionScreen() {
 
   return (
     <ThemedView className="flex-1">
-      <View className="p-5 border-b border-gray-border dark:border-gray-700">
-        <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100" testID="select-game-title">
+      <View className="p-5 border-b border-gray-border dark:border-stone-600">
+        <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50" testID="select-game-title">
           Select Game to Resume
         </Text>
-        <Text className="text-sm opacity-70 text-gray-900 dark:text-gray-300" testID="select-game-subtitle">
+        <Text className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400" testID="select-game-subtitle">
           {games.length} {games.length === 1 ? "game" : "games"} to resume
         </Text>
       </View>
@@ -183,7 +183,7 @@ export default function GameSelectionScreen() {
         {games.map((game) => (
           <TouchableOpacity
             key={game.id}
-            className={`bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-border dark:border-gray-700 ${Platform.OS === "ios" ? "min-h-[80px]" : Platform.OS === "android" ? "min-h-[88px]" : "min-h-[80px]"}`}
+            className={`bg-white dark:bg-stone-800 rounded-card p-4 border border-gray-border dark:border-stone-600 shadow-card ${Platform.OS === "ios" ? "min-h-[80px]" : Platform.OS === "android" ? "min-h-[88px]" : "min-h-[80px]"}`}
             onPress={() => handleSelectGame(game.id)}
             testID={`game-card-${game.id}`}
             accessibilityLabel={`Resume game ${game.id}, started ${formatDate(
@@ -193,12 +193,12 @@ export default function GameSelectionScreen() {
           >
             <View className="gap-2">
               <View className="flex-row justify-between items-center">
-                <Text className="text-lg font-semibold text-gray-900 dark:text-gray-100">Game #{game.id}</Text>
-                <Text className="text-sm opacity-70 text-gray-900 dark:text-gray-300">
+                <Text className="text-lg font-sans-semibold text-stone-900 dark:text-stone-50">Game #{game.id}</Text>
+                <Text className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400">
                   {formatDate(game.created_at)}
                 </Text>
               </View>
-              <Text className="text-sm opacity-70 text-gray-900 dark:text-gray-300">
+              <Text className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400">
                 {game.playerCount} {game.playerCount === 1 ? "player" : "players"}
               </Text>
             </View>
@@ -206,15 +206,15 @@ export default function GameSelectionScreen() {
         ))}
       </ScrollView>
 
-      <View className="p-4 border-t border-gray-border">
+      <View className="p-4 border-t border-gray-border dark:border-stone-600">
         <TouchableOpacity
-          className={`${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} px-6 rounded-lg items-center justify-center`}
+          className={`${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} px-6 rounded-button items-center justify-center`}
           onPress={() => router.replace("/(tabs)")}
           testID="cancel-game-selection-button"
           accessibilityLabel="Cancel and go to home"
           accessibilityRole="button"
         >
-          <Text className="text-primary text-base font-semibold">Cancel</Text>
+          <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">Cancel</Text>
         </TouchableOpacity>
       </View>
     </ThemedView>

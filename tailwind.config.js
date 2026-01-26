@@ -11,48 +11,49 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
-      // Custom colors for game state indicators
-      // Story 7.1: Dark mode variants added for all custom colors
+      fontFamily: {
+        sans: ['Poppins_400Regular', 'Poppins', 'System', 'sans-serif'],
+        'sans-medium': ['Poppins_500Medium', 'Poppins', 'System', 'sans-serif'],
+        'sans-semibold': ['Poppins_600SemiBold', 'Poppins', 'System', 'sans-serif'],
+        'sans-bold': ['Poppins_700Bold', 'Poppins', 'System', 'sans-serif'],
+      },
       colors: {
-        // Leader indicator - lighter in dark mode for visibility
-        leader: {
-          DEFAULT: "#007AFF",
-          light: "#F0F8FF",
-        },
-        // Eliminated player indicator - lighter in dark mode for visibility
-        eliminated: {
-          DEFAULT: "#999999",
-          light: "#F5F5F5",
-        },
-        // Active player indicator - lighter in dark mode for visibility
-        active: {
-          DEFAULT: "#34C759",
-          light: "#F0FDF4",
-        },
-        // Primary brand color - lighter in dark mode for visibility
+        // Primary: vibrant purple-blue (cool tones, polished)
         primary: {
-          DEFAULT: "#007AFF",
-          dark: "#0051D5",
-          light: "#F0F8FF",
+          DEFAULT: '#7C3AED',   // violet-600
+          light: '#EDE9FE',     // violet-100, highlights & cards
+          bright: '#A78BFA',    // violet-400, dark mode primary
+          dark: '#6D28D9',     // violet-700
         },
-        // Gray scale colors for borders and backgrounds
+        // Leader: warm amber accent
+        leader: {
+          DEFAULT: '#F59E0B',
+          light: '#FEF3C7',
+        },
+        // Eliminated: neutral stone
+        eliminated: {
+          DEFAULT: '#78716C',
+          light: '#F5F5F4',
+        },
+        // Active / in-progress: teal
+        active: {
+          DEFAULT: '#14B8A6',
+          light: '#CCFBF1',
+        },
+        // Semantic grays (light mode; use dark:border-stone-600 etc for dark)
         gray: {
-          border: "#E0E0E0",
-          "border-medium": "#CCCCCC",
-          "bg-light": "#F0F0F0",
+          border: '#E7E5E4',
+          'border-medium': '#D6D3D1',
+          'bg-light': '#F5F5F4',
         },
-        // Link color
         link: {
-          DEFAULT: "#0a7ea4",
+          DEFAULT: '#7C3AED',
         },
       },
-      // Spacing system optimized for mobile touch interactions
-      // Minimum touch targets: 44x44 points iOS, 48x48 dp Android
       spacing: {
-        "touch-min": "44px", // iOS minimum
-        "touch-min-android": "48px", // Android minimum
+        "touch-min": "44px",
+        "touch-min-android": "48px",
       },
-      // Typography scale - large, readable font sizes suitable for ages 6+
       fontSize: {
         "xs": ["12px", { lineHeight: "16px" }],
         "sm": ["14px", { lineHeight: "20px" }],
@@ -63,18 +64,18 @@ module.exports = {
         "3xl": ["32px", { lineHeight: "40px" }],
         "4xl": ["36px", { lineHeight: "44px" }],
       },
-      // Border radius for friendly, approachable feel
+      // Generous rounded corners (reference: "generously rounded")
       borderRadius: {
-        "card": "12px",
-        "button": "8px",
-        "badge": "4px",
+        "card": "16px",
+        "button": "12px",
+        "badge": "8px",
+        "xl": "16px",
+        "2xl": "20px",
       },
-      // Shadows for subtle elevation and visual hierarchy
       boxShadow: {
-        "card": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
-        "elevated": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+        "card": "0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.04)",
+        "elevated": "0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04)",
       },
-      // Minimum heights for touch targets
       minHeight: {
         "touch-ios": "44px",
         "touch-android": "48px",

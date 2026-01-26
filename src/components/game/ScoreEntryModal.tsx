@@ -82,20 +82,20 @@ export function ScoreEntryModal({
         accessibilityViewIsModal
       >
         <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
-          <ThemedView className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-[400px]">
-            <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100">
+          <ThemedView className="bg-white dark:bg-stone-800 rounded-2xl p-6 w-full max-w-[400px] shadow-elevated">
+            <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50">
               {gameStatus === "completed" ? "Game Completed" : gameStatus === "notcompleted" ? "Game Not Completed" : "Game Paused"}
             </Text>
-            <Text className="text-base mb-6 opacity-70 text-gray-900 dark:text-gray-300">
+            <Text className="text-base font-sans mb-6 opacity-70 text-stone-600 dark:text-stone-400">
               {statusMessage}
             </Text>
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-primary`}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-button items-center justify-center bg-primary dark:bg-primary-bright`}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
             >
-              <Text className="text-white text-base font-semibold">Close</Text>
+              <Text className="text-white text-base font-sans-semibold">Close</Text>
             </TouchableOpacity>
           </ThemedView>
         </View>
@@ -114,20 +114,20 @@ export function ScoreEntryModal({
         accessibilityViewIsModal
       >
         <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
-          <ThemedView className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-[400px]">
-            <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100">
+          <ThemedView className="bg-white dark:bg-stone-800 rounded-2xl p-6 w-full max-w-[400px] shadow-elevated">
+            <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50">
               Player Eliminated
             </Text>
-            <Text className="text-base mb-6 opacity-70 text-gray-900 dark:text-gray-300">
+            <Text className="text-base font-sans mb-6 opacity-70 text-stone-600 dark:text-stone-400">
               {player.name} has been eliminated for this round and cannot receive further scores until the next round begins.
             </Text>
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-primary`}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-button items-center justify-center bg-primary dark:bg-primary-bright`}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
             >
-              <Text className="text-white text-base font-semibold">Close</Text>
+              <Text className="text-white text-base font-sans-semibold">Close</Text>
             </TouchableOpacity>
           </ThemedView>
         </View>
@@ -147,20 +147,20 @@ export function ScoreEntryModal({
         accessibilityViewIsModal
       >
         <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
-          <ThemedView className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-[400px]">
-            <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100">
+          <ThemedView className="bg-white dark:bg-stone-800 rounded-2xl p-6 w-full max-w-[400px] shadow-elevated">
+            <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50">
               Already Scored This Round
             </Text>
-            <Text className="text-base mb-6 opacity-70 text-gray-900 dark:text-gray-300">
+            <Text className="text-base font-sans mb-6 opacity-70 text-stone-600 dark:text-stone-400">
               {player.name} has already scored in Round {gameState.currentRound}. Please finish the round before scoring again.
             </Text>
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-primary`}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-button items-center justify-center bg-primary dark:bg-primary-bright`}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
             >
-              <Text className="text-white text-base font-semibold">Close</Text>
+              <Text className="text-white text-base font-sans-semibold">Close</Text>
             </TouchableOpacity>
           </ThemedView>
         </View>
@@ -430,51 +430,51 @@ export function ScoreEntryModal({
       accessibilityViewIsModal
     >
       <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
-        <ThemedView className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-[400px]">
-          <Text className="text-2xl mb-2 text-gray-900 dark:text-gray-100">
+        <ThemedView className="bg-white dark:bg-stone-800 rounded-2xl p-6 w-full max-w-[400px] shadow-elevated">
+          <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50">
             Enter Score for {player.name}
           </Text>
 
-          <Text className="text-base mb-6 opacity-70 text-gray-900 dark:text-gray-300">
+          <Text className="text-base font-sans mb-6 opacity-70 text-stone-600 dark:text-stone-400">
             Current Score: {player.current_score}
           </Text>
 
           <View className="flex-row gap-3 mb-4">
             <TouchableOpacity
-              className={`flex-1 py-3 px-4 rounded-lg border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
+              className={`flex-1 py-3 px-4 rounded-button border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
                 entryMode === "single" 
-                  ? "border-primary bg-primary-light dark:bg-blue-500 dark:border-blue-500" 
-                  : "border-gray-border dark:border-gray-700"
+                  ? "border-primary bg-primary dark:bg-primary-bright dark:border-primary-bright" 
+                  : "border-gray-border dark:border-stone-600"
               }`}
               onPress={() => setEntryMode("single")}
               accessibilityLabel="Single block mode"
               accessibilityRole="button"
             >
               <Text
-                className={`text-base font-semibold ${
+                className={`text-base font-sans-semibold ${
                   entryMode === "single" 
                     ? "text-white" 
-                    : "text-primary dark:text-blue-400"
+                    : "text-primary dark:text-primary-bright"
                 }`}
               >
                 Single Block
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`flex-1 py-3 px-4 rounded-lg border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
+              className={`flex-1 py-3 px-4 rounded-button border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
                 entryMode === "multiple" 
-                  ? "border-primary bg-primary-light dark:bg-blue-500 dark:border-blue-500" 
-                  : "border-gray-border dark:border-gray-700"
+                  ? "border-primary bg-primary dark:bg-primary-bright dark:border-primary-bright" 
+                  : "border-gray-border dark:border-stone-600"
               }`}
               onPress={() => setEntryMode("multiple")}
               accessibilityLabel="Multiple blocks mode"
               accessibilityRole="button"
             >
               <Text
-                className={`text-base font-semibold ${
+                className={`text-base font-sans-semibold ${
                   entryMode === "multiple" 
                     ? "text-white" 
-                    : "text-primary dark:text-blue-400"
+                    : "text-primary dark:text-primary-bright"
                 }`}
               >
                 Multiple Blocks
@@ -482,16 +482,16 @@ export function ScoreEntryModal({
             </TouchableOpacity>
           </View>
 
-          <Text className="text-base mb-4 opacity-70 text-gray-900 dark:text-gray-300">
+          <Text className="text-base font-sans mb-4 opacity-70 text-stone-600 dark:text-stone-400">
             {entryMode === "single"
               ? "Enter the block number (e.g., 12 = 12 points)"
               : "Enter the number of blocks (e.g., 3 blocks = 3 points)"}
           </Text>
 
           <TextInput
-            className={`border border-gray-border-medium dark:border-gray-700 rounded-lg px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-2xl text-center mb-6 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
+            className={`border border-gray-border-medium dark:border-stone-600 rounded-button px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-2xl font-sans text-center mb-6 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50`}
             placeholder={entryMode === "single" ? "Block number" : "Number of blocks"}
-            placeholderTextColor="#999"
+            placeholderTextColor="#78716C"
             value={blockValue}
             onChangeText={setBlockValue}
             keyboardType="number-pad"
@@ -502,21 +502,21 @@ export function ScoreEntryModal({
 
           <View className="flex-row gap-3">
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-gray-bg-light dark:bg-gray-700`}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-button items-center justify-center bg-gray-bg-light dark:bg-stone-700`}
               onPress={handleClose}
               accessibilityLabel="Cancel"
               accessibilityRole="button"
             >
-              <Text className="text-primary dark:text-blue-400 text-base font-semibold">Cancel</Text>
+              <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-lg items-center justify-center bg-primary dark:bg-blue-500 ${isSubmitting ? "opacity-60" : ""}`}
+              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-button items-center justify-center bg-primary dark:bg-primary-bright ${isSubmitting ? "opacity-60" : ""} shadow-elevated`}
               onPress={handleSubmit}
               disabled={isSubmitting}
               accessibilityLabel="Submit score"
               accessibilityRole="button"
             >
-              <Text className="text-white text-base font-semibold">
+              <Text className="text-white text-base font-sans-semibold">
                 {isSubmitting ? "Submitting..." : "Submit"}
               </Text>
             </TouchableOpacity>

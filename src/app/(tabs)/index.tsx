@@ -110,7 +110,7 @@ export default function HomeScreen() {
     return (
       <ThemedView className="flex-1">
         <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-base">Loading...</Text>
+          <Text className="text-base font-sans text-stone-600 dark:text-stone-400">Loading...</Text>
         </View>
       </ThemedView>
     );
@@ -119,34 +119,34 @@ export default function HomeScreen() {
   return (
     <ThemedView className="flex-1">
       <View className="flex-1 justify-center items-center p-5">
-        <Text className="text-3xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">
+        <Text className="text-3xl font-sans-bold mb-4 text-center text-stone-900 dark:text-stone-50">
           Battle Blocks Scorecard
         </Text>
 
-        <Text className="text-base mb-10 text-center opacity-70 text-gray-900 dark:text-gray-300">
+        <Text className="text-base font-sans mb-10 text-center opacity-70 text-stone-600 dark:text-stone-400">
           Track scores for your Battle Blocks games
         </Text>
 
         <View className="w-full max-w-[300px] gap-4">
           <TouchableOpacity
-            className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center bg-primary dark:bg-blue-500`}
+            className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-button items-center justify-center bg-primary dark:bg-primary-bright shadow-elevated`}
             onPress={handleStartNewGame}
             accessibilityLabel="Start New Game"
             accessibilityRole="button"
             testID="start-new-game-button"
           >
-            <Text className="text-white text-base font-semibold">Start New Game</Text>
+            <Text className="text-white text-base font-sans-semibold">Start New Game</Text>
           </TouchableOpacity>
 
           {hasActiveGames && (
             <TouchableOpacity
-              className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-lg items-center justify-center bg-transparent border border-primary dark:border-blue-400`}
+              className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-button items-center justify-center bg-transparent border-2 border-primary dark:border-primary-bright`}
               onPress={handleContinueGame}
               testID="continue-game-button"
               accessibilityLabel="Continue Game"
               accessibilityRole="button"
             >
-              <Text className="text-primary dark:text-blue-400 text-base font-semibold">
+              <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">
                 Continue Game
               </Text>
             </TouchableOpacity>
@@ -154,13 +154,13 @@ export default function HomeScreen() {
 
           {/* Story 6.5: Privacy Policy Link (FR52) */}
           <TouchableOpacity
-            className={`${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} px-6 rounded-lg items-center justify-center`}
+            className={`${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} px-6 rounded-button items-center justify-center`}
             onPress={() => router.push("/privacy")}
             testID="privacy-policy-button"
             accessibilityLabel="View Privacy Policy"
             accessibilityRole="button"
           >
-            <Text className="text-base opacity-70 underline text-gray-900 dark:text-gray-300">
+            <Text className="text-base font-sans opacity-70 underline text-stone-600 dark:text-stone-400">
               Privacy Policy
             </Text>
           </TouchableOpacity>

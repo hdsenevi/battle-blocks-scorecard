@@ -28,14 +28,14 @@ export default function PrivacyScreen() {
       >
         <View className="mb-6">
           <Text 
-            className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100"
+            className="text-2xl font-sans-bold mb-4 text-stone-900 dark:text-stone-50"
             accessibilityRole="header"
             accessibilityLabel="Privacy Policy title"
           >
             Privacy Policy
           </Text>
           <Text 
-            className="text-sm opacity-70 mb-6 text-gray-900 dark:text-gray-300"
+            className="text-sm font-sans opacity-70 mb-6 text-stone-600 dark:text-stone-400"
             accessibilityRole="text"
           >
             Last Updated: {new Date().toLocaleDateString("en-US", {
@@ -48,13 +48,13 @@ export default function PrivacyScreen() {
 
         <View className="mb-6">
           <Text 
-            className="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100"
+            className="text-lg font-sans-semibold mb-3 text-stone-900 dark:text-stone-50"
             accessibilityRole="header"
           >
             Data Collection
           </Text>
           <Text 
-            className="text-base mb-4 opacity-90 text-gray-900 dark:text-gray-300"
+            className="text-base font-sans mb-4 opacity-90 text-stone-700 dark:text-stone-300"
             accessibilityRole="text"
           >
             Battle Blocks Scorecard does not collect, transmit, or share any personal data. 
@@ -65,30 +65,30 @@ export default function PrivacyScreen() {
 
         <View className="mb-6">
           <Text 
-            className="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100"
+            className="text-lg font-sans-semibold mb-3 text-stone-900 dark:text-stone-50"
             accessibilityRole="header"
           >
             Local Data Storage
           </Text>
           <Text 
-            className="text-base mb-4 opacity-90 text-gray-900 dark:text-gray-300"
+            className="text-base font-sans mb-4 opacity-90 text-stone-700 dark:text-stone-300"
             accessibilityRole="text"
           >
             The app stores the following data locally on your device:
           </Text>
           <View className="ml-4 mb-4">
-            <Text className="text-base opacity-90 mb-2 text-gray-900 dark:text-gray-300" accessibilityRole="text">
+            <Text className="text-base font-sans opacity-90 mb-2 text-stone-700 dark:text-stone-300" accessibilityRole="text">
               • Game records (game ID, status, timestamps)
             </Text>
-            <Text className="text-base opacity-90 mb-2 text-gray-900 dark:text-gray-300" accessibilityRole="text">
+            <Text className="text-base font-sans opacity-90 mb-2 text-stone-700 dark:text-stone-300" accessibilityRole="text">
               • Player information (names, scores, game statistics)
             </Text>
-            <Text className="text-base opacity-90 mb-2 text-gray-900 dark:text-gray-300" accessibilityRole="text">
+            <Text className="text-base font-sans opacity-90 mb-2 text-stone-700 dark:text-stone-300" accessibilityRole="text">
               • Score entry history (for game tracking)
             </Text>
           </View>
           <Text 
-            className="text-base opacity-90"
+            className="text-base font-sans opacity-90 text-stone-700 dark:text-stone-300"
             accessibilityRole="text"
           >
             This data is stored securely on your device and is not accessible by other apps 
@@ -98,13 +98,13 @@ export default function PrivacyScreen() {
 
         <View className="mb-6">
           <Text 
-            className="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100"
+            className="text-lg font-sans-semibold mb-3 text-stone-900 dark:text-stone-50"
             accessibilityRole="header"
           >
             No Network Access
           </Text>
           <Text 
-            className="text-base mb-4 opacity-90 text-gray-900 dark:text-gray-300"
+            className="text-base font-sans mb-4 opacity-90 text-stone-700 dark:text-stone-300"
             accessibilityRole="text"
           >
             The app operates completely offline. It does not require internet connectivity 
@@ -114,13 +114,13 @@ export default function PrivacyScreen() {
 
         <View className="mb-6">
           <Text 
-            className="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100"
+            className="text-lg font-sans-semibold mb-3 text-stone-900 dark:text-stone-50"
             accessibilityRole="header"
           >
             No Third-Party Services
           </Text>
           <Text 
-            className="text-base mb-4 opacity-90 text-gray-900 dark:text-gray-300"
+            className="text-base font-sans mb-4 opacity-90 text-stone-700 dark:text-stone-300"
             accessibilityRole="text"
           >
             The app does not integrate with any third-party analytics services, advertising 
@@ -130,13 +130,13 @@ export default function PrivacyScreen() {
 
         <View className="mb-6">
           <Text 
-            className="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100"
+            className="text-lg font-sans-semibold mb-3 text-stone-900 dark:text-stone-50"
             accessibilityRole="header"
           >
             Children&apos;s Privacy
           </Text>
           <Text 
-            className="text-base mb-4 opacity-90 text-gray-900 dark:text-gray-300"
+            className="text-base font-sans mb-4 opacity-90 text-stone-700 dark:text-stone-300"
             accessibilityRole="text"
           >
             The app is designed to be safe for users of all ages, including children. 
@@ -147,26 +147,26 @@ export default function PrivacyScreen() {
 
         <View className="mb-6">
           <Text 
-            className="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100"
+            className="text-lg font-sans-semibold mb-3 text-stone-900 dark:text-stone-50"
             accessibilityRole="header"
           >
             Your Rights
           </Text>
           <Text 
-            className="text-base mb-4 opacity-90 text-gray-900 dark:text-gray-300"
+            className="text-base font-sans mb-4 opacity-90 text-stone-700 dark:text-stone-300"
             accessibilityRole="text"
           >
             Since all data is stored locally on your device, you have complete control 
             over your data. You can:
           </Text>
           <View className="ml-4 mb-4">
-            <Text className="text-base opacity-90 mb-2 text-gray-900 dark:text-gray-300" accessibilityRole="text">
+            <Text className="text-base font-sans opacity-90 mb-2 text-stone-700 dark:text-stone-300" accessibilityRole="text">
               • View your game data within the app
             </Text>
-            <Text className="text-base opacity-90 mb-2 text-gray-900 dark:text-gray-300" accessibilityRole="text">
+            <Text className="text-base font-sans opacity-90 mb-2 text-stone-700 dark:text-stone-300" accessibilityRole="text">
               • Delete individual games or all data by uninstalling the app
             </Text>
-            <Text className="text-base opacity-90 mb-2 text-gray-900 dark:text-gray-300" accessibilityRole="text">
+            <Text className="text-base font-sans opacity-90 mb-2 text-stone-700 dark:text-stone-300" accessibilityRole="text">
               • Export or backup data (if supported in future versions)
             </Text>
           </View>
@@ -174,13 +174,13 @@ export default function PrivacyScreen() {
 
         <View className="mb-6">
           <Text 
-            className="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100"
+            className="text-lg font-sans-semibold mb-3 text-stone-900 dark:text-stone-50"
             accessibilityRole="header"
           >
             Changes to This Policy
           </Text>
           <Text 
-            className="text-base mb-4 opacity-90 text-gray-900 dark:text-gray-300"
+            className="text-base font-sans mb-4 opacity-90 text-stone-700 dark:text-stone-300"
             accessibilityRole="text"
           >
             We may update this privacy policy from time to time. The &quot;Last Updated&quot; date 
@@ -191,13 +191,13 @@ export default function PrivacyScreen() {
 
         <View className="mb-6">
           <Text 
-            className="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100"
+            className="text-lg font-sans-semibold mb-3 text-stone-900 dark:text-stone-50"
             accessibilityRole="header"
           >
             Contact
           </Text>
           <Text 
-            className="text-base opacity-90"
+            className="text-base font-sans opacity-90 text-stone-700 dark:text-stone-300"
             accessibilityRole="text"
           >
             If you have any questions about this privacy policy, please contact us through 

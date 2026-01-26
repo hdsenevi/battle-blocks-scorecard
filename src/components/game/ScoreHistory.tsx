@@ -75,17 +75,17 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
   };
 
   const renderItem = ({ item }: { item: ScoreHistoryItem }) => (
-    <View className="flex-row justify-between items-center py-3 px-4 border-b border-gray-border dark:border-gray-700">
+    <View className="flex-row justify-between items-center py-3 px-4 border-b border-gray-border dark:border-stone-600">
       <View className="flex-1">
-        <Text className="text-base font-semibold mb-1 text-gray-900 dark:text-gray-100">{item.playerName}</Text>
-        <Text className="text-sm opacity-70 mb-0.5 text-gray-900 dark:text-gray-300">
+        <Text className="text-base font-sans-semibold mb-1 text-stone-900 dark:text-stone-50">{item.playerName}</Text>
+        <Text className="text-sm font-sans opacity-70 mb-0.5 text-stone-600 dark:text-stone-400">
           {formatEntryType(item.entry_type)}
         </Text>
-        <Text className="text-xs opacity-50 text-gray-900 dark:text-gray-400">
+        <Text className="text-xs font-sans opacity-50 text-stone-500 dark:text-stone-500">
           {formatTimestamp(item.created_at)}
         </Text>
       </View>
-      <Text className="text-xl font-bold text-primary dark:text-blue-400">+{item.score_value}</Text>
+      <Text className="text-xl font-sans-bold text-primary dark:text-primary-bright">+{item.score_value}</Text>
     </View>
   );
 
@@ -98,9 +98,9 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
       accessibilityViewIsModal
     >
       <View className="flex-1 bg-black/50 dark:bg-black/70 justify-end">
-        <View className="bg-white dark:bg-gray-800 rounded-t-[20px] max-h-[80%] flex-1">
-          <View className="flex-row justify-between items-center p-5 border-b border-gray-border dark:border-gray-700">
-            <Text className="text-2xl text-gray-900 dark:text-gray-100">
+        <View className="bg-white dark:bg-stone-800 rounded-t-[20px] max-h-[80%] flex-1 shadow-elevated">
+          <View className="flex-row justify-between items-center p-5 border-b border-gray-border dark:border-stone-600">
+            <Text className="text-2xl font-sans-semibold text-stone-900 dark:text-stone-50">
               Score History
             </Text>
             <TouchableOpacity
@@ -108,17 +108,17 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
               accessibilityLabel="Close score history"
               accessibilityRole="button"
             >
-              <Text className="text-base text-primary dark:text-blue-400 font-semibold">Close</Text>
+              <Text className="text-base font-sans-semibold text-primary dark:text-primary-bright">Close</Text>
             </TouchableOpacity>
           </View>
 
           {isLoading ? (
             <View className="flex-1 py-10 items-center justify-center">
-              <Text className="text-base text-gray-900 dark:text-gray-100">Loading...</Text>
+              <Text className="text-base font-sans text-stone-600 dark:text-stone-400">Loading...</Text>
             </View>
           ) : scoreEntries.length === 0 ? (
             <View className="flex-1 py-10 items-center justify-center">
-              <Text className="opacity-70 text-gray-900 dark:text-gray-300">No score entries yet</Text>
+              <Text className="font-sans opacity-70 text-stone-600 dark:text-stone-400">No score entries yet</Text>
             </View>
           ) : (
             <FlatList

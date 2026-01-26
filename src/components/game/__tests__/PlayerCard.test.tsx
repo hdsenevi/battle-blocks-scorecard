@@ -230,7 +230,7 @@ describe("PlayerCard", () => {
     expect(card).toBeTruthy();
     // Card should have reduced opacity and gray border
     expect(card.props.className).toContain("opacity-60");
-    expect(card.props.className).toContain("border-gray-400");
+    expect(card.props.className).toContain("border-stone-500");
   });
 
   describe("Story 6.4: Display Eliminated Players", () => {
