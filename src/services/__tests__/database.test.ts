@@ -1013,8 +1013,24 @@ describe("Database Service - Status Filtering Functions", () => {
     it("should allow status changes for active games", async () => {
       testMockDb.runAsync.mockResolvedValue({ lastInsertRowId: 0, changes: 1 });
 
+      // updateGame calls getGame(2) before and after runAsync. The second getGame must
+      // return the updated game with status "paused".
+      let getGame2Calls = 0;
+      const origGetAll = testMockDb.getAllAsync.getMockImplementation();
+      testMockDb.getAllAsync.mockImplementation((query: string, params?: unknown[]) => {
+        if (query?.includes("SELECT * FROM games WHERE id = ?") && params?.[0] === 2) {
+          getGame2Calls++;
+          return Promise.resolve(
+            getGame2Calls === 1
+              ? [activeGame]
+              : [{ ...activeGame, status: "paused", updated_at: Math.floor(Date.now() / 1000) }]
+          );
+        }
+        return (origGetAll as (q: string, p?: unknown[]) => Promise<unknown[]>)(query, params);
+      });
+
       const result = await updateGame(2, { status: "paused" });
-      
+
       expect(result.status).toBe("paused");
       expect(testMockDb.runAsync).toHaveBeenCalledWith(
         "UPDATE games SET status = ?, updated_at = ? WHERE id = ?",

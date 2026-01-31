@@ -123,6 +123,15 @@ jest.mock('expo', () => ({
   default: {},
 }));
 
+// Mock expo-haptics to prevent requireOptionalNativeModule errors in Jest
+jest.mock('expo-haptics', () => ({
+  impactAsync: jest.fn(),
+  notificationAsync: jest.fn(),
+  selectionAsync: jest.fn(),
+  ImpactFeedbackStyle: { Light: 1, Medium: 2, Heavy: 3 },
+  NotificationFeedbackType: { Success: 1, Warning: 2, Error: 3 },
+}));
+
 // Mock ErrorUtils
 global.ErrorUtils = {
   setGlobalHandler: jest.fn(),

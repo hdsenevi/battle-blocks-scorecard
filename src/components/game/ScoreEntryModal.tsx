@@ -208,8 +208,8 @@ export function ScoreEntryModal({
 
     const trimmedValue = blockValue.trim();
 
-    // Check for non-numeric input
-    if (!/^\d+$/.test(trimmedValue)) {
+    // Check for non-numeric input (allow optional leading minus for clearer negative error)
+    if (!/^-?\d+$/.test(trimmedValue)) {
       Alert.alert("Invalid Input", "Please enter a valid number");
       triggerError();
       return;

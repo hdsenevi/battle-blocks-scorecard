@@ -20,6 +20,18 @@ jest.mock("expo-router", () => ({
   useRouter: jest.fn(() => mockRouter),
 }));
 
+const realGameContext = jest.requireActual<typeof import("@/contexts/GameContext")>("@/contexts/GameContext");
+
+// Mock GameContext so useGameState/useGameDispatch can be overridden; default to real implementation
+jest.mock("@/contexts/GameContext", () => {
+  const real = jest.requireActual("@/contexts/GameContext");
+  return {
+    ...real,
+    useGameState: jest.fn().mockImplementation(real.useGameState),
+    useGameDispatch: jest.fn().mockImplementation(real.useGameDispatch),
+  };
+});
+
 // Mock database service
 jest.mock("@/services/database");
 const mockDatabase = database as jest.Mocked<typeof database>;
@@ -199,7 +211,9 @@ describe("HomeScreen", () => {
       status: "completed",
     };
 
-    require("@/contexts/GameContext").useGameState.mockReturnValue({
+    const { useGameState } = require("@/contexts/GameContext");
+    const mockUseGameState = useGameState as jest.Mock;
+    mockUseGameState.mockReturnValue({
       currentGame: completedGame,
       gameStatus: "completed",
       players: [mockPlayer1, mockPlayer2],
@@ -207,6 +221,10 @@ describe("HomeScreen", () => {
       currentRound: 1,
       playersWhoScoredThisRound: new Set(),
     });
+
+    // Show Continue: effect needs hasActiveGames. Use listActiveGames so the button appears.
+    mockDatabase.listActiveGames.mockResolvedValue([{ ...mockGame, status: "active" }]);
+    mockDatabase.listPausedGames.mockResolvedValue([]);
 
     const { getByTestId } = render(<HomeScreen />, { wrapper });
 
@@ -221,6 +239,9 @@ describe("HomeScreen", () => {
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith("/game/1/winner");
     });
+
+    // Restore so other tests get the real implementation
+    mockUseGameState.mockImplementation(realGameContext.useGameState);
   });
 
   it("should navigate to game selection screen when multiple games exist", async () => {

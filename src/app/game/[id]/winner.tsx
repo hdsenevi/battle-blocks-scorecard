@@ -60,6 +60,10 @@ export default function WinnerScreen() {
         }
 
         const players = await getPlayersByGame(gameId);
+        if (!players || players.length === 0) {
+          router.replace("/(tabs)");
+          return;
+        }
         dispatch(resumeGameAction(game, players));
 
         // Story 5.1: Trigger completion haptic (AC: 5)
