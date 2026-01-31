@@ -1,6 +1,6 @@
 import '../../global.css';
 import { useEffect } from 'react';
-import { ThemeProvider } from '@react-navigation/native';
+import { ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -16,6 +16,7 @@ import {
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { LightNavigationTheme, DarkNavigationTheme } from '@/constants/theme';
 import { GameProvider } from '@/contexts/GameContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AppLifecycleHandler } from '@/components/AppLifecycleHandler';
 
 export const unstable_settings = {
@@ -42,15 +43,17 @@ export default function RootLayout() {
   }, [fontsLoaded, fontError]);
 
   return (
-    <GameProvider>
-      <AppLifecycleHandler />
-      <ThemeProvider value={colorScheme === 'dark' ? DarkNavigationTheme : LightNavigationTheme}>
+    <ThemeProvider>
+      <GameProvider>
+        <AppLifecycleHandler />
+      <NavigationThemeProvider value={colorScheme === 'dark' ? DarkNavigationTheme : LightNavigationTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         </Stack>
         <StatusBar style="auto" />
-      </ThemeProvider>
-    </GameProvider>
+      </NavigationThemeProvider>
+      </GameProvider>
+    </ThemeProvider>
   );
 }
