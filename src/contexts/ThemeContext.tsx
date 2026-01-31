@@ -1,6 +1,7 @@
 /**
  * Theme Context
- * Stores user's light/dark preference and persists it. Applies override via Appearance.setColorScheme.
+ * Stores user's appearance preference (light, dark, or system) and persists it.
+ * null = follow system; "light" | "dark" = override. Applies via Appearance.setColorScheme.
  */
 
 import React, {
