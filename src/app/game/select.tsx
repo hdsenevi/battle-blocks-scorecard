@@ -12,6 +12,7 @@ import {
   Text,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useResetToRoot } from "@/hooks/useResetToRoot";
 import { ThemedView } from "@/components/themed-view";
 import { useGameDispatch } from "@/contexts/GameContext";
 import {
@@ -31,6 +32,7 @@ interface GameWithMetadata extends Game {
 
 export default function GameSelectionScreen() {
   const router = useRouter();
+  const resetToRoot = useResetToRoot();
   const dispatch = useGameDispatch();
   const [games, setGames] = useState<GameWithMetadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,16 +56,14 @@ export default function GameSelectionScreen() {
               ...game,
               playerCount: players.length,
             };
-          })
+          }),
         );
 
         setGames(gamesWithMetadata);
       } catch (err) {
         console.error("Failed to load active games:", err);
         setError(
-          err instanceof DatabaseError
-            ? err.message
-            : "Failed to load games"
+          err instanceof DatabaseError ? err.message : "Failed to load games",
         );
       } finally {
         setIsLoading(false);
@@ -105,9 +105,7 @@ export default function GameSelectionScreen() {
     } catch (err) {
       console.error("Failed to resume game:", err);
       setError(
-        err instanceof DatabaseError
-          ? err.message
-          : "Failed to resume game"
+        err instanceof DatabaseError ? err.message : "Failed to resume game",
       );
     }
   };
@@ -127,7 +125,9 @@ export default function GameSelectionScreen() {
     return (
       <ThemedView className="flex-1">
         <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-base font-sans text-stone-600 dark:text-stone-400">Loading games...</Text>
+          <Text className="text-base font-sans text-stone-600 dark:text-stone-400">
+            Loading games...
+          </Text>
         </View>
       </ThemedView>
     );
@@ -137,12 +137,16 @@ export default function GameSelectionScreen() {
     return (
       <ThemedView className="flex-1">
         <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-base font-sans text-red-500 mb-4 text-center">{error}</Text>
+          <Text className="text-base font-sans text-red-500 mb-4 text-center">
+            {error}
+          </Text>
           <TouchableOpacity
             className={`bg-primary dark:bg-primary-bright ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-button items-center justify-center mt-4 shadow-elevated`}
             onPress={() => router.back()}
           >
-            <Text className="text-white text-base font-sans-semibold">Go Back</Text>
+            <Text className="text-white text-base font-sans-semibold">
+              Go Back
+            </Text>
           </TouchableOpacity>
         </View>
       </ThemedView>
@@ -153,15 +157,19 @@ export default function GameSelectionScreen() {
     return (
       <ThemedView className="flex-1">
         <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-2xl font-sans-semibold mb-2 text-center text-stone-900 dark:text-stone-50">No Active Games</Text>
+          <Text className="text-2xl font-sans-semibold mb-2 text-center text-stone-900 dark:text-stone-50">
+            No Active Games
+          </Text>
           <Text className="text-base font-sans mb-6 text-center opacity-70 text-stone-600 dark:text-stone-400">
             Start a new game to begin playing
           </Text>
           <TouchableOpacity
             className={`bg-primary dark:bg-primary-bright ${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-button items-center justify-center mt-4 shadow-elevated`}
-            onPress={() => router.replace("/(tabs)")}
+            onPress={() => resetToRoot()}
           >
-            <Text className="text-white text-base font-sans-semibold">Go to Home</Text>
+            <Text className="text-white text-base font-sans-semibold">
+              Go to Home
+            </Text>
           </TouchableOpacity>
         </View>
       </ThemedView>
@@ -171,15 +179,24 @@ export default function GameSelectionScreen() {
   return (
     <ThemedView className="flex-1">
       <View className="p-5 border-b border-gray-border dark:border-stone-600">
-        <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50" testID="select-game-title">
+        <Text
+          className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50"
+          testID="select-game-title"
+        >
           Select Game to Resume
         </Text>
-        <Text className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400" testID="select-game-subtitle">
+        <Text
+          className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400"
+          testID="select-game-subtitle"
+        >
           {games.length} {games.length === 1 ? "game" : "games"} to resume
         </Text>
       </View>
 
-      <ScrollView className="flex-1" contentContainerStyle={{ padding: 16, gap: 12 }}>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ padding: 16, gap: 12 }}
+      >
         {games.map((game) => (
           <TouchableOpacity
             key={game.id}
@@ -187,19 +204,22 @@ export default function GameSelectionScreen() {
             onPress={() => handleSelectGame(game.id)}
             testID={`game-card-${game.id}`}
             accessibilityLabel={`Resume game ${game.id}, started ${formatDate(
-              game.created_at
+              game.created_at,
             )}, ${game.playerCount} players`}
             accessibilityRole="button"
           >
             <View className="gap-2">
               <View className="flex-row justify-between items-center">
-                <Text className="text-lg font-sans-semibold text-stone-900 dark:text-stone-50">Game #{game.id}</Text>
+                <Text className="text-lg font-sans-semibold text-stone-900 dark:text-stone-50">
+                  Game #{game.id}
+                </Text>
                 <Text className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400">
                   {formatDate(game.created_at)}
                 </Text>
               </View>
               <Text className="text-sm font-sans opacity-70 text-stone-600 dark:text-stone-400">
-                {game.playerCount} {game.playerCount === 1 ? "player" : "players"}
+                {game.playerCount}{" "}
+                {game.playerCount === 1 ? "player" : "players"}
               </Text>
             </View>
           </TouchableOpacity>
@@ -209,12 +229,14 @@ export default function GameSelectionScreen() {
       <View className="p-4 border-t border-gray-border dark:border-stone-600">
         <TouchableOpacity
           className={`${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} px-6 rounded-button items-center justify-center`}
-          onPress={() => router.replace("/(tabs)")}
+          onPress={() => resetToRoot()}
           testID="cancel-game-selection-button"
           accessibilityLabel="Cancel and go to home"
           accessibilityRole="button"
         >
-          <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">Cancel</Text>
+          <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">
+            Cancel
+          </Text>
         </TouchableOpacity>
       </View>
     </ThemedView>

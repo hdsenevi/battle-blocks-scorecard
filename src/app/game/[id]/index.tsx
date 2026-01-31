@@ -10,13 +10,19 @@ import {
   Platform,
   TouchableOpacity,
   Text,
- Alert } from "react-native";
+  Alert,
+} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
+import { useResetToRoot } from "@/hooks/useResetToRoot";
 import { ThemedView } from "@/components/themed-view";
 import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import { getGame, getPlayersByGame, updateGame } from "@/services/database";
-import { resumeGameAction, startNewRoundAction, undoLastScoreAction } from "@/reducers/actionCreators";
+import {
+  resumeGameAction,
+  startNewRoundAction,
+  undoLastScoreAction,
+} from "@/reducers/actionCreators";
 import { checkRoundCompletion } from "@/services/gameRules";
 import { triggerCompletion, triggerScoreEntry } from "@/services/haptics";
 import { canUndoLastScore, undoLastScore } from "@/services/undo";
@@ -29,24 +35,26 @@ export default function GameScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const navigation = useNavigation();
+  const resetToRoot = useResetToRoot();
   const gameState = useGameState();
   const dispatch = useGameDispatch();
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isScoreModalVisible, setIsScoreModalVisible] = useState(false);
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
-  const [roundCompletionAlertShown, setRoundCompletionAlertShown] = useState<number>(0); // Track which round the alert was shown for
+  const [roundCompletionAlertShown, setRoundCompletionAlertShown] =
+    useState<number>(0); // Track which round the alert was shown for
   const [canUndo, setCanUndo] = useState(false);
 
   useEffect(() => {
     const loadGame = async () => {
       if (!id) {
-        router.replace("/(tabs)");
+        resetToRoot();
         return;
       }
 
       const gameId = parseInt(id, 10);
       if (isNaN(gameId)) {
-        router.replace("/(tabs)");
+        resetToRoot();
         return;
       }
 
@@ -65,7 +73,7 @@ export default function GameScreen() {
       try {
         const game = await getGame(gameId);
         if (!game) {
-          router.replace("/(tabs)");
+          resetToRoot();
           return;
         }
 
@@ -78,7 +86,7 @@ export default function GameScreen() {
         }
       } catch (error) {
         console.error("Failed to load game:", error);
-        router.replace("/(tabs)");
+        resetToRoot();
       }
     };
 
@@ -87,6 +95,7 @@ export default function GameScreen() {
     id,
     dispatch,
     router,
+    resetToRoot,
     gameState.currentGame?.id,
     gameState.players.length,
     gameState.gameStatus,
@@ -119,11 +128,11 @@ export default function GameScreen() {
             dispatch(startNewRoundAction());
             Alert.alert(
               "Round Finished",
-              `Round ${currentRound} finished. Starting Round ${currentRound + 1}.`
+              `Round ${currentRound} finished. Starting Round ${currentRound + 1}.`,
             );
           },
         },
-      ]
+      ],
     );
   };
 
@@ -139,7 +148,7 @@ export default function GameScreen() {
         const undoAvailable = await canUndoLastScore(
           currentGame.id,
           currentRound,
-          currentGame.status
+          currentGame.status,
         );
         setCanUndo(undoAvailable);
       } catch (error) {
@@ -161,7 +170,7 @@ export default function GameScreen() {
       const undoResult = await undoLastScore(
         currentGame.id,
         currentRound,
-        players
+        players,
       );
 
       if (!undoResult.success || !undoResult.scoreEntry) {
@@ -176,14 +185,14 @@ export default function GameScreen() {
           undoResult.previousPlayerState.score,
           undoResult.previousPlayerState.consecutive_misses,
           undoResult.previousPlayerState.is_eliminated,
-          undoResult.gameWasCompleted
-        )
+          undoResult.gameWasCompleted,
+        ),
       );
 
       // Show alert confirmation
       Alert.alert(
         "Score Undone",
-        "Last score entry undone. Score restored to previous value."
+        "Last score entry undone. Score restored to previous value.",
       );
 
       // Trigger haptic feedback
@@ -207,6 +216,7 @@ export default function GameScreen() {
   // Watch for game completion
   useEffect(() => {
     if (currentGame?.status === "completed" && id) {
+      router.dismissAll();
       router.replace(`/game/${id}/winner`);
     }
   }, [currentGame?.status, id, router]);
@@ -242,60 +252,56 @@ export default function GameScreen() {
     // Check if round is complete
     const isRoundComplete = checkRoundCompletion(
       players,
-      playersWhoScoredThisRound
+      playersWhoScoredThisRound,
     );
 
     // Only show alert once per round
     if (isRoundComplete && roundCompletionAlertShown !== currentRound) {
       // Build message showing player status
       const scoredPlayers = players.filter((p) =>
-        playersWhoScoredThisRound.has(p.id)
+        playersWhoScoredThisRound.has(p.id),
       );
       const eliminatedPlayers = players.filter((p) => p.is_eliminated);
 
       let message = `All players have completed Round ${currentRound}.\n\n`;
-      
+
       if (scoredPlayers.length > 0) {
         message += `Players who scored: ${scoredPlayers.map((p) => p.name).join(", ")}\n`;
       }
-      
+
       if (eliminatedPlayers.length > 0) {
         message += `Players eliminated: ${eliminatedPlayers.map((p) => p.name).join(", ")}\n`;
       }
-      
+
       message += `\nWould you like to finish this round?`;
 
       // Trigger haptic feedback
       triggerCompletion();
 
       // Show alert with options
-      Alert.alert(
-        "Round Complete",
-        message,
-        [
-          {
-            text: "Continue Manually",
-            style: "cancel",
-            onPress: () => {
-              // User wants to continue manually, just mark alert as shown
-              setRoundCompletionAlertShown(currentRound);
-            },
+      Alert.alert("Round Complete", message, [
+        {
+          text: "Continue Manually",
+          style: "cancel",
+          onPress: () => {
+            // User wants to continue manually, just mark alert as shown
+            setRoundCompletionAlertShown(currentRound);
           },
-          {
-            text: "Finish Round",
-            style: "default",
-            onPress: () => {
-              // Finish the round automatically
-              dispatch(startNewRoundAction());
-              setRoundCompletionAlertShown(currentRound);
-              Alert.alert(
-                "Round Finished",
-                `Round ${currentRound} finished. Starting Round ${currentRound + 1}.`
-              );
-            },
+        },
+        {
+          text: "Finish Round",
+          style: "default",
+          onPress: () => {
+            // Finish the round automatically
+            dispatch(startNewRoundAction());
+            setRoundCompletionAlertShown(currentRound);
+            Alert.alert(
+              "Round Finished",
+              `Round ${currentRound} finished. Starting Round ${currentRound + 1}.`,
+            );
           },
-        ]
-      );
+        },
+      ]);
 
       // Mark alert as shown for this round
       setRoundCompletionAlertShown(currentRound);
@@ -320,7 +326,9 @@ export default function GameScreen() {
   if (!currentGame) {
     return (
       <ThemedView className="flex-1">
-        <Text className="text-base font-sans text-stone-900 dark:text-stone-50">Loading game...</Text>
+        <Text className="text-base font-sans text-stone-900 dark:text-stone-50">
+          Loading game...
+        </Text>
       </ThemedView>
     );
   }
@@ -329,10 +337,16 @@ export default function GameScreen() {
     <ThemedView className="flex-1">
       <View className="flex-row justify-between items-center p-5 border-b border-gray-border dark:border-stone-600">
         <View className="flex-1">
-          <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50" testID="game-title">
+          <Text
+            className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50"
+            testID="game-title"
+          >
             Game #{currentGame.id}
           </Text>
-          <Text className="text-sm font-sans opacity-70 capitalize text-stone-600 dark:text-stone-400" testID="game-status">
+          <Text
+            className="text-sm font-sans opacity-70 capitalize text-stone-600 dark:text-stone-400"
+            testID="game-status"
+          >
             Status: {currentGame.status} | Round {currentRound}
           </Text>
         </View>
@@ -344,7 +358,9 @@ export default function GameScreen() {
             accessibilityLabel="View score history"
             accessibilityRole="button"
           >
-            <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">History</Text>
+            <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">
+              History
+            </Text>
           </TouchableOpacity>
           {currentGame.status === "active" && canUndo && (
             <TouchableOpacity
@@ -354,7 +370,9 @@ export default function GameScreen() {
               accessibilityLabel="Undo last score"
               accessibilityRole="button"
             >
-              <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">Undo</Text>
+              <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">
+                Undo
+              </Text>
             </TouchableOpacity>
           )}
           {currentGame.status === "active" && (
@@ -365,7 +383,9 @@ export default function GameScreen() {
               accessibilityLabel="Finish round"
               accessibilityRole="button"
             >
-              <Text className="text-white text-base font-sans-semibold">Finish Round</Text>
+              <Text className="text-white text-base font-sans-semibold">
+                Finish Round
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -376,7 +396,9 @@ export default function GameScreen() {
         contentContainerStyle={{ padding: 16, gap: 12 }}
       >
         {players.length === 0 ? (
-          <Text className="text-center mt-10 font-sans opacity-70 text-stone-600 dark:text-stone-400">No players yet</Text>
+          <Text className="text-center mt-10 font-sans opacity-70 text-stone-600 dark:text-stone-400">
+            No players yet
+          </Text>
         ) : (
           players.map((player) => {
             const hasScored = playersWhoScoredThisRound.has(player.id);
@@ -391,7 +413,11 @@ export default function GameScreen() {
                   // Story 5.3: Prevent score entry for completed/notcompleted/paused games
                   // Story 4.2: Prevent score entry for eliminated players
                   // Prevent score entry if player already scored this round
-                  if (currentGame.status === "active" && !player.is_eliminated && !hasScored) {
+                  if (
+                    currentGame.status === "active" &&
+                    !player.is_eliminated &&
+                    !hasScored
+                  ) {
                     setSelectedPlayer(player);
                     setIsScoreModalVisible(true);
                   }
