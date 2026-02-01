@@ -29,7 +29,11 @@ export default function HomeScreen() {
     const checkForActiveGames = async () => {
       try {
         // If game already loaded in context, show continue button
-        if (gameState.currentGame && (gameState.gameStatus === "active" || gameState.gameStatus === "paused")) {
+        if (
+          gameState.currentGame &&
+          (gameState.gameStatus === "active" ||
+            gameState.gameStatus === "paused")
+        ) {
           setHasActiveGames(true);
           setIsChecking(false);
           return;
@@ -62,7 +66,10 @@ export default function HomeScreen() {
       return;
     }
 
-    if (gameState.currentGame && (gameState.gameStatus === "active" || gameState.gameStatus === "paused")) {
+    if (
+      gameState.currentGame &&
+      (gameState.gameStatus === "active" || gameState.gameStatus === "paused")
+    ) {
       // If game already in context, navigate directly
       // If paused, make it active first
       if (gameState.gameStatus === "paused") {
@@ -77,7 +84,7 @@ export default function HomeScreen() {
       const activeGames = await listActiveGames();
       const pausedGames = await listPausedGames();
       const allResumableGames = [...activeGames, ...pausedGames];
-      
+
       if (allResumableGames.length === 1) {
         // Single game - resume directly
         const game = await getGame(allResumableGames[0].id);
@@ -110,7 +117,9 @@ export default function HomeScreen() {
     return (
       <ThemedView className="flex-1">
         <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-base font-sans text-stone-600 dark:text-stone-400">Loading...</Text>
+          <Text className="text-base font-sans text-stone-600 dark:text-stone-400">
+            Loading...
+          </Text>
         </View>
       </ThemedView>
     );
@@ -129,18 +138,32 @@ export default function HomeScreen() {
 
         <View className="w-full max-w-[300px] gap-4">
           <TouchableOpacity
-            className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-button items-center justify-center bg-primary dark:bg-primary-bright shadow-elevated`}
+            className={`${
+              Platform.OS === "ios"
+                ? "py-4 min-h-[44px]"
+                : Platform.OS === "android"
+                ? "py-[18px] min-h-[48px]"
+                : "py-4 min-h-[44px]"
+            } px-6 rounded-button items-center justify-center bg-primary dark:bg-primary-bright shadow-elevated`}
             onPress={handleStartNewGame}
             accessibilityLabel="Start New Game"
             accessibilityRole="button"
             testID="start-new-game-button"
           >
-            <Text className="text-white text-base font-sans-semibold">Start New Game</Text>
+            <Text className="text-white text-base font-sans-semibold">
+              Start New Game
+            </Text>
           </TouchableOpacity>
 
           {hasActiveGames && (
             <TouchableOpacity
-              className={`${Platform.OS === "ios" ? "py-4 min-h-[44px]" : Platform.OS === "android" ? "py-[18px] min-h-[48px]" : "py-4 min-h-[44px]"} px-6 rounded-button items-center justify-center bg-transparent border-2 border-primary dark:border-primary-bright`}
+              className={`${
+                Platform.OS === "ios"
+                  ? "py-4 min-h-[44px]"
+                  : Platform.OS === "android"
+                  ? "py-[18px] min-h-[48px]"
+                  : "py-4 min-h-[44px]"
+              } px-6 rounded-button items-center justify-center bg-transparent border-2 border-primary dark:border-primary-bright`}
               onPress={handleContinueGame}
               testID="continue-game-button"
               accessibilityLabel="Continue Game"
@@ -152,16 +175,15 @@ export default function HomeScreen() {
             </TouchableOpacity>
           )}
 
-          {/* Story 6.5: Privacy Policy Link (FR52) */}
           <TouchableOpacity
-            className={`${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} px-6 rounded-button items-center justify-center`}
-            onPress={() => router.push("/privacy")}
-            testID="privacy-policy-button"
-            accessibilityLabel="View Privacy Policy"
+            className="mt-6 py-3 px-6 rounded-button items-center justify-center"
+            onPress={() => router.push("/instructions")}
+            accessibilityLabel="Game Instructions"
             accessibilityRole="button"
+            testID="instructions-link"
           >
-            <Text className="text-base font-sans opacity-70 underline text-stone-600 dark:text-stone-400">
-              Privacy Policy
+            <Text className="text-base font-sans text-primary dark:text-primary-bright underline">
+              Game Instructions
             </Text>
           </TouchableOpacity>
         </View>

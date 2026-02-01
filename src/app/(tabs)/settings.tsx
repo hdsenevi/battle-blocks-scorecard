@@ -3,25 +3,18 @@
  * Third tab with a table-style list of settings options (e.g. Privacy Policy).
  */
 
-import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  Platform,
-  Alert,
-} from "react-native";
+import { View, Text, ScrollView, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/themed-view";
-import { IconSymbol } from "@/components/ui/icon-symbol";
+import { SettingsRow } from "@/components/SettingsRow";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useThemeOverride } from "@/contexts/ThemeContext";
 import type { ThemeOverride } from "@/contexts/ThemeContext";
 
 function getAppearanceLabel(override: ThemeOverride): string {
-  if (override === null) return "System";
+  if (override === null) return "Auto";
   return override === "light" ? "Light" : "Dark";
 }
 
@@ -37,7 +30,7 @@ export default function SettingsScreen() {
   const showAppearanceOptions = () => {
     Alert.alert("Appearance", "Choose appearance", [
       {
-        text: "System",
+        text: "Auto",
         onPress: () => themeContext?.setThemeOverride(null),
       },
       {
@@ -69,6 +62,37 @@ export default function SettingsScreen() {
           Settings
         </Text>
 
+        <Text
+          className="text-s font-sans-medium text-stone-600 dark:text-stone-50 mb-2"
+          accessibilityRole="header"
+        >
+          Appearance
+        </Text>
+        <View
+          className="rounded-2xl overflow-hidden mb-8"
+          style={{
+            backgroundColor: colors.backgroundCard,
+            borderWidth: 1,
+            borderColor: colors.border,
+          }}
+          accessibilityRole="list"
+          accessibilityLabel="Settings list"
+        >
+          <SettingsRow
+            title="Appearance"
+            value={appearanceLabel}
+            onPress={showAppearanceOptions}
+            testID="settings-appearance-row"
+            accessibilityLabel={`Appearance, currently ${appearanceLabel}`}
+          />
+        </View>
+
+        <Text
+          className="text-s font-sans-medium text-stone-600 dark:text-stone-50 mb-2"
+          accessibilityRole="header"
+        >
+          General
+        </Text>
         <View
           className="rounded-2xl overflow-hidden"
           style={{
@@ -79,58 +103,19 @@ export default function SettingsScreen() {
           accessibilityRole="list"
           accessibilityLabel="Settings list"
         >
-          <Pressable
-            onPress={showAppearanceOptions}
-            className={`flex-row items-center justify-between px-4 ${
-              Platform.OS === "ios"
-                ? "py-3 min-h-[44px]"
-                : "py-3.5 min-h-[48px]"
-            }`}
-            style={({ pressed }) => [
-              { borderBottomWidth: 1, borderBottomColor: colors.border },
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
-            testID="settings-appearance-row"
-            accessibilityRole="button"
-            accessibilityLabel={`Appearance, currently ${appearanceLabel}`}
-          >
-            <Text className="text-base font-sans text-stone-900 dark:text-stone-50">
-              Appearance
-            </Text>
-            <View className="flex-row items-center gap-2">
-              <Text className="text-base font-sans text-stone-600 dark:text-stone-400">
-                {appearanceLabel}
-              </Text>
-              <IconSymbol
-                name="chevron.right"
-                size={14}
-                color={colors.textSecondary}
-              />
-            </View>
-          </Pressable>
-          <Pressable
+          <SettingsRow
+            title="Game Instructions"
+            onPress={() => router.push("/instructions")}
+            testID="settings-instructions-row"
+            accessibilityLabel="Game Instructions"
+          />
+          <SettingsRow
+            title="Privacy Policy"
             onPress={() => router.push("/privacy")}
-            className={`flex-row items-center justify-between px-4 ${
-              Platform.OS === "ios"
-                ? "py-3 min-h-[44px]"
-                : "py-3.5 min-h-[48px]"
-            }`}
-            style={({ pressed }) => ({
-              opacity: pressed ? 0.7 : 1,
-            })}
+            isLast
             testID="settings-privacy-policy-row"
-            accessibilityRole="button"
             accessibilityLabel="Privacy Policy"
-          >
-            <Text className="text-base font-sans text-stone-900 dark:text-stone-50">
-              Privacy Policy
-            </Text>
-            <IconSymbol
-              name="chevron.right"
-              size={14}
-              color={colors.textSecondary}
-            />
-          </Pressable>
+          />
         </View>
       </ScrollView>
     </ThemedView>
