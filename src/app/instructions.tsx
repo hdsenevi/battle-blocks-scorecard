@@ -5,6 +5,7 @@
 
 import { ScrollView, Text, View } from "react-native";
 import { ThemedView } from "@/components/themed-view";
+import { PinCircle } from "@/components/PinCircle";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect } from "react";
 
@@ -84,72 +85,24 @@ export default function InstructionsScreen() {
             style={{ minWidth: 140 }}
           >
             <View className="flex-row justify-center mb-1">
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  7
-                </Text>
-              </View>
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  9
-                </Text>
-              </View>
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  8
-                </Text>
-              </View>
+              <PinCircle value={7} />
+              <PinCircle value={9} />
+              <PinCircle value={8} />
             </View>
             <View className="flex-row justify-center mb-1">
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  5
-                </Text>
-              </View>
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  11
-                </Text>
-              </View>
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  12
-                </Text>
-              </View>
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  6
-                </Text>
-              </View>
+              <PinCircle value={5} />
+              <PinCircle value={11} />
+              <PinCircle value={12} />
+              <PinCircle value={6} />
             </View>
             <View className="flex-row justify-center mb-1">
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  3
-                </Text>
-              </View>
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  10
-                </Text>
-              </View>
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  4
-                </Text>
-              </View>
+              <PinCircle value={3} />
+              <PinCircle value={10} />
+              <PinCircle value={4} />
             </View>
             <View className="flex-row justify-center">
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  1
-                </Text>
-              </View>
-              <View className="w-9 h-9 rounded-full border-2 border-stone-400 dark:border-stone-500 items-center justify-center mx-0.5">
-                <Text className="text-sm font-sans-bold text-stone-700 dark:text-stone-300">
-                  2
-                </Text>
-              </View>
+              <PinCircle value={1} />
+              <PinCircle value={2} />
             </View>
           </View>
         </View>

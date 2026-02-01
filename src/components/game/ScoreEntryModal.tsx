@@ -3,7 +3,7 @@
  * Interface for entering scores (single block or multiple blocks)
  */
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   View,
   Modal,
@@ -12,11 +12,18 @@ import {
   Platform,
   Alert,
   Text,
+  KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { ThemedView } from "@/components/themed-view";
 import type { Player } from "@/database/types";
-import { calculateScore, checkPenaltyRule, checkElimination, checkWinCondition } from "@/services/gameRules";
+import {
+  calculateScore,
+  checkPenaltyRule,
+  checkElimination,
+  checkWinCondition,
+} from "@/services/gameRules";
 import {
   addScoreEntry,
   updatePlayer,
@@ -29,7 +36,7 @@ import {
   completeGameAction,
   eliminatePlayerAction,
 } from "@/reducers/actionCreators";
-import { useGameState , useGameDispatch } from "@/contexts/GameContext";
+import { useGameState, useGameDispatch } from "@/contexts/GameContext";
 import {
   triggerScoreEntry,
   triggerError,
@@ -59,20 +66,32 @@ export function ScoreEntryModal({
   const [blockValue, setBlockValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
+  const inputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (visible && gameStatus === "active") {
+      const timer = setTimeout(() => inputRef.current?.focus(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [visible, gameStatus]);
 
   if (!player) {
     return null;
   }
 
   // Story 5.3: Prevent score entries after completion or for non-active games
-  if (gameStatus === "completed" || gameStatus === "notcompleted" || gameStatus === "paused") {
-    const statusMessage = 
-      gameStatus === "completed" 
+  if (
+    gameStatus === "completed" ||
+    gameStatus === "notcompleted" ||
+    gameStatus === "paused"
+  ) {
+    const statusMessage =
+      gameStatus === "completed"
         ? "This game has been completed. No further score entries are allowed."
         : gameStatus === "notcompleted"
         ? "This game was not completed. No further score entries are allowed."
         : "This game is paused. Resume the game to continue playing.";
-    
+
     return (
       <Modal
         visible={visible}
@@ -84,18 +103,30 @@ export function ScoreEntryModal({
         <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
           <ThemedView className="bg-white dark:bg-stone-800 rounded-2xl p-6 w-full max-w-[400px] shadow-elevated">
             <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50">
-              {gameStatus === "completed" ? "Game Completed" : gameStatus === "notcompleted" ? "Game Not Completed" : "Game Paused"}
+              {gameStatus === "completed"
+                ? "Game Completed"
+                : gameStatus === "notcompleted"
+                ? "Game Not Completed"
+                : "Game Paused"}
             </Text>
             <Text className="text-base font-sans mb-6 opacity-70 text-stone-600 dark:text-stone-400">
               {statusMessage}
             </Text>
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-button items-center justify-center bg-primary dark:bg-primary-bright`}
+              className={`flex-1 ${
+                Platform.OS === "ios"
+                  ? "py-3.5 min-h-[44px]"
+                  : Platform.OS === "android"
+                  ? "py-4 min-h-[48px]"
+                  : "py-3.5 min-h-[44px]"
+              } rounded-button items-center justify-center bg-primary dark:bg-primary-bright`}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
             >
-              <Text className="text-white text-base font-sans-semibold">Close</Text>
+              <Text className="text-white text-base font-sans-semibold">
+                Close
+              </Text>
             </TouchableOpacity>
           </ThemedView>
         </View>
@@ -119,15 +150,24 @@ export function ScoreEntryModal({
               Player Eliminated
             </Text>
             <Text className="text-base font-sans mb-6 opacity-70 text-stone-600 dark:text-stone-400">
-              {player.name} has been eliminated for this round and cannot receive further scores until the next round begins.
+              {player.name} has been eliminated for this round and cannot
+              receive further scores until the next round begins.
             </Text>
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-button items-center justify-center bg-primary dark:bg-primary-bright`}
+              className={`flex-1 ${
+                Platform.OS === "ios"
+                  ? "py-3.5 min-h-[44px]"
+                  : Platform.OS === "android"
+                  ? "py-4 min-h-[48px]"
+                  : "py-3.5 min-h-[44px]"
+              } rounded-button items-center justify-center bg-primary dark:bg-primary-bright`}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
             >
-              <Text className="text-white text-base font-sans-semibold">Close</Text>
+              <Text className="text-white text-base font-sans-semibold">
+                Close
+              </Text>
             </TouchableOpacity>
           </ThemedView>
         </View>
@@ -136,7 +176,9 @@ export function ScoreEntryModal({
   }
 
   // Prevent score entry if player has already scored in this round
-  const hasPlayerScoredThisRound = gameState.playersWhoScoredThisRound.has(player.id);
+  const hasPlayerScoredThisRound = gameState.playersWhoScoredThisRound.has(
+    player.id
+  );
   if (hasPlayerScoredThisRound) {
     return (
       <Modal
@@ -152,15 +194,24 @@ export function ScoreEntryModal({
               Already Scored This Round
             </Text>
             <Text className="text-base font-sans mb-6 opacity-70 text-stone-600 dark:text-stone-400">
-              {player.name} has already scored in Round {gameState.currentRound}. Please finish the round before scoring again.
+              {player.name} has already scored in Round {gameState.currentRound}
+              . Please finish the round before scoring again.
             </Text>
             <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-button items-center justify-center bg-primary dark:bg-primary-bright`}
+              className={`flex-1 ${
+                Platform.OS === "ios"
+                  ? "py-3.5 min-h-[44px]"
+                  : Platform.OS === "android"
+                  ? "py-4 min-h-[48px]"
+                  : "py-3.5 min-h-[44px]"
+              } rounded-button items-center justify-center bg-primary dark:bg-primary-bright`}
               onPress={onClose}
               accessibilityLabel="Close"
               accessibilityRole="button"
             >
-              <Text className="text-white text-base font-sans-semibold">Close</Text>
+              <Text className="text-white text-base font-sans-semibold">
+                Close
+              </Text>
             </TouchableOpacity>
           </ThemedView>
         </View>
@@ -194,7 +245,10 @@ export function ScoreEntryModal({
     // Story 6.2: Prevent rapid duplicate score entries
     const now = Date.now();
     if (now - lastSubmitTime < 500) {
-      Alert.alert("Please wait", "Please wait a moment before submitting again");
+      Alert.alert(
+        "Please wait",
+        "Please wait a moment before submitting again"
+      );
       triggerError();
       return;
     }
@@ -219,7 +273,10 @@ export function ScoreEntryModal({
 
     // Validate value
     if (isNaN(value) || value < 0) {
-      Alert.alert("Invalid Input", "Please enter a valid number (0 or greater)");
+      Alert.alert(
+        "Invalid Input",
+        "Please enter a valid number (0 or greater)"
+      );
       triggerError();
       return;
     }
@@ -284,7 +341,9 @@ export function ScoreEntryModal({
         } else {
           Alert.alert(
             "Miss Recorded",
-            `${player.name} has ${newConsecutiveMisses} consecutive miss${newConsecutiveMisses > 1 ? "es" : ""}.`
+            `${player.name} has ${newConsecutiveMisses} consecutive miss${
+              newConsecutiveMisses > 1 ? "es" : ""
+            }.`
           );
         }
 
@@ -292,7 +351,7 @@ export function ScoreEntryModal({
         // They can still score later in the round if they haven't been eliminated
       } catch (error) {
         console.error("Failed to record miss:", error);
-        
+
         // Extract error message more reliably
         let errorMessage = "Unknown error";
         if (error instanceof DatabaseError) {
@@ -304,7 +363,7 @@ export function ScoreEntryModal({
         } else {
           errorMessage = String(error) || "Unknown error";
         }
-        
+
         Alert.alert(
           "Error",
           `Failed to record miss. ${errorMessage} Please try again.`
@@ -334,10 +393,10 @@ export function ScoreEntryModal({
       if (penaltyApplied) {
         // Reset to 25
         newScore = 25;
-        
+
         // Trigger strong haptic feedback for penalty
         await triggerPenalty();
-        
+
         // Show clear message explaining what happened
         Alert.alert(
           "Penalty Applied",
@@ -392,7 +451,7 @@ export function ScoreEntryModal({
       setBlockValue("");
     } catch (error) {
       console.error("Failed to record score:", error);
-      
+
       // Extract error message more reliably
       let errorMessage = "Unknown error";
       if (error instanceof DatabaseError) {
@@ -404,7 +463,7 @@ export function ScoreEntryModal({
       } else {
         errorMessage = String(error) || "Unknown error";
       }
-      
+
       Alert.alert(
         "Error",
         `Failed to record score. ${errorMessage} Please try again.`
@@ -429,101 +488,158 @@ export function ScoreEntryModal({
       onRequestClose={handleClose}
       accessibilityViewIsModal
     >
-      <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
-        <ThemedView className="bg-white dark:bg-stone-800 rounded-2xl p-6 w-full max-w-[400px] shadow-elevated">
-          <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50">
-            Enter Score for {player.name}
-          </Text>
-
-          <Text className="text-base font-sans mb-6 opacity-70 text-stone-600 dark:text-stone-400">
-            Current Score: {player.current_score}
-          </Text>
-
-          <View className="flex-row gap-3 mb-4">
-            <TouchableOpacity
-              className={`flex-1 py-3 px-4 rounded-button border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
-                entryMode === "single" 
-                  ? "border-primary bg-primary dark:bg-primary-bright dark:border-primary-bright" 
-                  : "border-gray-border dark:border-stone-600"
-              }`}
-              onPress={() => setEntryMode("single")}
-              accessibilityLabel="Single block mode"
-              accessibilityRole="button"
-            >
-              <Text
-                className={`text-base font-sans-semibold ${
-                  entryMode === "single" 
-                    ? "text-white" 
-                    : "text-primary dark:text-primary-bright"
-                }`}
-              >
-                Single Block
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 24}
+      >
+        <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: "center",
+              paddingVertical: 24,
+            }}
+            showsVerticalScrollIndicator={false}
+          >
+            <ThemedView className="bg-white dark:bg-stone-800 rounded-2xl p-6 w-full max-w-[400px] shadow-elevated">
+              <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50">
+                Enter Score for {player.name}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className={`flex-1 py-3 px-4 rounded-button border-2 items-center ${Platform.OS === "ios" ? "min-h-[44px]" : Platform.OS === "android" ? "min-h-[48px]" : "min-h-[44px]"} justify-center ${
-                entryMode === "multiple" 
-                  ? "border-primary bg-primary dark:bg-primary-bright dark:border-primary-bright" 
-                  : "border-gray-border dark:border-stone-600"
-              }`}
-              onPress={() => setEntryMode("multiple")}
-              accessibilityLabel="Multiple blocks mode"
-              accessibilityRole="button"
-            >
-              <Text
-                className={`text-base font-sans-semibold ${
-                  entryMode === "multiple" 
-                    ? "text-white" 
-                    : "text-primary dark:text-primary-bright"
-                }`}
-              >
-                Multiple Blocks
+
+              <Text className="text-base font-sans mb-6 opacity-70 text-stone-600 dark:text-stone-400">
+                Current Score: {player.current_score}
               </Text>
-            </TouchableOpacity>
-          </View>
 
-          <Text className="text-base font-sans mb-4 opacity-70 text-stone-600 dark:text-stone-400">
-            {entryMode === "single"
-              ? "Enter the block number (e.g., 12 = 12 points)"
-              : "Enter the number of blocks (e.g., 3 blocks = 3 points)"}
-          </Text>
+              <View className="flex-row gap-3 mb-4">
+                <TouchableOpacity
+                  className={`flex-1 py-3 px-4 rounded-button border-2 items-center ${
+                    Platform.OS === "ios"
+                      ? "min-h-[44px]"
+                      : Platform.OS === "android"
+                      ? "min-h-[48px]"
+                      : "min-h-[44px]"
+                  } justify-center ${
+                    entryMode === "single"
+                      ? "border-primary bg-primary dark:bg-primary-bright dark:border-primary-bright"
+                      : "border-gray-border dark:border-stone-600"
+                  }`}
+                  onPress={() => setEntryMode("single")}
+                  accessibilityLabel="Single block mode"
+                  accessibilityRole="button"
+                >
+                  <Text
+                    className={`text-base font-sans-semibold ${
+                      entryMode === "single"
+                        ? "text-white"
+                        : "text-primary dark:text-primary-bright"
+                    }`}
+                  >
+                    Single Block
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className={`flex-1 py-3 px-4 rounded-button border-2 items-center ${
+                    Platform.OS === "ios"
+                      ? "min-h-[44px]"
+                      : Platform.OS === "android"
+                      ? "min-h-[48px]"
+                      : "min-h-[44px]"
+                  } justify-center ${
+                    entryMode === "multiple"
+                      ? "border-primary bg-primary dark:bg-primary-bright dark:border-primary-bright"
+                      : "border-gray-border dark:border-stone-600"
+                  }`}
+                  onPress={() => setEntryMode("multiple")}
+                  accessibilityLabel="Multiple blocks mode"
+                  accessibilityRole="button"
+                >
+                  <Text
+                    className={`text-base font-sans-semibold ${
+                      entryMode === "multiple"
+                        ? "text-white"
+                        : "text-primary dark:text-primary-bright"
+                    }`}
+                  >
+                    Multiple Blocks
+                  </Text>
+                </TouchableOpacity>
+              </View>
 
-          <TextInput
-            className={`border border-gray-border-medium dark:border-stone-600 rounded-button px-4 ${Platform.OS === "ios" ? "py-3 min-h-[44px]" : Platform.OS === "android" ? "py-3.5 min-h-[48px]" : "py-3 min-h-[44px]"} text-2xl font-sans text-center mb-6 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50`}
-            placeholder={entryMode === "single" ? "Block number" : "Number of blocks"}
-            placeholderTextColor="#78716C"
-            value={blockValue}
-            onChangeText={setBlockValue}
-            keyboardType="number-pad"
-            accessibilityLabel={
-              entryMode === "single" ? "Block number input" : "Number of blocks input"
-            }
-          />
-
-          <View className="flex-row gap-3">
-            <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-button items-center justify-center bg-gray-bg-light dark:bg-stone-700`}
-              onPress={handleClose}
-              accessibilityLabel="Cancel"
-              accessibilityRole="button"
-            >
-              <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className={`flex-1 ${Platform.OS === "ios" ? "py-3.5 min-h-[44px]" : Platform.OS === "android" ? "py-4 min-h-[48px]" : "py-3.5 min-h-[44px]"} rounded-button items-center justify-center bg-primary dark:bg-primary-bright ${isSubmitting ? "opacity-60" : ""} shadow-elevated`}
-              onPress={handleSubmit}
-              disabled={isSubmitting}
-              accessibilityLabel="Submit score"
-              accessibilityRole="button"
-            >
-              <Text className="text-white text-base font-sans-semibold">
-                {isSubmitting ? "Submitting..." : "Submit"}
+              <Text className="text-base font-sans mb-4 opacity-70 text-stone-600 dark:text-stone-400">
+                {entryMode === "single"
+                  ? "Enter the block number (e.g., 12 = 12 points)"
+                  : "Enter the number of blocks (e.g., 3 blocks = 3 points)"}
               </Text>
-            </TouchableOpacity>
-          </View>
-        </ThemedView>
-      </View>
+
+              <TextInput
+                ref={inputRef}
+                className={`border border-gray-border-medium dark:border-stone-600 rounded-button px-4 ${
+                  Platform.OS === "ios"
+                    ? "py-3 min-h-[44px]"
+                    : Platform.OS === "android"
+                    ? "py-3.5 min-h-[48px]"
+                    : "py-3 min-h-[44px]"
+                } text-2xl font-sans text-center mb-6 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50`}
+                placeholder={
+                  entryMode === "single" ? "Block number" : "Number of blocks"
+                }
+                placeholderTextColor="#78716C"
+                value={blockValue}
+                onChangeText={setBlockValue}
+                keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
+                returnKeyType="done"
+                onSubmitEditing={handleSubmit}
+                accessibilityLabel={
+                  entryMode === "single"
+                    ? "Block number input"
+                    : "Number of blocks input"
+                }
+              />
+
+              <View className="flex-row gap-3">
+                <TouchableOpacity
+                  className={`flex-1 ${
+                    Platform.OS === "ios"
+                      ? "py-3.5 min-h-[44px]"
+                      : Platform.OS === "android"
+                      ? "py-4 min-h-[48px]"
+                      : "py-3.5 min-h-[44px]"
+                  } rounded-button items-center justify-center bg-gray-bg-light dark:bg-stone-700`}
+                  onPress={handleClose}
+                  accessibilityLabel="Cancel"
+                  accessibilityRole="button"
+                >
+                  <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className={`flex-1 ${
+                    Platform.OS === "ios"
+                      ? "py-3.5 min-h-[44px]"
+                      : Platform.OS === "android"
+                      ? "py-4 min-h-[48px]"
+                      : "py-3.5 min-h-[44px]"
+                  } rounded-button items-center justify-center bg-primary dark:bg-primary-bright ${
+                    isSubmitting ? "opacity-60" : ""
+                  } shadow-elevated`}
+                  onPress={handleSubmit}
+                  disabled={isSubmitting}
+                  accessibilityLabel="Submit score"
+                  accessibilityRole="button"
+                >
+                  <Text className="text-white text-base font-sans-semibold">
+                    {isSubmitting ? "Submitting..." : "Submit"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ThemedView>
+          </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
-

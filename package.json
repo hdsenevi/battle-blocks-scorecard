@@ -14,7 +14,8 @@
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --maxWorkers=2",
     "test:e2e": "./scripts/run-maestro.sh test .maestro/flows/",
-    "build:ios": "npx expo prebuild --platform ios && xed ios"
+    "build:ios": "npx expo prebuild && xed ios",
+    "build:ios:clean": "npx expo prebuild --clean --platform ios && xed ios"
   },
   "dependencies": {
     "@expo-google-fonts/poppins": "^0.4.1",
