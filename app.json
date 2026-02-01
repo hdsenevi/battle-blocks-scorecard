@@ -11,7 +11,7 @@
         "ios": {
             "supportsTablet": true,
             "deploymentTarget": "13.0",
-            "bundleIdentifier": "com.battleblocks.scorecard"
+            "bundleIdentifier": "au.com.sodamade.battleblocksscorecard"
         },
         "android": {
             "adaptiveIcon": {
@@ -23,7 +23,7 @@
             "edgeToEdgeEnabled": true,
             "predictiveBackGestureEnabled": false,
             "minSdkVersion": 23,
-            "package": "com.anonymous.battleblocksscorecard"
+            "package": "au.com.sodamade.battleblocksscorecard"
         },
         "web": {
             "bundler": "metro",

@@ -25,6 +25,13 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+### App identifiers
+
+- **Bundle ID (iOS):** `au.com.sodamade.battleblocksscorecard`
+- **Package (Android):** `au.com.sodamade.battleblocksscorecard`
+
+Defined in `app.json` under `expo.ios.bundleIdentifier` and `expo.android.package`.
+
 ## Get a fresh project
 
 When you're ready, run:

@@ -45,7 +45,7 @@ Test flows are written in YAML format. Each flow file in `flows/` represents a c
 ### Example Flow Structure
 
 ```yaml
-appId: com.battleblocks.scorecard
+appId: au.com.sodamade.battleblocksscorecard
 ---
 - launchApp
 - assertVisible: "Start New Game"
@@ -125,7 +125,7 @@ For reliable test selection, all interactive UI elements should have `testID` at
 
 - Ensure development build is installed: `npx expo run:ios` or `npx expo run:android`
 - Verify simulator/emulator is running
-- Check that app bundle ID matches configuration
+- Check that app bundle ID matches configuration (iOS/Android: `au.com.sodamade.battleblocksscorecard`)
 
 ### Elements Not Found
 

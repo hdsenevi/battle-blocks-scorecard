@@ -2,7 +2,7 @@
 # Story 2.4: Resume Interrupted Game
 # Tests AC: 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 
-appId: com.battleblocks.scorecard
+appId: au.com.sodamade.battleblocksscorecard
 ---
 # AC11: Launch the app with an existing active game in the database
 # First, create a game to simulate an interrupted game

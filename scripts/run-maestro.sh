@@ -54,7 +54,7 @@ fi
 
 # Check if app is installed before running tests
 if [[ "$*" == *"test"* ]]; then
-  APP_ID="com.battleblocks.scorecard"
+  APP_ID="au.com.sodamade.battleblocksscorecard"
   APP_FOUND=false
   DEVICE_FOUND=false
   

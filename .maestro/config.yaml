@@ -2,9 +2,8 @@
 # For Expo managed workflow
 
 # App configuration
-# Note: For Expo development builds, use the app name or bundle ID
-# The bundle ID will be set when building with EAS Build
-# For local development, Maestro can detect the app automatically
+# Bundle ID: au.com.sodamade.battleblocksscorecard (iOS bundleIdentifier / Android package)
+# Set per-flow in .maestro/flows/*.yaml via appId. For EAS Build, bundle ID comes from app.json.
 
 # Platform support
 platforms:

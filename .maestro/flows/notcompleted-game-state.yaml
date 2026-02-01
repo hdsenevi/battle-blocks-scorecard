@@ -2,7 +2,7 @@
 # Story 2.6: Not Completed Game State
 # Tests AC: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 
-appId: com.battleblocks.scorecard
+appId: au.com.sodamade.battleblocksscorecard
 ---
 # AC11: Launch the app, create a new game, and add players
 # Launch the app

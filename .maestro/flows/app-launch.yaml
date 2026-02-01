@@ -1,7 +1,7 @@
 # Example Maestro Test Flow
 # This flow demonstrates basic Maestro commands and test structure
 
-appId: com.battleblocks.scorecard
+appId: au.com.sodamade.battleblocksscorecard
 ---
 # Launch the app
 - launchApp

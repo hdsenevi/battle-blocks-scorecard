@@ -13,7 +13,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --maxWorkers=2",
-    "test:e2e": "./scripts/run-maestro.sh test .maestro/flows/"
+    "test:e2e": "./scripts/run-maestro.sh test .maestro/flows/",
+    "build:ios": "npx expo prebuild --platform ios && xed ios"
   },
   "dependencies": {
     "@expo-google-fonts/poppins": "^0.4.1",

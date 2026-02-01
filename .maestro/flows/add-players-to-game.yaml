@@ -2,7 +2,7 @@
 # Story 2.2: Add Players to Game
 # Tests AC: 2, 3, 5, 7, 8, 9, 10, 11
 
-appId: com.battleblocks.scorecard
+appId: au.com.sodamade.battleblocksscorecard
 ---
 # Launch the app
 - launchApp
