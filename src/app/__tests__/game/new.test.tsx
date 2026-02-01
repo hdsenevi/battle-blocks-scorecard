@@ -47,6 +47,20 @@ jest.mock("@/hooks/useThemeColor", () => ({
   useThemeColor: jest.fn(() => "#000000"),
 }));
 
+// Avoid KeyboardAvoidingView native cleanup in Jest (componentWillUnmount .remove on undefined)
+jest.mock("react-native", () => {
+  const RN = jest.requireActual<typeof import("react-native")>("react-native");
+  const React = require("react");
+  return {
+    ...RN,
+    KeyboardAvoidingView: function KeyboardAvoidingView(
+      props: Record<string, unknown> & { children?: React.ReactNode }
+    ) {
+      return React.createElement(RN.View, props);
+    },
+  };
+});
+
 describe("NewGameScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks();

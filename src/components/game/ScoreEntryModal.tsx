@@ -70,6 +70,11 @@ export function ScoreEntryModal({
 
   useEffect(() => {
     if (visible && gameStatus === "active") {
+      // In test env, focus immediately to avoid timer firing after Jest tears down
+      if (process.env.NODE_ENV === "test") {
+        inputRef.current?.focus();
+        return;
+      }
       const timer = setTimeout(() => inputRef.current?.focus(), 100);
       return () => clearTimeout(timer);
     }
