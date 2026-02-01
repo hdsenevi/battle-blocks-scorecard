@@ -24,7 +24,7 @@ let initializationPromise: Promise<void> | null = null;
 export class DatabaseError extends Error {
   constructor(message: string, public cause?: Error, public code?: string) {
     super(message);
-      this.name = "DatabaseError";
+    this.name = "DatabaseError";
   }
 }
 
@@ -101,7 +101,6 @@ async function executeSchemaStatements(
       player_id INTEGER NOT NULL,
       game_id INTEGER NOT NULL,
       score_value INTEGER NOT NULL,
-      entry_type TEXT NOT NULL CHECK(entry_type IN ('single_block', 'multiple_blocks')),
       round_number INTEGER NOT NULL DEFAULT 1,
       created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE,
@@ -114,7 +113,7 @@ async function executeSchemaStatements(
     "CREATE INDEX IF NOT EXISTS idx_score_entries_player_id ON score_entries(player_id);",
     "CREATE INDEX IF NOT EXISTS idx_score_entries_game_id ON score_entries(game_id);",
     "CREATE INDEX IF NOT EXISTS idx_score_entries_round_number ON score_entries(game_id, round_number);",
-    
+
     // Migration: Add round_number column if it doesn't exist (for existing databases)
     // SQLite doesn't support IF NOT EXISTS for ALTER TABLE ADD COLUMN, so we use a try-catch approach
     // This will fail silently if the column already exists, which is fine
@@ -339,13 +338,13 @@ export async function updateGame(
 ): Promise<Game> {
   try {
     const db = await getDatabase();
-    
+
     // Story 5.3: Prevent modifications to completed games (AC: 6, 7)
     const currentGame = await getGame(id);
     if (!currentGame) {
       throw new DatabaseError(`Game with id ${id} not found`);
     }
-    
+
     // Prevent status changes for completed games
     if (currentGame.status === "completed" && updates.status !== undefined) {
       // Allow setting to completed (idempotent), but prevent changing from completed
@@ -357,7 +356,7 @@ export async function updateGame(
         );
       }
     }
-    
+
     // Prevent any updates to completed games (except timestamp updates)
     if (currentGame.status === "completed" && updates.status === undefined) {
       // Allow timestamp updates only (for tracking purposes)
@@ -681,7 +680,6 @@ export async function getPlayersByGame(gameId: number): Promise<Player[]> {
  * @param playerId Player ID
  * @param gameId Game ID
  * @param scoreValue Score value
- * @param entryType Type of score entry
  * @param roundNumber Round number for this score entry (default: 1)
  * @returns Created score entry with generated ID and timestamp
  * @throws {DatabaseError} If score entry creation fails
@@ -690,7 +688,6 @@ export async function addScoreEntry(
   playerId: number,
   gameId: number,
   scoreValue: number,
-  entryType: ScoreEntryType,
   roundNumber: number = 1
 ): Promise<ScoreEntry> {
   try {
@@ -698,8 +695,8 @@ export async function addScoreEntry(
     const now = Math.floor(Date.now() / 1000);
 
     const result = await db.runAsync(
-      "INSERT INTO score_entries (player_id, game_id, score_value, entry_type, round_number, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-      [playerId, gameId, scoreValue, entryType, roundNumber, now]
+      "INSERT INTO score_entries (player_id, game_id, score_value, round_number, created_at) VALUES (?, ?, ?, ?, ?)",
+      [playerId, gameId, scoreValue, roundNumber, now]
     );
 
     const scoreEntry = await db.getAllAsync<ScoreEntry>(
@@ -857,11 +854,10 @@ export async function getLastScoreEntryForRound(
 export async function deleteScoreEntry(entryId: number): Promise<void> {
   try {
     const db = await getDatabase();
-    const result = await db.runAsync(
-      "DELETE FROM score_entries WHERE id = ?",
-      [entryId]
-    );
-    
+    const result = await db.runAsync("DELETE FROM score_entries WHERE id = ?", [
+      entryId,
+    ]);
+
     // Check if any row was actually deleted
     if (result.changes === 0) {
       throw new DatabaseError(

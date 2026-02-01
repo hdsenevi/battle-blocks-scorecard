@@ -3,10 +3,7 @@
  * Tests canUndoLastScore() and undoLastScore() functions
  */
 
-import {
-  canUndoLastScore,
-  undoLastScore,
-} from "../undo";
+import { canUndoLastScore, undoLastScore } from "../undo";
 import {
   getLastScoreEntryForRound,
   deleteScoreEntry,
@@ -20,15 +17,18 @@ import type { Player, ScoreEntry, Game } from "../../database/types";
 // Mock the database module
 jest.mock("../database");
 
-const mockGetLastScoreEntryForRound = getLastScoreEntryForRound as jest.MockedFunction<
-  typeof getLastScoreEntryForRound
->;
+const mockGetLastScoreEntryForRound =
+  getLastScoreEntryForRound as jest.MockedFunction<
+    typeof getLastScoreEntryForRound
+  >;
 const mockDeleteScoreEntry = deleteScoreEntry as jest.MockedFunction<
   typeof deleteScoreEntry
 >;
 const mockGetGame = getGame as jest.MockedFunction<typeof getGame>;
 const mockUpdateGame = updateGame as jest.MockedFunction<typeof updateGame>;
-const mockUpdatePlayer = updatePlayer as jest.MockedFunction<typeof updatePlayer>;
+const mockUpdatePlayer = updatePlayer as jest.MockedFunction<
+  typeof updatePlayer
+>;
 
 describe("Undo Service", () => {
   const mockGameId = 1;
@@ -49,7 +49,6 @@ describe("Undo Service", () => {
     player_id: 1,
     game_id: mockGameId,
     score_value: 5,
-    entry_type: "single_block",
     round_number: mockRound,
     created_at: 2000,
   };
@@ -120,9 +119,9 @@ describe("Undo Service", () => {
     it.skip("should throw error if player not found", async () => {
       mockGetLastScoreEntryForRound.mockResolvedValue(mockScoreEntry);
       mockGetGame.mockResolvedValue(mockGame);
-      await expect(
-        undoLastScore(mockGameId, mockRound, [])
-      ).rejects.toThrow(DatabaseError);
+      await expect(undoLastScore(mockGameId, mockRound, [])).rejects.toThrow(
+        DatabaseError
+      );
     });
 
     it("should successfully undo a score entry", async () => {
@@ -266,7 +265,9 @@ describe("Undo Service", () => {
     it.skip("should handle error during database operations", async () => {
       mockGetLastScoreEntryForRound.mockResolvedValue(mockScoreEntry);
       mockGetGame.mockResolvedValue(mockGame);
-      mockDeleteScoreEntry.mockRejectedValue(new DatabaseError("Delete failed"));
+      mockDeleteScoreEntry.mockRejectedValue(
+        new DatabaseError("Delete failed")
+      );
       await expect(
         undoLastScore(mockGameId, mockRound, [mockPlayer])
       ).rejects.toThrow(DatabaseError);

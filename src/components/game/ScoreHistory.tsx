@@ -4,13 +4,7 @@
  */
 
 import { useEffect, useState } from "react";
-import {
-  View,
-  FlatList,
-  Modal,
-  TouchableOpacity,
-  Text,
-} from "react-native";
+import { View, FlatList, Modal, TouchableOpacity, Text } from "react-native";
 import { getScoreEntriesByGame, getPlayersByGame } from "@/services/database";
 import type { ScoreEntry } from "@/database/types";
 
@@ -70,22 +64,19 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
-  const formatEntryType = (type: string): string => {
-    return type === "single_block" ? "Single Block" : "Multiple Blocks";
-  };
-
   const renderItem = ({ item }: { item: ScoreHistoryItem }) => (
     <View className="flex-row justify-between items-center py-3 px-4 border-b border-gray-border dark:border-stone-600">
       <View className="flex-1">
-        <Text className="text-base font-sans-semibold mb-1 text-stone-900 dark:text-stone-50">{item.playerName}</Text>
-        <Text className="text-sm font-sans opacity-70 mb-0.5 text-stone-600 dark:text-stone-400">
-          {formatEntryType(item.entry_type)}
+        <Text className="text-base font-sans-semibold mb-1 text-stone-900 dark:text-stone-50">
+          {item.playerName}
         </Text>
         <Text className="text-xs font-sans opacity-50 text-stone-500 dark:text-stone-500">
           {formatTimestamp(item.created_at)}
         </Text>
       </View>
-      <Text className="text-xl font-sans-bold text-primary dark:text-primary-bright">+{item.score_value}</Text>
+      <Text className="text-xl font-sans-bold text-primary dark:text-primary-bright">
+        +{item.score_value}
+      </Text>
     </View>
   );
 
@@ -108,17 +99,23 @@ export function ScoreHistory({ visible, gameId, onClose }: ScoreHistoryProps) {
               accessibilityLabel="Close score history"
               accessibilityRole="button"
             >
-              <Text className="text-base font-sans-semibold text-primary dark:text-primary-bright">Close</Text>
+              <Text className="text-base font-sans-semibold text-primary dark:text-primary-bright">
+                Close
+              </Text>
             </TouchableOpacity>
           </View>
 
           {isLoading ? (
             <View className="flex-1 py-10 items-center justify-center">
-              <Text className="text-base font-sans text-stone-600 dark:text-stone-400">Loading...</Text>
+              <Text className="text-base font-sans text-stone-600 dark:text-stone-400">
+                Loading...
+              </Text>
             </View>
           ) : scoreEntries.length === 0 ? (
             <View className="flex-1 py-10 items-center justify-center">
-              <Text className="font-sans opacity-70 text-stone-600 dark:text-stone-400">No score entries yet</Text>
+              <Text className="font-sans opacity-70 text-stone-600 dark:text-stone-400">
+                No score entries yet
+              </Text>
             </View>
           ) : (
             <FlatList

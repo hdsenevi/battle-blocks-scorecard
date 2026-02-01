@@ -41,13 +41,9 @@ jest.mock("@/services/database", () => ({
   DatabaseError: class DatabaseError extends Error {},
 }));
 
+const PLACEHOLDER = "New points";
+
 jest.mock("@/services/gameRules", () => ({
-  calculateScore: jest.fn((blocks: number[], isMultiple: boolean) => {
-    if (isMultiple) {
-      return blocks.length;
-    }
-    return blocks[0] || 0;
-  }),
   checkPenaltyRule: jest.fn((score: number) => score > 50),
   checkElimination: jest.fn((consecutiveMisses: number) => consecutiveMisses >= 3),
   checkWinCondition: jest.fn((score: number) => score === 50),
@@ -144,8 +140,8 @@ describe("ScoreEntryModal", () => {
     expect(getByText("Current Score: 10")).toBeTruthy();
   });
 
-  it("should display single block and multiple blocks options", () => {
-    const { getByText } = render(
+  it("should display new points input", () => {
+    const { getByPlaceholderText } = render(
       <ScoreEntryModal
         visible={true}
         player={mockPlayer}
@@ -154,30 +150,7 @@ describe("ScoreEntryModal", () => {
       />
     );
 
-    expect(getByText("Single Block")).toBeTruthy();
-    expect(getByText("Multiple Blocks")).toBeTruthy();
-  });
-
-  it("should allow switching between single and multiple block modes", () => {
-    const { getByText, getByPlaceholderText } = render(
-      <ScoreEntryModal
-        visible={true}
-        player={mockPlayer}
-        gameId={1}
-        onClose={mockOnClose}
-      />
-    );
-
-    // Initially single block mode
-    expect(getByPlaceholderText("Block number")).toBeTruthy();
-    expect(getByText("Enter the block number (e.g., 12 = 12 points)")).toBeTruthy();
-
-    // Switch to multiple blocks mode
-    const multipleButton = getByText("Multiple Blocks");
-    fireEvent.press(multipleButton);
-
-    expect(getByPlaceholderText("Number of blocks")).toBeTruthy();
-    expect(getByText("Enter the number of blocks (e.g., 3 blocks = 3 points)")).toBeTruthy();
+    expect(getByPlaceholderText(PLACEHOLDER)).toBeTruthy();
   });
 
   it("should have correct accessibility labels", () => {
@@ -190,9 +163,7 @@ describe("ScoreEntryModal", () => {
       />
     );
 
-    expect(getByLabelText("Single block mode")).toBeTruthy();
-    expect(getByLabelText("Multiple blocks mode")).toBeTruthy();
-    expect(getByLabelText("Block number input")).toBeTruthy();
+    expect(getByLabelText("New points input")).toBeTruthy();
     expect(getByLabelText("Cancel")).toBeTruthy();
     expect(getByLabelText("Submit score")).toBeTruthy();
   });
@@ -213,7 +184,7 @@ describe("ScoreEntryModal", () => {
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
-  it("should handle score submission for single block mode", async () => {
+  it("should handle score submission", async () => {
     const { addScoreEntry, updatePlayer } = require("@/services/database");
     const { addScoreAction, updatePlayerAction } = require("@/reducers/actionCreators");
     const { triggerScoreEntry } = require("@/services/haptics");
@@ -234,7 +205,7 @@ describe("ScoreEntryModal", () => {
       />
     );
 
-    const input = getByPlaceholderText("Block number");
+    const input = getByPlaceholderText(PLACEHOLDER);
     fireEvent.changeText(input, "12");
 
     const submitButton = getByText("Submit");
@@ -245,46 +216,8 @@ describe("ScoreEntryModal", () => {
         current_score: 22,
         consecutive_misses: 0,
       });
-      expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 12, "single_block", 1);
+      expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 12, 1);
       expect(mockDispatch).toHaveBeenCalled();
-      expect(triggerScoreEntry).toHaveBeenCalled();
-      expect(mockOnClose).toHaveBeenCalled();
-    });
-  });
-
-  it("should handle score submission for multiple blocks mode", async () => {
-    const { addScoreEntry, updatePlayer } = require("@/services/database");
-    const { triggerScoreEntry } = require("@/services/haptics");
-
-    updatePlayer.mockResolvedValue({
-      ...mockPlayer,
-      current_score: 13,
-      consecutive_misses: 0,
-    });
-    addScoreEntry.mockResolvedValue(undefined);
-
-    const { getByText, getByPlaceholderText } = render(
-      <ScoreEntryModal
-        visible={true}
-        player={mockPlayer}
-        gameId={1}
-        onClose={mockOnClose}
-      />
-    );
-
-    // Switch to multiple blocks mode
-    const multipleButton = getByText("Multiple Blocks");
-    fireEvent.press(multipleButton);
-
-    const input = getByPlaceholderText("Number of blocks");
-    fireEvent.changeText(input, "3");
-
-    const submitButton = getByText("Submit");
-    fireEvent.press(submitButton);
-
-    await waitFor(() => {
-      expect(updatePlayer).toHaveBeenCalled();
-      expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 3, "multiple_blocks", 1);
       expect(triggerScoreEntry).toHaveBeenCalled();
       expect(mockOnClose).toHaveBeenCalled();
     });
@@ -304,7 +237,7 @@ describe("ScoreEntryModal", () => {
     fireEvent.press(submitButton);
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith("Error", "Please enter a block value");
+      expect(Alert.alert).toHaveBeenCalledWith("Error", "Please enter points");
     });
   });
 
@@ -318,7 +251,7 @@ describe("ScoreEntryModal", () => {
       />
     );
 
-    const input = getByPlaceholderText("Block number");
+    const input = getByPlaceholderText(PLACEHOLDER);
     fireEvent.changeText(input, "abc");
 
     const submitButton = getByText("Submit");
@@ -402,19 +335,10 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "5");
 
-      // Simulate game status changing to completed during submission
-      // This tests the service-level check in handleSubmit
       const submitButton = getByText("Submit");
-      
-      // Mock gameStatus to be completed (simulating race condition)
-      // The handleSubmit function checks gameStatus at the start
-      // We can't easily test this without modifying the component
-      // But the check is there in the code
-      
-      // For now, verify the component renders correctly
       expect(submitButton).toBeTruthy();
     });
   });
@@ -430,7 +354,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "-5");
 
       const submitButton = getByText("Submit");
@@ -454,7 +378,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "abc123");
 
       const submitButton = getByText("Submit");
@@ -478,7 +402,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "10000");
 
       const submitButton = getByText("Submit");
@@ -503,7 +427,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "-5");
 
       const submitButton = getByText("Submit");
@@ -524,7 +448,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       
       // Enter invalid value
       fireEvent.changeText(input, "-5");
@@ -553,7 +477,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       
       // Try various invalid inputs
       const invalidInputs = ["-5", "abc", "999999", ""];
@@ -582,7 +506,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "5");
 
       const submitButton = getByText("Submit");
@@ -608,7 +532,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "5");
 
       const submitButton = getByText("Submit");
@@ -631,7 +555,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "5");
 
       const submitButton = getByText("Submit");
@@ -665,7 +589,7 @@ describe("ScoreEntryModal", () => {
       addScoreEntry.mockResolvedValue(undefined);
       checkElimination.mockReturnValue(false);
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "0");
 
       const submitButton = getByText("Submit");
@@ -677,7 +601,6 @@ describe("ScoreEntryModal", () => {
           mockPlayer.id,
           1,
           0,
-          expect.any(String),
           1
         );
       });
@@ -693,7 +616,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "-10");
 
       const submitButton = getByText("Submit");
@@ -717,7 +640,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "5000");
 
       const submitButton = getByText("Submit");
@@ -741,7 +664,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       
       // Try invalid input
       fireEvent.changeText(input, "-5");
@@ -786,14 +709,9 @@ describe("ScoreEntryModal", () => {
       />
     );
 
-    const singleButton = getByText("Single Block").parent;
-    const multipleButton = getByText("Multiple Blocks").parent;
     const cancelButton = getByText("Cancel").parent;
     const submitButton = getByText("Submit").parent;
 
-    // Check that buttons exist and have minimum touch target
-    expect(singleButton).toBeTruthy();
-    expect(multipleButton).toBeTruthy();
     expect(cancelButton).toBeTruthy();
     expect(submitButton).toBeTruthy();
   });
@@ -811,7 +729,7 @@ describe("ScoreEntryModal", () => {
       />
     );
 
-    const input = getByPlaceholderText("Block number");
+    const input = getByPlaceholderText(PLACEHOLDER);
     fireEvent.changeText(input, "12");
 
     const submitButton = getByText("Submit");
@@ -832,7 +750,7 @@ describe("ScoreEntryModal", () => {
       />
     );
 
-    const input = getByPlaceholderText("Block number");
+    const input = getByPlaceholderText(PLACEHOLDER);
     fireEvent.changeText(input, "12");
 
     const cancelButton = getByText("Cancel");
@@ -848,7 +766,7 @@ describe("ScoreEntryModal", () => {
       />
     );
 
-    const inputAfterClose = getInputAfterClose("Block number");
+    const inputAfterClose = getInputAfterClose(PLACEHOLDER);
     expect(inputAfterClose.props.value).toBe("");
   });
 
@@ -857,20 +775,17 @@ describe("ScoreEntryModal", () => {
       const { addScoreEntry, updatePlayer } = require("@/services/database");
       const { triggerPenalty } = require("@/services/haptics");
       const { checkPenaltyRule } = require("@/services/gameRules");
-      const { calculateScore } = require("@/services/gameRules");
 
-      // Player with score 48, adding 5 points would make it 53
       const playerWithHighScore: Player = {
         ...mockPlayer,
         current_score: 48,
       };
 
-      calculateScore.mockReturnValue(5);
       checkPenaltyRule.mockReturnValue(true); // Score 53 > 50
 
       updatePlayer.mockResolvedValue({
         ...playerWithHighScore,
-        current_score: 25, // Reset to 25
+        current_score: 25,
         consecutive_misses: 0,
       });
       addScoreEntry.mockResolvedValue(undefined);
@@ -884,7 +799,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "5");
 
       const submitButton = getByText("Submit");
@@ -901,7 +816,7 @@ describe("ScoreEntryModal", () => {
           "Penalty Applied",
           "Player 1's score exceeded 50 and has been reset to 25."
         );
-        expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 5, "single_block", 1);
+        expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 5, 1);
         expect(mockOnClose).toHaveBeenCalled();
       });
     });
@@ -910,15 +825,12 @@ describe("ScoreEntryModal", () => {
       const { addScoreEntry, updatePlayer } = require("@/services/database");
       const { triggerPenalty, triggerScoreEntry } = require("@/services/haptics");
       const { checkPenaltyRule } = require("@/services/gameRules");
-      const { calculateScore } = require("@/services/gameRules");
 
-      // Player with score 48, adding 2 points makes it exactly 50
       const playerWithHighScore: Player = {
         ...mockPlayer,
         current_score: 48,
       };
 
-      calculateScore.mockReturnValue(2);
       checkPenaltyRule.mockReturnValue(false); // Score 50 is not > 50
 
       updatePlayer.mockResolvedValue({
@@ -937,7 +849,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "2");
 
       const submitButton = getByText("Submit");
@@ -958,19 +870,16 @@ describe("ScoreEntryModal", () => {
       });
     });
 
-    it("should apply penalty rule in multiple blocks mode", async () => {
+    it("should apply penalty rule when entered points push score over 50", async () => {
       const { addScoreEntry, updatePlayer } = require("@/services/database");
       const { triggerPenalty } = require("@/services/haptics");
       const { checkPenaltyRule } = require("@/services/gameRules");
-      const { calculateScore } = require("@/services/gameRules");
 
-      // Player with score 49, adding 3 blocks would make it 52
       const playerWithHighScore: Player = {
         ...mockPlayer,
         current_score: 49,
       };
 
-      calculateScore.mockReturnValue(3);
       checkPenaltyRule.mockReturnValue(true); // Score 52 > 50
 
       updatePlayer.mockResolvedValue({
@@ -989,11 +898,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      // Switch to multiple blocks mode
-      const multipleButton = getByText("Multiple Blocks");
-      fireEvent.press(multipleButton);
-
-      const input = getByPlaceholderText("Number of blocks");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "3");
 
       const submitButton = getByText("Submit");
@@ -1010,6 +915,7 @@ describe("ScoreEntryModal", () => {
           "Penalty Applied",
           "Player 1's score exceeded 50 and has been reset to 25."
         );
+        expect(addScoreEntry).toHaveBeenCalledWith(1, 1, 3, 1);
       });
     });
 
@@ -1017,15 +923,12 @@ describe("ScoreEntryModal", () => {
       const { addScoreEntry, updatePlayer } = require("@/services/database");
       const { triggerPenalty } = require("@/services/haptics");
       const { checkPenaltyRule } = require("@/services/gameRules");
-      const { calculateScore } = require("@/services/gameRules");
 
-      // Player with score 30, adding 25 points would make it 55
       const playerWithHighScore: Player = {
         ...mockPlayer,
         current_score: 30,
       };
 
-      calculateScore.mockReturnValue(25);
       checkPenaltyRule.mockReturnValue(true); // Score 55 > 50
 
       updatePlayer.mockResolvedValue({
@@ -1044,7 +947,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "25");
 
       const submitButton = getByText("Submit");
@@ -1052,7 +955,7 @@ describe("ScoreEntryModal", () => {
 
       await waitFor(() => {
         expect(updatePlayer).toHaveBeenCalledWith(1, {
-          current_score: 25, // Exactly 25, not 55
+          current_score: 25,
           consecutive_misses: 0,
         });
         expect(triggerPenalty).toHaveBeenCalled();
@@ -1090,7 +993,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "0");
 
       const submitButton = getByText("Submit");
@@ -1136,7 +1039,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "0");
 
       const submitButton = getByText("Submit");
@@ -1157,18 +1060,16 @@ describe("ScoreEntryModal", () => {
     it("should detect win condition when score equals exactly 50", async () => {
       const { addScoreEntry, updatePlayer, updateGame } = require("@/services/database");
       const { triggerCompletion } = require("@/services/haptics");
-      const { checkWinCondition, checkPenaltyRule, calculateScore } = require("@/services/gameRules");
+      const { checkWinCondition, checkPenaltyRule } = require("@/services/gameRules");
       const { completeGameAction } = require("@/reducers/actionCreators");
 
-      // Player with score 48, adding 2 points would make it exactly 50
       const playerNearWin: Player = {
         ...mockPlayer,
         current_score: 48,
       };
 
-      calculateScore.mockReturnValue(2);
-      checkPenaltyRule.mockReturnValue(false); // Score 50 is not > 50, no penalty
-      checkWinCondition.mockReturnValue(true); // Score 50 === 50
+      checkPenaltyRule.mockReturnValue(false);
+      checkWinCondition.mockReturnValue(true);
 
       updatePlayer.mockResolvedValue({
         ...playerNearWin,
@@ -1187,7 +1088,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "2");
 
       const submitButton = getByText("Submit");
@@ -1205,18 +1106,16 @@ describe("ScoreEntryModal", () => {
     it("should not trigger win condition when score is not exactly 50", async () => {
       const { addScoreEntry, updatePlayer, updateGame } = require("@/services/database");
       const { triggerCompletion } = require("@/services/haptics");
-      const { checkWinCondition, checkPenaltyRule, calculateScore } = require("@/services/gameRules");
+      const { checkWinCondition, checkPenaltyRule } = require("@/services/gameRules");
       const { completeGameAction } = require("@/reducers/actionCreators");
 
-      // Player with score 48, adding 1 point would make it 49
       const playerNearWin: Player = {
         ...mockPlayer,
         current_score: 48,
       };
 
-      calculateScore.mockReturnValue(1);
-      checkPenaltyRule.mockReturnValue(false); // Score 49 is not > 50, no penalty
-      checkWinCondition.mockReturnValue(false); // Score 49 !== 50
+      checkPenaltyRule.mockReturnValue(false);
+      checkWinCondition.mockReturnValue(false);
 
       updatePlayer.mockResolvedValue({
         ...playerNearWin,
@@ -1234,7 +1133,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "1");
 
       const submitButton = getByText("Submit");
@@ -1255,22 +1154,20 @@ describe("ScoreEntryModal", () => {
     it("should apply penalty rule instead of win when score would exceed 50", async () => {
       const { addScoreEntry, updatePlayer, updateGame } = require("@/services/database");
       const { triggerPenalty, triggerCompletion } = require("@/services/haptics");
-      const { checkWinCondition, checkPenaltyRule, calculateScore } = require("@/services/gameRules");
+      const { checkWinCondition, checkPenaltyRule } = require("@/services/gameRules");
       const { completeGameAction } = require("@/reducers/actionCreators");
 
-      // Player with score 48, adding 5 points would make it 53 (penalty applies)
       const playerNearWin: Player = {
         ...mockPlayer,
         current_score: 48,
       };
 
-      calculateScore.mockReturnValue(5);
-      checkPenaltyRule.mockReturnValue(true); // Score 53 > 50
-      checkWinCondition.mockReturnValue(false); // After penalty, score is 25, not 50
+      checkPenaltyRule.mockReturnValue(true);
+      checkWinCondition.mockReturnValue(false);
 
       updatePlayer.mockResolvedValue({
         ...playerNearWin,
-        current_score: 25, // Penalty applied
+        current_score: 25,
         consecutive_misses: 0,
       });
       addScoreEntry.mockResolvedValue(undefined);
@@ -1284,7 +1181,7 @@ describe("ScoreEntryModal", () => {
         />
       );
 
-      const input = getByPlaceholderText("Block number");
+      const input = getByPlaceholderText(PLACEHOLDER);
       fireEvent.changeText(input, "5");
 
       const submitButton = getByText("Submit");
@@ -1292,7 +1189,7 @@ describe("ScoreEntryModal", () => {
 
       await waitFor(() => {
         expect(checkPenaltyRule).toHaveBeenCalledWith(53);
-        expect(checkWinCondition).toHaveBeenCalledWith(25); // After penalty
+        expect(checkWinCondition).toHaveBeenCalledWith(25);
         expect(updateGame).not.toHaveBeenCalled();
         expect(completeGameAction).not.toHaveBeenCalled();
         expect(triggerCompletion).not.toHaveBeenCalled();

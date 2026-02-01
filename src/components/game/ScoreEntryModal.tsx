@@ -1,6 +1,6 @@
 /**
  * Score Entry Modal Component
- * Interface for entering scores (single block or multiple blocks)
+ * Simple prompt to enter new points for a player.
  */
 
 import { useState, useRef, useEffect } from "react";
@@ -13,13 +13,11 @@ import {
   Alert,
   Text,
   KeyboardAvoidingView,
-  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { ThemedView } from "@/components/themed-view";
 import type { Player } from "@/database/types";
 import {
-  calculateScore,
   checkPenaltyRule,
   checkElimination,
   checkWinCondition,
@@ -62,8 +60,7 @@ export function ScoreEntryModal({
   const dispatch = useGameDispatch();
   const gameState = useGameState();
   const router = useRouter();
-  const [entryMode, setEntryMode] = useState<"single" | "multiple">("single");
-  const [blockValue, setBlockValue] = useState("");
+  const [pointsValue, setPointsValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
   const inputRef = useRef<TextInput>(null);
@@ -259,13 +256,13 @@ export function ScoreEntryModal({
     }
 
     // Story 6.1 & 6.3: Handle invalid score entries and edge cases
-    if (!blockValue.trim()) {
-      Alert.alert("Error", "Please enter a block value");
+    if (!pointsValue.trim()) {
+      Alert.alert("Error", "Please enter points");
       triggerError();
       return;
     }
 
-    const trimmedValue = blockValue.trim();
+    const trimmedValue = pointsValue.trim();
 
     // Check for non-numeric input (allow optional leading minus for clearer negative error)
     if (!/^-?\d+$/.test(trimmedValue)) {
@@ -315,13 +312,7 @@ export function ScoreEntryModal({
         });
 
         // Save miss entry to database
-        await addScoreEntry(
-          player.id,
-          gameId,
-          0,
-          entryMode === "single" ? "single_block" : "multiple_blocks",
-          gameState.currentRound
-        );
+        await addScoreEntry(player.id, gameId, 0, gameState.currentRound);
 
         // Update context
         dispatch(updatePlayerAction(updatedPlayer));
@@ -331,7 +322,7 @@ export function ScoreEntryModal({
 
         // Close modal
         onClose();
-        setBlockValue("");
+        setPointsValue("");
 
         // Story 4.2: Check for elimination using checkElimination() - ROUND-SPECIFIC
         const shouldEliminate = checkElimination(newConsecutiveMisses);
@@ -386,9 +377,8 @@ export function ScoreEntryModal({
         throw new Error("Invalid player or game data");
       }
 
-      // Calculate score using game rules
-      const blocks = entryMode === "single" ? [value] : Array(value).fill(1);
-      const score = calculateScore(blocks, entryMode === "multiple");
+      // Input is the points to add
+      const score = value;
 
       // Calculate new score
       let newScore = player.current_score + score;
@@ -419,13 +409,7 @@ export function ScoreEntryModal({
       });
 
       // Save score entry to database
-      await addScoreEntry(
-        player.id,
-        gameId,
-        score,
-        entryMode === "single" ? "single_block" : "multiple_blocks",
-        gameState.currentRound
-      );
+      await addScoreEntry(player.id, gameId, score, gameState.currentRound);
 
       // Update context (this also marks player as having scored this round)
       dispatch(addScoreAction(player.id, score));
@@ -440,7 +424,7 @@ export function ScoreEntryModal({
         triggerCompletion();
         // Close modal first
         onClose();
-        setBlockValue("");
+        setPointsValue("");
         setIsSubmitting(false);
         // Story 5.1: Navigate to winner screen automatically (AC: 2, 4)
         // Use replace to prevent going back to game screen
@@ -453,7 +437,7 @@ export function ScoreEntryModal({
 
       // Close modal
       onClose();
-      setBlockValue("");
+      setPointsValue("");
     } catch (error) {
       console.error("Failed to record score:", error);
 
@@ -480,8 +464,7 @@ export function ScoreEntryModal({
   };
 
   const handleClose = () => {
-    setBlockValue("");
-    setEntryMode("single");
+    setPointsValue("");
     onClose();
   };
 
@@ -499,150 +482,72 @@ export function ScoreEntryModal({
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 24}
       >
         <View className="flex-1 bg-black/50 dark:bg-black/70 justify-center items-center p-5">
-          <ScrollView
-            keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="on-drag"
-            contentContainerStyle={{
-              flexGrow: 1,
-              justifyContent: "center",
-              paddingVertical: 24,
-            }}
-            showsVerticalScrollIndicator={false}
-          >
-            <ThemedView className="bg-white dark:bg-stone-800 rounded-2xl p-6 w-full max-w-[400px] shadow-elevated">
-              <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50">
-                Enter Score for {player.name}
-              </Text>
+          <ThemedView className="bg-white dark:bg-stone-800 rounded-2xl p-6 w-full max-w-[400px] shadow-elevated">
+            <Text className="text-2xl font-sans-semibold mb-2 text-stone-900 dark:text-stone-50">
+              Enter Score for {player.name}
+            </Text>
 
-              <Text className="text-base font-sans mb-6 opacity-70 text-stone-600 dark:text-stone-400">
-                Current Score: {player.current_score}
-              </Text>
+            <Text className="text-base font-sans mb-4 opacity-70 text-stone-600 dark:text-stone-400">
+              Current Score: {player.current_score}
+            </Text>
 
-              <View className="flex-row gap-3 mb-4">
-                <TouchableOpacity
-                  className={`flex-1 py-3 px-4 rounded-button border-2 items-center ${
-                    Platform.OS === "ios"
-                      ? "min-h-[44px]"
-                      : Platform.OS === "android"
-                      ? "min-h-[48px]"
-                      : "min-h-[44px]"
-                  } justify-center ${
-                    entryMode === "single"
-                      ? "border-primary bg-primary dark:bg-primary-bright dark:border-primary-bright"
-                      : "border-gray-border dark:border-stone-600"
-                  }`}
-                  onPress={() => setEntryMode("single")}
-                  accessibilityLabel="Single block mode"
-                  accessibilityRole="button"
-                >
-                  <Text
-                    className={`text-base font-sans-semibold ${
-                      entryMode === "single"
-                        ? "text-white"
-                        : "text-primary dark:text-primary-bright"
-                    }`}
-                  >
-                    Single Block
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`flex-1 py-3 px-4 rounded-button border-2 items-center ${
-                    Platform.OS === "ios"
-                      ? "min-h-[44px]"
-                      : Platform.OS === "android"
-                      ? "min-h-[48px]"
-                      : "min-h-[44px]"
-                  } justify-center ${
-                    entryMode === "multiple"
-                      ? "border-primary bg-primary dark:bg-primary-bright dark:border-primary-bright"
-                      : "border-gray-border dark:border-stone-600"
-                  }`}
-                  onPress={() => setEntryMode("multiple")}
-                  accessibilityLabel="Multiple blocks mode"
-                  accessibilityRole="button"
-                >
-                  <Text
-                    className={`text-base font-sans-semibold ${
-                      entryMode === "multiple"
-                        ? "text-white"
-                        : "text-primary dark:text-primary-bright"
-                    }`}
-                  >
-                    Multiple Blocks
-                  </Text>
-                </TouchableOpacity>
-              </View>
+            <TextInput
+              ref={inputRef}
+              className={`border border-gray-border-medium dark:border-stone-600 rounded-button px-4 ${
+                Platform.OS === "ios"
+                  ? "py-3 min-h-[44px]"
+                  : Platform.OS === "android"
+                  ? "py-3.5 min-h-[48px]"
+                  : "py-3 min-h-[44px]"
+              } text-xl font-sans text-center mb-6 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50`}
+              placeholder="New points"
+              placeholderTextColor="#78716C"
+              value={pointsValue}
+              onChangeText={setPointsValue}
+              keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
+              returnKeyType="done"
+              onSubmitEditing={handleSubmit}
+              accessibilityLabel="New points input"
+            />
 
-              <Text className="text-base font-sans mb-4 opacity-70 text-stone-600 dark:text-stone-400">
-                {entryMode === "single"
-                  ? "Enter the block number (e.g., 12 = 12 points)"
-                  : "Enter the number of blocks (e.g., 3 blocks = 3 points)"}
-              </Text>
-
-              <TextInput
-                ref={inputRef}
-                className={`border border-gray-border-medium dark:border-stone-600 rounded-button px-4 ${
+            <View className="flex-row gap-3">
+              <TouchableOpacity
+                className={`flex-1 ${
                   Platform.OS === "ios"
-                    ? "py-3 min-h-[44px]"
+                    ? "py-3.5 min-h-[44px]"
                     : Platform.OS === "android"
-                    ? "py-3.5 min-h-[48px]"
-                    : "py-3 min-h-[44px]"
-                } text-2xl font-sans text-center mb-6 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50`}
-                placeholder={
-                  entryMode === "single" ? "Block number" : "Number of blocks"
-                }
-                placeholderTextColor="#78716C"
-                value={blockValue}
-                onChangeText={setBlockValue}
-                keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
-                returnKeyType="done"
-                onSubmitEditing={handleSubmit}
-                accessibilityLabel={
-                  entryMode === "single"
-                    ? "Block number input"
-                    : "Number of blocks input"
-                }
-              />
-
-              <View className="flex-row gap-3">
-                <TouchableOpacity
-                  className={`flex-1 ${
-                    Platform.OS === "ios"
-                      ? "py-3.5 min-h-[44px]"
-                      : Platform.OS === "android"
-                      ? "py-4 min-h-[48px]"
-                      : "py-3.5 min-h-[44px]"
-                  } rounded-button items-center justify-center bg-gray-bg-light dark:bg-stone-700`}
-                  onPress={handleClose}
-                  accessibilityLabel="Cancel"
-                  accessibilityRole="button"
-                >
-                  <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">
-                    Cancel
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`flex-1 ${
-                    Platform.OS === "ios"
-                      ? "py-3.5 min-h-[44px]"
-                      : Platform.OS === "android"
-                      ? "py-4 min-h-[48px]"
-                      : "py-3.5 min-h-[44px]"
-                  } rounded-button items-center justify-center bg-primary dark:bg-primary-bright ${
-                    isSubmitting ? "opacity-60" : ""
-                  } shadow-elevated`}
-                  onPress={handleSubmit}
-                  disabled={isSubmitting}
-                  accessibilityLabel="Submit score"
-                  accessibilityRole="button"
-                >
-                  <Text className="text-white text-base font-sans-semibold">
-                    {isSubmitting ? "Submitting..." : "Submit"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </ThemedView>
-          </ScrollView>
+                    ? "py-4 min-h-[48px]"
+                    : "py-3.5 min-h-[44px]"
+                } rounded-button items-center justify-center bg-gray-bg-light dark:bg-stone-700`}
+                onPress={handleClose}
+                accessibilityLabel="Cancel"
+                accessibilityRole="button"
+              >
+                <Text className="text-primary dark:text-primary-bright text-base font-sans-semibold">
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className={`flex-1 ${
+                  Platform.OS === "ios"
+                    ? "py-3.5 min-h-[44px]"
+                    : Platform.OS === "android"
+                    ? "py-4 min-h-[48px]"
+                    : "py-3.5 min-h-[44px]"
+                } rounded-button items-center justify-center bg-primary dark:bg-primary-bright ${
+                  isSubmitting ? "opacity-60" : ""
+                } shadow-elevated`}
+                onPress={handleSubmit}
+                disabled={isSubmitting}
+                accessibilityLabel="Submit score"
+                accessibilityRole="button"
+              >
+                <Text className="text-white text-base font-sans-semibold">
+                  {isSubmitting ? "Submitting..." : "Submit"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </ThemedView>
         </View>
       </KeyboardAvoidingView>
     </Modal>

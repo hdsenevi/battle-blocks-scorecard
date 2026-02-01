@@ -762,7 +762,6 @@ describe("Database Service - Status Filtering Functions", () => {
         player_id: 1,
         game_id: 1,
         score_value: 5,
-        entry_type: "single_block",
         round_number: 1,
         created_at: 2000,
       };
@@ -864,7 +863,6 @@ describe("Database Service - Status Filtering Functions", () => {
           player_id: 1,
           game_id: 1,
           score_value: 5,
-          entry_type: "single_block",
           round_number: 1,
           created_at: 1000,
         },
@@ -873,7 +871,6 @@ describe("Database Service - Status Filtering Functions", () => {
           player_id: 2,
           game_id: 1,
           score_value: 3,
-          entry_type: "multiple_blocks",
           round_number: 1,
           created_at: 2000,
         },

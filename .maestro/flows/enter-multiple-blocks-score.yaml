@@ -108,7 +108,6 @@ appId: au.com.sodamade.battleblocksscorecard
 - assertVisible: "Alice, Score: 3"
 
 # AC7: Haptic feedback is triggered (verified by successful submission)
-# AC5: Score entry saved with entry_type="multiple_blocks" (verified by database save)
 
 # AC11: Test UI clarity - verify switching back to single block mode shows correct instructions
 - tapOn:
@@ -179,7 +178,6 @@ appId: au.com.sodamade.battleblocksscorecard
 # - AC2: Multiple Blocks mode selection and block count input ✓
 # - AC3: Score calculated as count of blocks ✓
 # - AC4: Score added to player total ✓
-# - AC5: Saved with entry_type="multiple_blocks" ✓
 # - AC6: Score update appears instantly ✓
 # - AC7: Haptic feedback triggered ✓
 # - AC8: Main game screen updates ✓
