@@ -15,6 +15,7 @@ import { Game, Player } from "@/database/types";
 // Mock expo-router
 const mockReplace = jest.fn();
 const mockSetOptions = jest.fn();
+const mockReset = jest.fn();
 
 const mockRouter = {
   replace: mockReplace,
@@ -22,6 +23,7 @@ const mockRouter = {
 
 const mockNavigation = {
   setOptions: mockSetOptions,
+  reset: mockReset,
 };
 
 jest.mock("expo-router", () => ({
@@ -163,7 +165,10 @@ describe("WinnerScreen (Story 5.1)", () => {
       render(<WinnerScreen />, { wrapper });
 
       await waitFor(() => {
-        expect(mockReplace).toHaveBeenCalledWith("/(tabs)");
+        expect(mockReset).toHaveBeenCalledWith({
+          index: 0,
+          routes: [{ name: "(tabs)" }],
+        });
       });
     });
 
@@ -173,7 +178,10 @@ describe("WinnerScreen (Story 5.1)", () => {
       render(<WinnerScreen />, { wrapper });
 
       await waitFor(() => {
-        expect(mockReplace).toHaveBeenCalledWith("/(tabs)");
+        expect(mockReset).toHaveBeenCalledWith({
+          index: 0,
+          routes: [{ name: "(tabs)" }],
+        });
       });
     });
   });
@@ -327,7 +335,10 @@ describe("WinnerScreen (Story 5.1)", () => {
         fireEvent.press(newGameButton);
       });
 
-      expect(mockReplace).toHaveBeenCalledWith("/(tabs)");
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "(tabs)" }],
+      });
     });
   });
 
@@ -625,7 +636,10 @@ describe("WinnerScreen (Story 5.1)", () => {
           fireEvent.press(newGameButton);
         });
 
-        expect(mockReplace).toHaveBeenCalledWith("/(tabs)");
+        expect(mockReset).toHaveBeenCalledWith({
+          index: 0,
+          routes: [{ name: "(tabs)" }],
+        });
       });
     });
   });
@@ -674,7 +688,7 @@ describe("WinnerScreen (Story 5.1)", () => {
 
       // Should navigate away or show error state
       await waitFor(() => {
-        expect(mockReplace).toHaveBeenCalled();
+        expect(mockReset).toHaveBeenCalled();
       }, { timeout: 3000 });
     });
 
@@ -685,7 +699,10 @@ describe("WinnerScreen (Story 5.1)", () => {
       render(<WinnerScreen />, { wrapper });
 
       await waitFor(() => {
-        expect(mockReplace).toHaveBeenCalledWith("/(tabs)");
+        expect(mockReset).toHaveBeenCalledWith({
+          index: 0,
+          routes: [{ name: "(tabs)" }],
+        });
       });
     });
   });
